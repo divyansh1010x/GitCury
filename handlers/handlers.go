@@ -98,14 +98,14 @@ func CommitPreparedFilesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for file, message := range commitMessages {
-		utils.Debug("Adding file to commit: " + file)
+		// utils.Debug("Adding file to commit: " + file)
 		if _, err := git.RunGitCmd("add", file); err != nil {
 			utils.Error("Failed to add file to commit: " + err.Error())
 			http.Error(w, "Failed to add file to commit: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		utils.Debug("Committing file: " + file + " with message: " + message)
+		// utils.Debug("Committing file: " + file + " with message: " + message)
 		if _, err := git.RunGitCmd("commit", "-m", message); err != nil {
 			utils.Error("Failed to commit file: " + err.Error())
 			http.Error(w, "Failed to commit file: "+err.Error(), http.StatusInternalServerError)
