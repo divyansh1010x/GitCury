@@ -109,6 +109,8 @@ func GenCommitMessage(file string) (string, error) {
 		"type": fileType,
 	}
 
+	utils.Debug("Diff for file '" + file + "':\n" + output)
+
 	apiKey := config.Get("GEMINI_API_KEY")
 	if apiKey == "" {
 		apiKey = os.Getenv("GEMINI_API_KEY")
