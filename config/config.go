@@ -23,6 +23,7 @@ func LoadConfig() {
 		settings = map[string]interface{}{
 			"app_name": "GitCury",
 			"version":  "1.0.0",
+			"root_folders": []string{"."},
 		}
 		utils.Error("Config file not found. Using default settings: \n" + utils.ToJSON(settings))
 		return
