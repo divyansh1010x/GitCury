@@ -36,6 +36,11 @@ func GetAllChangedFiles(dir string) ([]string, error) {
 		return nil, err
 	}
 
+	if strings.TrimSpace(output) == "" {
+		utils.Info("No changed files detected in directory: " + dir)
+		return nil, nil
+	}
+
 	var changedFiles []string
 	lines := strings.Split(output, "\n")
 	cacheMu.Lock()
