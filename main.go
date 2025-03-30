@@ -17,8 +17,9 @@ func main() {
 	})
 
 	router.HandleFunc("/config", handlers.ConfigHandler).Methods("POST");
-	router.HandleFunc("/getmessages",handlers.PrepareCommitMessagesHandler).Methods("POST");
-	router.HandleFunc("/commit",handlers.CommitPreparedFilesHandler).Methods("POST");
+	router.HandleFunc("/getmessages",handlers.PrepareCommitMessagesHandler).Methods("GET");
+	router.HandleFunc("/commit",handlers.CommitAllFiles).Methods("GET");
+	router.HandleFunc("/commit",handlers.CommitFolder).Methods("POST");
 	
 	utils.Info("Starting server on :8080")
 	http.ListenAndServe(":8080", router)
