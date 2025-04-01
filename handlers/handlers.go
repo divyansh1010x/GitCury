@@ -13,20 +13,35 @@ import (
 )
 
 func ConfigHandler(w http.ResponseWriter, r *http.Request) {
-	var settings map[string]interface{}
-
-	if err := json.NewDecoder(r.Body).Decode(&settings); err != nil {
-		utils.Error("Error decoding request: " + err.Error())
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	if r.Method == http.MethodGet {
+		// Handle GET request to return the current configuration
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(config.GetAll())
 		return
 	}
 
-	for key, value := range settings {
-		utils.Info("Setting " + key + " to " + fmt.Sprintf("%v", value))
-		config.Set(key, value)
+	if r.Method == http.MethodPost {
+		// Handle POST request to update the configuration
+		var settings map[string]interface{}
+
+		if err := json.NewDecoder(r.Body).Decode(&settings); err != nil {
+			utils.Error("Error decoding request: " + err.Error())
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		for key, value := range settings {
+			utils.Info("Setting " + key + " to " + fmt.Sprintf("%v", value))
+			config.Set(key, value)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(config.GetAll())
+		return
 	}
 
-	json.NewEncoder(w).Encode(config.GetAll())
+	// Handle unsupported methods
+	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 }
 
 func PrepareCommitMessagesHandler(w http.ResponseWriter, r *http.Request) {
