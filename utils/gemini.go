@@ -66,6 +66,7 @@ func SendToGemini(contextData map[string]string, apiKey string) (string, error) 
 	}
 
 	respMessage := fmt.Sprintf(`%s`, resp.Candidates[0].Content.Parts[0])
+	Debug("Response message: " + respMessage)
 
 	var result map[string]string
 	err = json.Unmarshal([]byte(respMessage), &result)
