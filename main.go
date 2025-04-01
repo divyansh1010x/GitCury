@@ -16,6 +16,7 @@ func main() {
 		fmt.Fprintln(w, "Welcome to GitCury!")
 	})
 
+	router.HandleFunc("/config", handlers.ConfigHandler).Methods("GET");
 	router.HandleFunc("/config", handlers.ConfigHandler).Methods("POST");
 	router.HandleFunc("/getmessages",handlers.PrepareCommitMessagesHandler).Methods("GET");
 	router.HandleFunc("/commit",handlers.CommitAllFiles).Methods("GET");
