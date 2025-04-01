@@ -22,7 +22,7 @@ func ListFiles(directory string) ([]string, error) {
 	return files, nil
 }
 
-func ToJSON(data map[string]interface{}) string {
+func ToJSON(data interface{}) string {
 	jsonData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		Error("Error marshalling data: " + err.Error())
