@@ -36,9 +36,32 @@ func SendToGemini(contextData map[string]string, apiKey string) (string, error) 
 	model := client.GenerativeModel("gemini-2.0-flash")
 	model.SetTemperature(0.5)
 	model.SetMaxOutputTokens(100)
-	model.SystemInstruction = genai.NewUserContent(genai.Text("Generate and return only a commit message for the following diff as json with key - 'message'. Make the message short and specific to this project (root folder). Pay attention to type of file. "))
 	model.ResponseMIMEType = "application/json"
-	prompt := `file: "` + contextData["file"] + `"\n` + `type: "` + contextData["type"] + `"` + `",\n\n diff: "` + contextData["diff"] + `"`
+	model.SystemInstruction = genai.NewUserContent(genai.Text(`
+	Generate and return only a commit message as JSON with the key "message".
+	Follow these guidelines for the commit message:
+	• Capitalize the first word, omit final punctuation. If using conventional commits, use lowercase for the commit type.
+	• Use imperative mood in the subject line.
+	• Include a commit type (e.g. fix, update, refactor, bump).
+	• Limit the first line to ≤ 50 characters, subsequent lines ≤ 72.
+	• Be concise and direct; avoid filler words.
+
+	The commit type can include the following:
+	feat – a new feature
+	fix – a bug fix
+	chore – non-source changes
+	refactor – refactored code
+	docs – documentation updates
+	style – formatting changes
+	test – tests
+	perf – performance improvements
+	ci – continuous integration
+	build – build system changes
+	revert – revert a previous commit
+	`))
+
+	prompt := `file: "` + contextData["file"] + `"\n` +
+		`type: "` + contextData["type"] + `",\n\n diff: "` + contextData["diff"] + `"`
 
 	var resp *genai.GenerateContentResponse
 	for retries := 0; retries < maxRetries; retries++ {
