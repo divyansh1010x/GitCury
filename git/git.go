@@ -246,13 +246,13 @@ func CommitBatch(rootFolder output.Folder) error {
 	return nil
 }
 
-func PushBranch(rootFolder output.Folder, branch string) error {
+func PushBranch(rootFolderName string, branch string) error {
 	if branch == "" {
 		branch = "main"
 	}
 
-	utils.Debug("Pushing branch: " + branch + " in folder: " + rootFolder.Name)
-	if _, err := RunGitCmd(rootFolder.Name, "push", "origin", branch); err != nil {
+	utils.Debug("Pushing branch: " + branch + " in folder: " + rootFolderName)
+	if _, err := RunGitCmd(rootFolderName, "push", "origin", branch); err != nil {
 		utils.Error("Failed to push branch: " + err.Error())
 		return fmt.Errorf("failed to push branch: %s", err.Error())
 	}
