@@ -228,13 +228,13 @@ func CommitBatch(rootFolder output.Folder) error {
 	}
 	for _, commit := range commitMessagesList {
 		utils.Debug("Adding file to commit: " + commit.Name)
-		if _, err := RunGitCmd(rootFolder.Name ,"add", commit.Name); err != nil {
+		if _, err := RunGitCmd(rootFolder.Name, "add", commit.Name); err != nil {
 			utils.Error("Failed to add file to commit: " + err.Error())
 			return fmt.Errorf("failed to add file to commit: %s", err.Error())
 		}
 
 		utils.Debug("Committing file: " + commit.Name + " with message: " + commit.Message)
-		if _, err := RunGitCmd(rootFolder.Name ,"commit", "-m", commit.Message); err != nil {
+		if _, err := RunGitCmd(rootFolder.Name, "commit", "-m", commit.Message); err != nil {
 			utils.Error("Failed to commit file: " + err.Error())
 			return fmt.Errorf("failed to commit file: %s", err.Error())
 		}
@@ -243,5 +243,20 @@ func CommitBatch(rootFolder output.Folder) error {
 	}
 
 	utils.Info("Batch commit completed successfully")
+	return nil
+}
+
+func PushBranch(rootFolder output.Folder, branch string) error {
+	if branch == "" {
+		branch = "main"
+	}
+
+	utils.Debug("Pushing branch: " + branch + " in folder: " + rootFolder.Name)
+	if _, err := RunGitCmd(rootFolder.Name, "push", "origin", branch); err != nil {
+		utils.Error("Failed to push branch: " + err.Error())
+		return fmt.Errorf("failed to push branch: %s", err.Error())
+	}
+
+	utils.Info("Branch pushed successfully")
 	return nil
 }
