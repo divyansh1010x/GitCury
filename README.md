@@ -9,113 +9,163 @@
 [![Contributors](https://img.shields.io/github/contributors/lakshyajain-0291/GitCury)](https://github.com/lakshyajain-0291/GitCury/graphs/contributors)
 [![Forks](https://img.shields.io/github/forks/lakshyajain-0291/GitCury?style=social)](https://github.com/lakshyajain-0291/GitCury/network/members)
 [![Stars](https://img.shields.io/github/stars/lakshyajain-0291/GitCury?style=social)](https://github.com/lakshyajain-0291/GitCury/stargazers)
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/lakshyajain-0291/GitCury)
-[![License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/lakshyajain-0291/GitCury/blob/main/LICENSE)
-
-*Automate Git Commit Messages with AI-Powered Suggestions*
-
-[Features](#key-features) • [Installation](#installation) • [Usage](#usage) • [Contributing](#contribution)
 
 </div>
 
-## 🌟 Overview
+## Overview
 
-**GitCury** is a Go-based tool designed to streamline your Git workflow by automating commit message generation. Powered by the GEMINI API, GitCury analyzes file changes and generates concise, project-specific commit messages.
+GitCury is a Go-based tool that automates Git commit message generation using the Gemini API. It not only streamlines your commit process but now leverages a configurable set of root folders to limit Git operations to specific areas of your file system. This means that the output commit messages are grouped by the designated root folders in the generated `output.json`.
 
-## 🚀 Key Features
+## Key Features
 
-- 🤖 **AI-Powered Commit Messages**: Generate meaningful commit messages using the GEMINI API.
-- 📂 **File-Specific Suggestions**: Tailored messages based on file type and changes.
-- 🔄 **Batch Commit Preparation**: Prepare multiple files for commit in one go.
-- ⚙️ **Configurable Settings**: Easily customize the number of files to process and other parameters.
-- 🛠️ **Seamless Git Integration**: Works directly with your Git repository.
+- **AI-Powered Commit Messages**  
+  Generate meaningful commit messages using the Gemini API. Messages are created based on file changes and differences.
 
-## 🌈 Why GitCury?
+- **Root Folder Filtering**  
+  Configure multiple root folders in the `config.json` so that Git operations are scoped to specific directories. This is ideal when working on multi-repository projects or segmented codebases.
 
-- **Efficiency**: Save time by automating commit message creation.
-- **Consistency**: Ensure uniform and meaningful commit messages.
-- **Flexibility**: Easily configurable for different workflows.
-- **Integration**: Works seamlessly with existing Git commands.
+- **Grouped Output**  
+  Commit messages are stored in `output.json` grouped by root folder. The structure looks like:  
+  ```
+  {
+    "root_folder1": {
+      "file1": "commit message",
+      "file2": "commit message"
+    },
+    "root_folder2": {
+      "file3": "commit message",
+      "file4": "commit message"
+    },
+    ...
+  }
+  ```
 
-## 📋 Prerequisites
+- **Batch and Single-File Operations**  
+  Prepare, commit, and push operations can be performed either in batch (all root folders) or on specific folders.
 
-- Go (1.24.1 or higher)
-- GEMINI API Key
-- Git
+- **Configurable Parameters**  
+  Easily update configuration settings (such as the number of files to commit and the root folders) via a simple API endpoint.
 
-## 🔧 Installation
+## Installation
 
 <details>
 <summary>Step-by-step guide</summary>
 
-1. Clone the repository:
-```bash
-git clone https://github.com/lakshyajain-0291/GitCury.git
-cd GitCury
-```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/lakshyajain-0291/GitCury.git
+   cd GitCury
+   ```
 
-2. Set up GEMINI API Key:
-```bash
-# Add your API key to config.json
-echo '{"GEMINI_API_KEY":"YOUR_API_KEY"}' > config.json
-```
+2. **Set up the configuration:**  
+   Edit the `config.json` file to update your GEMINI API key and list the root folders where Git operations should take place. An example configuration:
+   ```json
+   {
+     "GEMINI_API_KEY": "YOUR_API_KEY",
+     "app_name": "GitCury",
+     "numFilesToCommit": 5,
+     "root_folders": [
+       "/path/to/folder1",
+       "/path/to/folder2"
+     ],
+     "version": "1.0.0"
+   }
+   ```
 
-3. Build the project:
-```bash
-go build -o gitcury main.go
-```
+3. **Build the project:**
+   ```bash
+   go build -o gitcury main.go
+   ```
 
-4. Run the application:
-```bash
-./gitcury
-```
+4. **Run the application:**
+   ```bash
+   ./gitcury
+   ```
 </details>
 
-## 🎮 Usage
+## Usage & API Endpoints
 
-- **Start the server**:
-    ```bash
-    go run main.go
-    ```
-- **Prepare commit messages**:
-    Send a POST request to `/getmessages` with the number of files to process.
-- **Commit prepared files**:
-    Send a POST request to `/commit` to commit files with generated messages.
-- **Update configuration**:
-    Send a POST request to `/config` with new settings.
+- **Server Startup:**  
+  Start the server using:
+  ```bash
+  go run main.go
+  ```
+  The server listens on port 8080.
 
-## 🔑 Example Workflow
+- **Update / Retrieve Configuration:**  
+  - **GET /config:** Returns the current configuration.
+  - **POST /config:** Updates configuration settings (including root folders).
 
-1. Start the server:
-     ```bash
-     go run main.go
-     ```
-2. Prepare commit messages for changed files:
-     ```bash
-     curl -X POST http://localhost:8080/getmessages -d '{"numFilesToCommit": 5}'
-     ```
-3. Commit the prepared files:
-     ```bash
-     curl -X POST http://localhost:8080/commit
-     ```
+- **Prepare Commit Messages:**  
+  - **GET /getallmsgs:** Prepares commit messages for all configured root folders.  
+  - **GET /getonemsgs?rootFolder=/path/to/folder:** Prepares commit messages for a specific root folder.
 
-## 🤝 Contributing
+- **Commit Operations:**  
+  - **GET /commitall:** Commits files from all grouped folders as per the generated messages.
+  - **GET /commitone?rootFolder=/path/to/folder:** Commits files for a single root folder.
 
-Contributions are welcome! Here's how you can help:
+- **Push Operations:**  
+  - **GET /pushall?branch=branchName:** Pushes all committed changes to the specified branch.
+  - **GET /pushone?rootFolder=/path/to/folder&branch=branchName:** Pushes changes from a specific root folder.
+
+## Example Workflow
+
+1. **Start the server:**
+   ```bash
+   go run main.go
+   ```
+
+2. **Prepare commit messages for changed files across all root folders:**
+   ```bash
+   curl -X GET http://localhost:8080/getallmsgs
+   ```
+   or for a single folder:
+   ```bash
+   curl -X GET "http://localhost:8080/getonemsgs?rootFolder=/path/to/folder"
+   ```
+
+3. **Commit the prepared files:**
+   To commit all folders:
+   ```bash
+   curl -X GET http://localhost:8080/commitall
+   ```
+   or to commit one folder:
+   ```bash
+   curl -X GET "http://localhost:8080/commitone?rootFolder=/path/to/folder"
+   ```
+
+4. **Push the commits:**
+   For all folders:
+   ```bash
+   curl -X GET "http://localhost:8080/pushall?branch=main"
+   ```
+   For a specific folder:
+   ```bash
+   curl -X GET "http://localhost:8080/pushone?rootFolder=/path/to/folder&branch=main"
+   ```
+
+## Contributing
+
+Contributions are welcome! To contribute:
 
 1. Fork the repository.
-2. Create a feature branch (`git checkout -b feature/NewFeature`).
-3. Commit your changes (`git commit -m 'Add new feature'`).
-4. Push to the branch (`git push origin feature/NewFeature`).
-5. Open a Pull Request.
+2. Create a feature branch:
+   ```bash
+   git checkout -b feature/NewFeature
+   ```
+3. Make your changes and commit them:
+   ```bash
+   git commit -m 'Add new feature'
+   ```
+4. Push your branch and open a Pull Request.
 
-## 📜 License
+## License
 
-GitCury is open-source, released under the MIT License. See `LICENSE` for details.
+GitCury is open-source, released under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
-- GEMINI API for AI-powered commit message generation.
-- Open-source community for inspiration and support.
+- Gemini API for AI-powered commit message generation.
+- The open source community for continuous support and inspiration.
 
-**Happy coding!** 🚀  
+Happy coding! 🚀
