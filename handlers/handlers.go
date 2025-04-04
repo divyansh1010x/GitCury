@@ -251,10 +251,10 @@ func PushAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rootFolders := output.GetAll().Folders
-	if len(rootFolders) == 0 {
-		utils.Error("No root folders found")
-		http.Error(w, "No root folders found", http.StatusNotFound)
+	rootFolders, ok := config.Get("root_folders").([]interface{})
+	if !ok {
+		utils.Error("Invalid or missing root_folders configuration")
+		http.Error(w, "Invalid or missing root_folders configuration", http.StatusInternalServerError)
 		return
 	}
 
@@ -263,21 +263,27 @@ func PushAll(w http.ResponseWriter, r *http.Request) {
 	var errors []string
 
 	for _, rootFolder := range rootFolders {
+		rootFolderStr, ok := rootFolder.(string)
+		if !ok {
+			utils.Error("Invalid root folder type")
+			continue
+		}
+
 		rootFolderWg.Add(1)
 
-		go func(rootFolder output.Folder) {
+		go func(folder string) {
 			defer rootFolderWg.Done()
-			utils.Debug("Root folder to push: " + rootFolder.Name)
+			utils.Debug("Root folder to push: " + folder)
 
-			err := git.PushBranch(rootFolder, branchName)
+			err := git.PushBranch(folder, branchName)
 			if err != nil {
 				utils.Error("Failed to push branch: " + err.Error())
 				mu.Lock()
-				errors = append(errors, fmt.Sprintf("Folder: %s, Error: %s", rootFolder.Name, err.Error()))
+				errors = append(errors, fmt.Sprintf("Folder: %s, Error: %s", folder, err.Error()))
 				mu.Unlock()
 				return
 			}
-		}(rootFolder)
+		}(rootFolderStr)
 	}
 
 	rootFolderWg.Wait()
@@ -306,14 +312,7 @@ func PushOne(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rootFolder := output.GetAllFiles(rootFolderName)
-	if len(rootFolder.Files) == 0 {
-		utils.Error("Root folder not found: " + rootFolderName)
-		http.Error(w, "Root folder not found", http.StatusNotFound)
-		return
-	}
-
-	err := git.PushBranch(rootFolder, branchName)
+	err := git.PushBranch(rootFolderName, branchName)
 	if err != nil {
 		utils.Error("Failed to push branch: " + err.Error())
 		http.Error(w, "Failed to push branch", http.StatusInternalServerError)
