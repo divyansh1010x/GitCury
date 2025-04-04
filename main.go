@@ -19,11 +19,11 @@ func main() {
 	router.HandleFunc("/config", handlers.ConfigHandler).Methods("GET")
 	router.HandleFunc("/config", handlers.ConfigHandler).Methods("POST")
 	router.HandleFunc("/getallmsgs", handlers.PrepareCommitMessagesHandler).Methods("GET")
-	router.HandleFunc("/getonemsgs", handlers.PrepareCommitMessagesOne).Methods("Get")
+	router.HandleFunc("/getonemsgs", handlers.PrepareCommitMessagesOne).Methods("GET")
 	router.HandleFunc("/commitall", handlers.CommitAllFiles).Methods("GET")
-	router.HandleFunc("/commitone", handlers.CommitFolder).Methods("Get")
-	router.HandleFunc("/pushall", handlers.PushAll).Methods("POST")
-	router.HandleFunc("/pushone", handlers.PushOne).Methods("POST")
+	router.HandleFunc("/commitone", handlers.CommitFolder).Methods("GET")
+	router.HandleFunc("/pushall", handlers.PushAll).Methods("GET")
+	router.HandleFunc("/pushone", handlers.PushOne).Methods("GET")
 
 	err := http.ListenAndServe(":8080", router)
 	if err != nil {
