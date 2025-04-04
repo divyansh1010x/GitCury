@@ -244,17 +244,13 @@ func CommitFolder(w http.ResponseWriter, r *http.Request) {
 }
 
 func PushAll(w http.ResponseWriter, r *http.Request) {
-	var requestBody struct {
-		BranchName string `json:"branch"`
-	}
-
-	if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil || requestBody.BranchName == "" {
-		utils.Error("Invalid or missing branch name in request body")
-		http.Error(w, "Invalid or missing branch name in request body", http.StatusBadRequest)
+	branchName := r.URL.Query().Get("branch")
+	if branchName == "" {
+		utils.Error("Missing branch name in query parameter")
+		http.Error(w, "Missing branch name in query parameter", http.StatusBadRequest)
 		return
 	}
 
-	branchName := requestBody.BranchName
 	rootFolders := output.GetAll().Folders
 	if len(rootFolders) == 0 {
 		utils.Error("No root folders found")
@@ -301,19 +297,14 @@ func PushAll(w http.ResponseWriter, r *http.Request) {
 }
 
 func PushOne(w http.ResponseWriter, r *http.Request) {
-	var requestBody struct {
-		RootFolderName string `json:"rootFolder"`
-		BranchName     string `json:"branch"`
-	}
+	rootFolderName := r.URL.Query().Get("rootFolder")
+	branchName := r.URL.Query().Get("branch")
 
-	if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil || requestBody.RootFolderName == "" || requestBody.BranchName == "" {
-		utils.Error("Invalid or missing root folder name or branch name in request body")
-		http.Error(w, "Invalid or missing root folder name or branch name in request body", http.StatusBadRequest)
+	if rootFolderName == "" || branchName == "" {
+		utils.Error("Missing root folder name or branch name in query parameters")
+		http.Error(w, "Missing root folder name or branch name in query parameters", http.StatusBadRequest)
 		return
 	}
-
-	rootFolderName := requestBody.RootFolderName
-	branchName := requestBody.BranchName
 
 	rootFolder := output.GetAllFiles(rootFolderName)
 	if len(rootFolder.Files) == 0 {
