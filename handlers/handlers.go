@@ -126,6 +126,55 @@ func PrepareCommitMessagesHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(output.GetAll())
 }
 
+func PrepareCommitMessagesOne(w http.ResponseWriter, r *http.Request) {
+	folder := r.URL.Query().Get("rootFolder")
+	if folder == "" {
+		utils.Error("Missing root folder name in query parameter")
+		http.Error(w, "Missing root folder name in query parameter", http.StatusBadRequest)
+		return
+	}
+
+	numFilesToCommit := 10 // Default value
+	if configValue := config.Get("numFilesToCommit"); configValue != "" {
+		if configValueFloat, ok := configValue.(float64); ok {
+			numFilesToCommit = int(configValueFloat)
+		}
+	}
+
+	utils.Debug("Number of files to prepare commit messages for: " + strconv.Itoa(numFilesToCommit))
+
+	utils.Debug("Root folder to get messages : " + folder)
+
+	changedFiles, err := git.GetAllChangedFiles(folder)
+	if err != nil {
+		utils.Error("Failed to get changed files: " + err.Error())
+		http.Error(w, "Failed to get changed files", http.StatusInternalServerError)
+		return
+	}
+
+	if len(changedFiles) == 0 {
+		utils.Info("No changed files found")
+		return
+	}
+
+	if len(changedFiles) > numFilesToCommit {
+		changedFiles = changedFiles[:numFilesToCommit]
+	}
+
+	utils.Debug("Total files to process: " + strconv.Itoa(len(changedFiles)))
+
+	err = git.BatchProcessGetMessages(changedFiles, folder)
+	if err != nil {
+		utils.Error("Batch processing failed: " + err.Error())
+		http.Error(w, "Batch processing failed", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(output.GetAllFiles(folder))
+}
+
 func CommitAllFiles(w http.ResponseWriter, r *http.Request) {
 	rootFolders := output.GetAll().Folders
 
@@ -169,17 +218,12 @@ func CommitAllFiles(w http.ResponseWriter, r *http.Request) {
 }
 
 func CommitFolder(w http.ResponseWriter, r *http.Request) {
-	var requestBody struct {
-		RootFolderName string `json:"rootFolder"`
-	}
-
-	if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil || requestBody.RootFolderName == "" {
-		utils.Error("Invalid or missing root folder name in request body")
-		http.Error(w, "Invalid or missing root folder name in request body", http.StatusBadRequest)
+	rootFolderName := r.URL.Query().Get("rootFolder")
+	if rootFolderName == "" {
+		utils.Error("Missing root folder name in query parameter")
+		http.Error(w, "Missing root folder name in query parameter", http.StatusBadRequest)
 		return
 	}
-
-	rootFolderName := requestBody.RootFolderName
 
 	rootFolder := output.GetAllFiles(rootFolderName)
 	if len(rootFolder.Files) == 0 {
@@ -197,4 +241,94 @@ func CommitFolder(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Files committed successfully"))
+}
+
+func PushAll(w http.ResponseWriter, r *http.Request) {
+	var requestBody struct {
+		BranchName string `json:"branch"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil || requestBody.BranchName == "" {
+		utils.Error("Invalid or missing branch name in request body")
+		http.Error(w, "Invalid or missing branch name in request body", http.StatusBadRequest)
+		return
+	}
+
+	branchName := requestBody.BranchName
+	rootFolders := output.GetAll().Folders
+	if len(rootFolders) == 0 {
+		utils.Error("No root folders found")
+		http.Error(w, "No root folders found", http.StatusNotFound)
+		return
+	}
+
+	var rootFolderWg sync.WaitGroup
+	var mu sync.Mutex
+	var errors []string
+
+	for _, rootFolder := range rootFolders {
+		rootFolderWg.Add(1)
+
+		go func(rootFolder output.Folder) {
+			defer rootFolderWg.Done()
+			utils.Debug("Root folder to push: " + rootFolder.Name)
+
+			err := git.PushBranch(rootFolder, branchName)
+			if err != nil {
+				utils.Error("Failed to push branch: " + err.Error())
+				mu.Lock()
+				errors = append(errors, fmt.Sprintf("Folder: %s, Error: %s", rootFolder.Name, err.Error()))
+				mu.Unlock()
+				return
+			}
+		}(rootFolder)
+	}
+
+	rootFolderWg.Wait()
+	if len(errors) > 0 {
+		utils.Error("Errors occurred during push operation")
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"message": "Errors occurred during push operation",
+			"errors":  errors,
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("All folders pushed successfully"))
+}
+
+func PushOne(w http.ResponseWriter, r *http.Request) {
+	var requestBody struct {
+		RootFolderName string `json:"rootFolder"`
+		BranchName     string `json:"branch"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil || requestBody.RootFolderName == "" || requestBody.BranchName == "" {
+		utils.Error("Invalid or missing root folder name or branch name in request body")
+		http.Error(w, "Invalid or missing root folder name or branch name in request body", http.StatusBadRequest)
+		return
+	}
+
+	rootFolderName := requestBody.RootFolderName
+	branchName := requestBody.BranchName
+
+	rootFolder := output.GetAllFiles(rootFolderName)
+	if len(rootFolder.Files) == 0 {
+		utils.Error("Root folder not found: " + rootFolderName)
+		http.Error(w, "Root folder not found", http.StatusNotFound)
+		return
+	}
+
+	err := git.PushBranch(rootFolder, branchName)
+	if err != nil {
+		utils.Error("Failed to push branch: " + err.Error())
+		http.Error(w, "Failed to push branch", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Files pushed successfully"))
 }
