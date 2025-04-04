@@ -23,7 +23,7 @@ func main() {
 	router.HandleFunc("/commitall", handlers.CommitAllFiles).Methods("GET")
 	router.HandleFunc("/commitone", handlers.CommitFolder).Methods("Get")
 	router.HandleFunc("/pushall", handlers.PushAll).Methods("POST")
-	router.HandleFunc("/pushfolder", handlers.PushOne).Methods("POST")
+	router.HandleFunc("/pushone", handlers.PushOne).Methods("POST")
 
 	err := http.ListenAndServe(":8080", router)
 	if err != nil {
