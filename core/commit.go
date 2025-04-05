@@ -8,7 +8,7 @@ import (
 	"sync"
 )
 
-func CommitAllRoots() error {
+func CommitAllRoots(env ...[]string) error {
 	rootFolders := output.GetAll().Folders
 
 	var rootFolderWg sync.WaitGroup
@@ -22,7 +22,7 @@ func CommitAllRoots() error {
 			defer rootFolderWg.Done()
 			utils.Debug("Root folder to commit in: " + rootFolder.Name)
 
-			err := git.CommitBatch(rootFolder)
+			err := git.CommitBatch(rootFolder, env...)
 			if err != nil {
 				utils.Error("Failed to commit batch: " + err.Error())
 				mu.Lock()
@@ -46,14 +46,14 @@ func CommitAllRoots() error {
 	return nil
 }
 
-func CommitOneRoot(rootFolderName string) error {
+func CommitOneRoot(rootFolderName string, env ...[]string) error {
 	rootFolder := output.GetFolder(rootFolderName)
 	if len(rootFolder.Files) == 0 {
 		utils.Error("Root folder not found or has no files: " + rootFolderName)
 		return fmt.Errorf("root folder not found or has no files: %s", rootFolderName)
 	}
 
-	err := git.CommitBatch(rootFolder)
+	err := git.CommitBatch(rootFolder, env...)
 	if err != nil {
 		utils.Error("Failed to commit batch: " + err.Error())
 		return fmt.Errorf("failed to commit batch: %s", err.Error())
