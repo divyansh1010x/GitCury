@@ -13,22 +13,53 @@ import (
 	"sync"
 )
 
-func RunGitCmd(dir string, args ...string) (string, error) {
+// func RunGitCmd(dir string, args ...string) (string, error) {
+// 	cmd := exec.Command("git", args...)
+// 	cmd.Dir = dir
+
+// 	// output, err := cmd.CombinedOutput()
+// 	// if err != nil {
+// 	// 	utils.Error("Error in running command 'git " + strings.Join(args, " ") + "' in directory '" + dir + "': " + err.Error())
+// 	// 	return "", err
+// 	// }
+
+// 	var stdout, stderr bytes.Buffer
+// 	cmd.Stdout = &stdout
+// 	cmd.Stderr = &stderr
+
+// 	if err := cmd.Run(); err != nil {
+// 		utils.Error(fmt.Sprintf("Command failed: %s\nStdout: %s\nStderr: %s\n", err, stdout.String(), stderr.String()))
+// 		return "", err
+// 	}
+
+// 	utils.Info("Successfully ran git command in directory '" + dir + "': git " + strings.Join(args, " "))
+// 	return stdout.String(), nil
+// }
+
+func RunGitCmd(dir string, envVars map[string]string, args ...string) (string, error) {
 	cmd := exec.Command("git", args...)
 	cmd.Dir = dir
 
-	// output, err := cmd.CombinedOutput()
-	// if err != nil {
-	// 	utils.Error("Error in running command 'git " + strings.Join(args, " ") + "' in directory '" + dir + "': " + err.Error())
-	// 	return "", err
-	// }
+	// Append custom environment variables to the existing environment
+	if envVars != nil {
+		env := cmd.Env
+		for key, value := range envVars {
+			env = append(env, fmt.Sprintf("%s=%s", key, value))
+		}
+		cmd.Env = env
+	}
 
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 
 	if err := cmd.Run(); err != nil {
-		utils.Error(fmt.Sprintf("Command failed: %s\nStdout: %s\nStderr: %s\n", err, stdout.String(), stderr.String()))
+		utils.Error(fmt.Sprintf(
+			"Command failed: %s\nStdout: %s\nStderr: %s\n",
+			err,
+			stdout.String(),
+			stderr.String(),
+		))
 		return "", err
 	}
 
@@ -108,7 +139,7 @@ var cacheMu sync.RWMutex
 // }
 
 func GetAllChangedFiles(dir string) ([]string, error) {
-	output, err := RunGitCmd(dir, "status", "--porcelain")
+	output, err := RunGitCmd(dir, nil, "status", "--porcelain")
 	if err != nil {
 		utils.Error("Failed to get git status: " + err.Error())
 		return nil, err
@@ -161,7 +192,7 @@ func GetAllChangedFiles(dir string) ([]string, error) {
 
 		if info.IsDir() && status == "??" {
 			// List untracked, non-ignored files inside the directory
-			innerOutput, err := RunGitCmd(dir, "ls-files", "--others", "--exclude-standard", relativePath)
+			innerOutput, err := RunGitCmd(dir, nil, "ls-files", "--others", "--exclude-standard", relativePath)
 			if err != nil {
 				utils.Error("Failed to list files in untracked dir '" + relativePath + "': " + err.Error())
 				return nil, err
@@ -222,14 +253,14 @@ func GenCommitMessage(file string, dir string) (string, error) {
 	}
 
 	// Handle other file types (modified, new, etc.)
-	output, err = RunGitCmd(dir, "diff", "--", file)
+	output, err = RunGitCmd(dir, nil, "diff", "--", file)
 	if err != nil {
 		utils.Error("Error running git diff for unstaged changes in file '" + file + "': " + err.Error())
 		return "", err
 	}
 
 	if strings.TrimSpace(output) == "" {
-		output, err = RunGitCmd(dir, "diff", "--cached", "--", file)
+		output, err = RunGitCmd(dir, nil, "diff", "--cached", "--", file)
 		if err != nil {
 			utils.Error("Error running git diff for staged changes in file '" + file + "': " + err.Error())
 			return "", err
@@ -311,7 +342,7 @@ func BatchProcessGetMessages(allChangedFiles []string, rootFolder string) error 
 	return nil
 }
 
-func CommitBatch(rootFolder output.Folder) error {
+func CommitBatch(rootFolder output.Folder, env ...[]string) error {
 	commitMessagesList := rootFolder.Files
 	if len(commitMessagesList) == 0 {
 		utils.Info("No commit messages found for root folder: " + rootFolder.Name)
@@ -323,13 +354,23 @@ func CommitBatch(rootFolder output.Folder) error {
 
 	for _, commit := range commitMessagesList {
 		utils.Debug("Adding file to commit: " + commit.Name)
-		if _, err := RunGitCmd(rootFolder.Name, "add", commit.Name); err != nil {
+		envMap := make(map[string]string)
+		if len(env) > 0 {
+			for _, pair := range env[0] {
+				parts := strings.SplitN(pair, "=", 2)
+				if len(parts) == 2 {
+					envMap[parts[0]] = parts[1]
+				}
+			}
+		}
+
+		if _, err := RunGitCmd(rootFolder.Name, envMap, "add", commit.Name); err != nil {
 			utils.Error("Failed to add file to commit: " + err.Error())
 			return fmt.Errorf("failed to add file to commit: %s", err.Error())
 		}
 
 		utils.Debug("Committing file: " + commit.Name + " with message: " + commit.Message)
-		if _, err := RunGitCmd(rootFolder.Name, "commit", "-m", commit.Message); err != nil {
+		if _, err := RunGitCmd(rootFolder.Name, envMap, "commit", "-m", commit.Message); err != nil {
 			utils.Error("Failed to commit file: " + err.Error())
 			return fmt.Errorf("failed to commit file: %s", err.Error())
 		}
@@ -350,7 +391,7 @@ func PushBranch(rootFolderName string, branch string) error {
 	}
 
 	utils.Debug("Pushing branch: " + branch + " in folder: " + rootFolderName)
-	if _, err := RunGitCmd(rootFolderName, "push", "origin", branch); err != nil {
+	if _, err := RunGitCmd(rootFolderName, nil, "push", "origin", branch); err != nil {
 		utils.Error("Failed to push branch: " + err.Error())
 		return fmt.Errorf("failed to push branch: %s", err.Error())
 	}
