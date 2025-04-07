@@ -28,4 +28,7 @@ tmp/
 
 output.json
 config.json
+
+# Go executable files
+*.out.exe
 # End of https://www.toptal.com/developers/gitignore/api/go
