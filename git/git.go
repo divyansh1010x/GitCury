@@ -29,6 +29,74 @@ func RunGitCmd(dir string, args ...string) (string, error) {
 var changedFilesCache = make(map[string]string)
 var cacheMu sync.RWMutex
 
+// func GetAllChangedFiles(dir string) ([]string, error) {
+// 	output, err := RunGitCmd(dir, "status", "--porcelain")
+// 	if err != nil {
+// 		utils.Error("Failed to get git status: " + err.Error())
+// 		return nil, err
+// 	}
+
+// 	if strings.TrimSpace(output) == "" {
+// 		utils.Info("No changed files detected in directory: " + dir)
+// 		return nil, nil
+// 	}
+
+// 	var changedFiles []string
+// 	lines := strings.Split(output, "\n")
+// 	cacheMu.Lock()
+// 	defer cacheMu.Unlock()
+// 	for _, line := range lines {
+// 		if len(line) > 3 {
+// 			status := line[:2]
+// 			relativePath := line[3:]
+// 			absolutePath := filepath.Join(dir, relativePath)
+
+// 			changedFilesCache[absolutePath] = status
+
+// 			if strings.HasPrefix(status, "D") {
+// 				// Handle deleted files
+// 				utils.Debug("File marked as deleted: " + absolutePath)
+// 				changedFiles = append(changedFiles, absolutePath)
+// 				continue
+// 			}
+
+// 			// Check if the path is a directory or file
+// 			info, err := os.Stat(absolutePath)
+// 			if err != nil {
+// 				if os.IsNotExist(err) {
+// 					utils.Debug("File does not exist (possibly deleted): " + absolutePath)
+// 					changedFiles = append(changedFiles, absolutePath)
+// 					continue
+// 				}
+// 				utils.Error("Failed to stat path '" + absolutePath + "': " + err.Error())
+// 				return nil, err
+// 			}
+
+// 			if info.IsDir() {
+// 				// Walk through the directory and collect all files
+// 				err = filepath.Walk(absolutePath, func(path string, info os.FileInfo, err error) error {
+// 					if err != nil {
+// 						utils.Error("Error walking through directory '" + absolutePath + "': " + err.Error())
+// 						return err
+// 					}
+// 					if !info.IsDir() {
+// 						changedFiles = append(changedFiles, path)
+// 					}
+// 					return nil
+// 				})
+// 				if err != nil {
+// 					return nil, err
+// 				}
+// 			} else {
+// 				changedFiles = append(changedFiles, absolutePath)
+// 			}
+// 		}
+// 	}
+
+// 	utils.Debug("Changed files: " + strings.Join(changedFiles, ", "))
+// 	return changedFiles, nil
+// }
+
 func GetAllChangedFiles(dir string) ([]string, error) {
 	output, err := RunGitCmd(dir, "status", "--porcelain")
 	if err != nil {
@@ -43,53 +111,65 @@ func GetAllChangedFiles(dir string) ([]string, error) {
 
 	var changedFiles []string
 	lines := strings.Split(output, "\n")
+
 	cacheMu.Lock()
 	defer cacheMu.Unlock()
+
 	for _, line := range lines {
-		if len(line) > 3 {
-			status := line[:2]
-			relativePath := line[3:]
-			absolutePath := filepath.Join(dir, relativePath)
+		if len(line) < 4 {
+			continue
+		}
 
-			changedFilesCache[absolutePath] = status
+		status := strings.TrimSpace(line[:2])
+		relativePath := strings.TrimSpace(line[3:])
+		absolutePath := filepath.Join(dir, relativePath)
+		abs, err := filepath.Abs(absolutePath)
+		if err != nil {
+			utils.Error("Failed to resolve absolute path for '" + relativePath + "': " + err.Error())
+			continue
+		}
 
-			if strings.HasPrefix(status, "D") {
-				// Handle deleted files
-				utils.Debug("File marked as deleted: " + absolutePath)
-				changedFiles = append(changedFiles, absolutePath)
+		changedFilesCache[abs] = status
+
+		if strings.HasPrefix(status, "D") {
+			utils.Debug("File marked as deleted: " + abs)
+			changedFiles = append(changedFiles, abs)
+			continue
+		}
+
+		// Handle untracked directories by letting git tell us the real contents (excluding .gitignore)
+		info, err := os.Stat(abs)
+		if err != nil {
+			if os.IsNotExist(err) {
+				utils.Debug("File does not exist (possibly deleted): " + abs)
+				changedFiles = append(changedFiles, abs)
 				continue
 			}
+			utils.Error("Failed to stat path '" + abs + "': " + err.Error())
+			return nil, err
+		}
 
-			// Check if the path is a directory or file
-			info, err := os.Stat(absolutePath)
+		if info.IsDir() && status == "??" {
+			// List untracked, non-ignored files inside the directory
+			innerOutput, err := RunGitCmd(dir, "ls-files", "--others", "--exclude-standard", relativePath)
 			if err != nil {
-				if os.IsNotExist(err) {
-					utils.Debug("File does not exist (possibly deleted): " + absolutePath)
-					changedFiles = append(changedFiles, absolutePath)
-					continue
-				}
-				utils.Error("Failed to stat path '" + absolutePath + "': " + err.Error())
+				utils.Error("Failed to list files in untracked dir '" + relativePath + "': " + err.Error())
 				return nil, err
 			}
 
-			if info.IsDir() {
-				// Walk through the directory and collect all files
-				err = filepath.Walk(absolutePath, func(path string, info os.FileInfo, err error) error {
-					if err != nil {
-						utils.Error("Error walking through directory '" + absolutePath + "': " + err.Error())
-						return err
-					}
-					if !info.IsDir() {
-						changedFiles = append(changedFiles, path)
-					}
-					return nil
-				})
-				if err != nil {
-					return nil, err
+			for _, inner := range strings.Split(innerOutput, "\n") {
+				if strings.TrimSpace(inner) == "" {
+					continue
 				}
-			} else {
-				changedFiles = append(changedFiles, absolutePath)
+				fullPath := filepath.Join(dir, inner)
+				absInner, err := filepath.Abs(fullPath)
+				if err == nil {
+					changedFiles = append(changedFiles, absInner)
+					changedFilesCache[absInner] = "??"
+				}
 			}
+		} else {
+			changedFiles = append(changedFiles, abs)
 		}
 	}
 
@@ -194,6 +274,7 @@ func BatchProcessGetMessages(allChangedFiles []string, rootFolder string) error 
 		go func(file string) {
 			defer fileWg.Done()
 
+			utils.Info("Processing file: " + file)
 			utils.Debug("Processing file: " + file)
 			message, err := GenCommitMessage(file, rootFolder)
 			if err != nil {
@@ -226,6 +307,10 @@ func CommitBatch(rootFolder output.Folder) error {
 		utils.Info("No commit messages found for root folder: " + rootFolder.Name)
 		return fmt.Errorf("no commit messages found for root folder: %s", rootFolder.Name)
 	}
+
+	utils.Debug("Starting batch commit in folder: " + rootFolder.Name)
+	utils.Debug("Total files to commit: " + fmt.Sprint(len(commitMessagesList)))
+
 	for _, commit := range commitMessagesList {
 		utils.Debug("Adding file to commit: " + commit.Name)
 		if _, err := RunGitCmd(rootFolder.Name, "add", commit.Name); err != nil {
@@ -239,15 +324,18 @@ func CommitBatch(rootFolder output.Folder) error {
 			return fmt.Errorf("failed to commit file: %s", err.Error())
 		}
 
-		output.Delete(commit.Name, rootFolder.Name)
+		// output.Delete(commit.Name, rootFolder.Name)
+		// utils.Debug("File committed and removed from output: " + commit.Name)
 	}
 
-	utils.Info("Batch commit completed successfully")
+	output.RemoveFolder(rootFolder.Name)
+	utils.Info("Batch commit completed successfully and folder removed: " + rootFolder.Name)
 	return nil
 }
 
 func PushBranch(rootFolderName string, branch string) error {
 	if branch == "" {
+		utils.Info("Branch name is empty, defaulting to 'main'")
 		branch = "main"
 	}
 
