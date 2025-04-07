@@ -2,14 +2,12 @@ package handlers
 
 import (
 	"GitCury/config"
-	"GitCury/git"
+	"GitCury/core"
 	"GitCury/output"
 	"GitCury/utils"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
-	"sync"
 )
 
 func ConfigHandler(w http.ResponseWriter, r *http.Request) {
@@ -45,79 +43,10 @@ func ConfigHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func PrepareCommitMessagesHandler(w http.ResponseWriter, r *http.Request) {
-
-	numFilesToCommit := 10 // Default value
-	if configValue := config.Get("numFilesToCommit"); configValue != "" {
-		if configValueFloat, ok := configValue.(float64); ok {
-			numFilesToCommit = int(configValueFloat)
-		}
-	}
-
-	utils.Debug("Number of files to prepare commit messages for: " + strconv.Itoa(numFilesToCommit))
-
-	rootFolders, ok := config.Get("root_folders").([]interface{})
-	if !ok {
-		utils.Error("Invalid or missing root_folders configuration")
-		http.Error(w, "Invalid or missing root_folders configuration", http.StatusInternalServerError)
-		return
-	}
-
-	var rootFolderWg sync.WaitGroup
-	var mu sync.Mutex
-	var errors []string
-
-	for _, rootFolder := range rootFolders {
-		rootFolderStr, ok := rootFolder.(string)
-		if !ok {
-			utils.Error("Invalid root folder type")
-			continue
-		}
-
-		rootFolderWg.Add(1)
-		go func(folder string) {
-			defer rootFolderWg.Done()
-
-			utils.Debug("Root folder to get messages : " + folder)
-
-			changedFiles, err := git.GetAllChangedFiles(folder)
-			if err != nil {
-				utils.Error("Failed to get changed files: " + err.Error())
-				mu.Lock()
-				errors = append(errors, fmt.Sprintf("Folder: %s, Error: %s", folder, err.Error()))
-				mu.Unlock()
-				return
-			}
-
-			if len(changedFiles) == 0 {
-				utils.Info("No changed files found")
-				return
-			}
-
-			if len(changedFiles) > numFilesToCommit {
-				changedFiles = changedFiles[:numFilesToCommit]
-			}
-
-			utils.Debug("Total files to process: " + strconv.Itoa(len(changedFiles)))
-
-			err = git.BatchProcessGetMessages(changedFiles, folder)
-			if err != nil {
-				utils.Error("Batch processing failed for folder: " + folder + ", Error: " + err.Error())
-				mu.Lock()
-				errors = append(errors, fmt.Sprintf("Folder: %s, Error: %s", folder, err.Error()))
-				mu.Unlock()
-			}
-		}(rootFolderStr)
-	}
-
-	rootFolderWg.Wait()
-
-	if len(errors) > 0 {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"message": "Errors occurred during batch processing",
-			"errors":  errors,
-		})
+	err := core.GetAllMsgs()
+	if err != nil {
+		utils.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -134,85 +63,27 @@ func PrepareCommitMessagesOne(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	numFilesToCommit := 10 // Default value
-	if configValue := config.Get("numFilesToCommit"); configValue != "" {
-		if configValueFloat, ok := configValue.(float64); ok {
-			numFilesToCommit = int(configValueFloat)
-		}
-	}
-
-	utils.Debug("Number of files to prepare commit messages for: " + strconv.Itoa(numFilesToCommit))
-
-	utils.Debug("Root folder to get messages : " + folder)
-
-	changedFiles, err := git.GetAllChangedFiles(folder)
+	err := core.GetMsgsForRootFolder(folder)
 	if err != nil {
-		utils.Error("Failed to get changed files: " + err.Error())
-		http.Error(w, "Failed to get changed files", http.StatusInternalServerError)
-		return
-	}
-
-	if len(changedFiles) == 0 {
-		utils.Info("No changed files found")
-		return
-	}
-
-	if len(changedFiles) > numFilesToCommit {
-		changedFiles = changedFiles[:numFilesToCommit]
-	}
-
-	utils.Debug("Total files to process: " + strconv.Itoa(len(changedFiles)))
-
-	err = git.BatchProcessGetMessages(changedFiles, folder)
-	if err != nil {
-		utils.Error("Batch processing failed: " + err.Error())
-		http.Error(w, "Batch processing failed", http.StatusInternalServerError)
+		utils.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(output.GetAllFiles(folder))
+	json.NewEncoder(w).Encode(output.GetFolder(folder))
 }
 
 func CommitAllFiles(w http.ResponseWriter, r *http.Request) {
-	rootFolders := output.GetAll().Folders
 
-	var rootFolderWg sync.WaitGroup
-	var mu sync.Mutex
-	var errors []string
-
-	for _, rootFolder := range rootFolders {
-		rootFolderWg.Add(1)
-
-		go func(rootFolder output.Folder) {
-			defer rootFolderWg.Done()
-			utils.Debug("Root folder to commit in: " + rootFolder.Name)
-
-			err := git.CommitBatch(rootFolder)
-			if err != nil {
-				utils.Error("Failed to commit batch: " + err.Error())
-				mu.Lock()
-				errors = append(errors, fmt.Sprintf("Folder: %s, Error: %s", rootFolder.Name, err.Error()))
-				mu.Unlock()
-				return
-			}
-		}(rootFolder)
-	}
-
-	rootFolderWg.Wait()
-
-	if len(errors) > 0 {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"message": "Errors occurred during batch processing",
-			"errors":  errors,
-		})
+	err := core.CommitAllRoots()
+	if err != nil {
+		utils.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	output.Clear()
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Files committed successfully and output.json deleted"))
 }
@@ -225,17 +96,10 @@ func CommitFolder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rootFolder := output.GetAllFiles(rootFolderName)
-	if len(rootFolder.Files) == 0 {
-		utils.Error("Root folder not found: " + rootFolderName)
-		http.Error(w, "Root folder not found", http.StatusNotFound)
-		return
-	}
-
-	err := git.CommitBatch(rootFolder)
+	err := core.CommitOneRoot(rootFolderName)
 	if err != nil {
-		utils.Error("Failed to commit batch: " + err.Error())
-		http.Error(w, "Failed to commit batch", http.StatusInternalServerError)
+		utils.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -251,50 +115,10 @@ func PushAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rootFolders, ok := config.Get("root_folders").([]interface{})
-	if !ok {
-		utils.Error("Invalid or missing root_folders configuration")
-		http.Error(w, "Invalid or missing root_folders configuration", http.StatusInternalServerError)
-		return
-	}
-
-	var rootFolderWg sync.WaitGroup
-	var mu sync.Mutex
-	var errors []string
-
-	for _, rootFolder := range rootFolders {
-		rootFolderStr, ok := rootFolder.(string)
-		if !ok {
-			utils.Error("Invalid root folder type")
-			continue
-		}
-
-		rootFolderWg.Add(1)
-
-		go func(folder string) {
-			defer rootFolderWg.Done()
-			utils.Debug("Root folder to push: " + folder)
-
-			err := git.PushBranch(folder, branchName)
-			if err != nil {
-				utils.Error("Failed to push branch: " + err.Error())
-				mu.Lock()
-				errors = append(errors, fmt.Sprintf("Folder: %s, Error: %s", folder, err.Error()))
-				mu.Unlock()
-				return
-			}
-		}(rootFolderStr)
-	}
-
-	rootFolderWg.Wait()
-	if len(errors) > 0 {
-		utils.Error("Errors occurred during push operation")
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"message": "Errors occurred during push operation",
-			"errors":  errors,
-		})
+	err := core.PushAllRoots(branchName)
+	if err != nil {
+		utils.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -312,10 +136,10 @@ func PushOne(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := git.PushBranch(rootFolderName, branchName)
+	err := core.PushOneRoot(rootFolderName, branchName)
 	if err != nil {
-		utils.Error("Failed to push branch: " + err.Error())
-		http.Error(w, "Failed to push branch", http.StatusInternalServerError)
+		utils.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
