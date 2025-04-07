@@ -1,6 +1,7 @@
 package output
 
 import (
+	"GitCury/config"
 	"GitCury/utils"
 	"encoding/json"
 	"os"
@@ -31,9 +32,14 @@ func init() {
 }
 
 func LoadOutput() {
-	file, err := os.Open("output.json")
+	outputFilePath, ok := config.Get("output_file_path").(string)
+	if !ok || outputFilePath == "" {
+		outputFilePath = os.Getenv("HOME") + "/.gitcury/output.json"
+	}
+
+	file, err := os.Open(outputFilePath)
 	if os.IsNotExist(err) {
-		utils.Debug("Output file not found")
+		// utils.Error("Output file not found")
 		return
 	} else if err != nil {
 		utils.Error("Error loading output file: " + err.Error())
@@ -46,13 +52,14 @@ func LoadOutput() {
 		utils.Error("Error decoding output file: " + err.Error())
 	}
 
-	utils.Debug("Loaded output:\n" + utils.ToJSON(outputData))
+	// utils.Debug("Loaded output:\n" + utils.ToJSON(outputData))
 }
 
 func Set(file, rootFolder string, commitMessage string) {
 	mu.Lock()
 	defer mu.Unlock()
 
+	utils.Debug("Setting commit message for file: " + file + " in folder: " + rootFolder)
 	// rootFolder := getRootFolder(file)
 	folder := findOrCreateFolder(rootFolder)
 
@@ -71,7 +78,7 @@ func Set(file, rootFolder string, commitMessage string) {
 		folder.Files = append(folder.Files, FileEntry{Name: file, Message: commitMessage})
 	}
 
-	saveToFile()
+	utils.Debug("Set commit message for file: " + file + " in folder: " + rootFolder)
 }
 
 func Get(file string, rootFolder string) string {
@@ -92,7 +99,7 @@ func Get(file string, rootFolder string) string {
 	return ""
 }
 
-func GetAllFiles(rootFolder string) Folder {
+func GetFolder(rootFolder string) Folder {
 	mu.RLock()
 	defer mu.RUnlock()
 
@@ -124,6 +131,7 @@ func Delete(file string, rootFolder string) {
 	// rootFolder := getRootFolder(file)
 	folder := findFolder(rootFolder)
 	if folder == nil {
+		utils.Error("Folder not found: " + rootFolder)
 		return
 	}
 
@@ -136,10 +144,10 @@ func Delete(file string, rootFolder string) {
 
 	// Remove the folder if it's empty
 	if len(folder.Files) == 0 {
-		removeFolder(rootFolder)
+		RemoveFolder(rootFolder)
 	}
 
-	saveToFile()
+	SaveToFile()
 }
 
 func Clear() {
@@ -147,28 +155,42 @@ func Clear() {
 	defer mu.Unlock()
 	outputData = OutputData{}
 
-	if err := os.Remove("output.json"); err != nil && !os.IsNotExist(err) {
+	outputFilePath, ok := config.Get("output_file_path").(string)
+	if !ok || outputFilePath == "" {
+		outputFilePath = os.Getenv("HOME") + "/.gitcury/output.json"
+	}
+
+	if err := os.Remove(outputFilePath); err != nil && !os.IsNotExist(err) {
 		utils.Error("Error deleting output file: " + err.Error())
 	}
 }
 
-func saveToFile() {
-	go func() {
-		mu.RLock()
-		defer mu.RUnlock()
+func SaveToFile() {
+	utils.Debug("Saving output to file... with data: " + utils.ToJSON(outputData))
+	mu.RLock()
+	defer mu.RUnlock()
 
-		outputFile, err := os.OpenFile("output.json", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
-		if err != nil {
-			utils.Error("Error saving output file: " + err.Error())
-			return
-		}
-		defer outputFile.Close()
+	outputFilePath, ok := config.Get("output_file_path").(string)
+	if !ok || outputFilePath == "" {
+		outputFilePath = os.Getenv("HOME") + "/.gitcury/output.json"
+		config.Set("output_file_path", outputFilePath)
+	}
 
-		encoder := json.NewEncoder(outputFile)
-		if err := encoder.Encode(outputData); err != nil {
-			utils.Error("Error saving output file: " + err.Error())
-		}
-	}()
+	outputFile, err := os.OpenFile(outputFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		utils.Error("Error saving output file: " + err.Error())
+		return
+	}
+	defer outputFile.Close()
+
+	encoder := json.NewEncoder(outputFile)
+	encoder.SetIndent("", "  ") // Format JSON with indentation
+	if err := encoder.Encode(outputData); err != nil {
+		utils.Error("Error saving output file: " + err.Error())
+	}
+
+	outputDataJSON, _ := json.Marshal(outputData)
+	utils.Debug("Output : " + string(outputDataJSON) + " saved to file: " + outputFilePath)
 }
 
 func findFolder(name string) *Folder {
@@ -189,11 +211,13 @@ func findOrCreateFolder(name string) *Folder {
 	return folder
 }
 
-func removeFolder(name string) {
+func RemoveFolder(name string) {
 	for i, folder := range outputData.Folders {
 		if folder.Name == name {
 			outputData.Folders = append(outputData.Folders[:i], outputData.Folders[i+1:]...)
 			break
 		}
 	}
+
+	SaveToFile()
 }
