@@ -20,11 +20,11 @@ func CommitAllRoots(env ...[]string) error {
 
 		go func(rootFolder output.Folder) {
 			defer rootFolderWg.Done()
-			utils.Debug("Root folder to commit in: " + rootFolder.Name)
+			utils.Debug("[SEAL]: Targeting root folder for commit: " + rootFolder.Name)
 
 			err := git.CommitBatch(rootFolder, env...)
 			if err != nil {
-				utils.Error("Failed to commit batch: " + err.Error())
+				utils.Error("[SEAL.FAIL]: Failed to commit batch for folder '" + rootFolder.Name + "' - " + err.Error())
 				mu.Lock()
 				errors = append(errors, fmt.Sprintf("Folder: %s, Error: %s", rootFolder.Name, err.Error()))
 				mu.Unlock()
@@ -36,29 +36,31 @@ func CommitAllRoots(env ...[]string) error {
 	rootFolderWg.Wait()
 
 	if len(errors) > 0 {
-		utils.Error("Batch commit completed with errors")
-		utils.Debug("Errors: " + fmt.Sprint(errors))
+		utils.Error("[SEAL.FAIL]: Batch commit completed with errors")
+		utils.Debug("[SEAL.FAIL]: Errors encountered: " + fmt.Sprint(errors))
 		return fmt.Errorf("one or more errors occurred while committing files: %v", errors)
 	}
 
 	output.Clear()
-	utils.Info("Batch commit completed successfully and output cleared")
+	utils.Success("[SEAL.SUCCESS]: Batch commit completed successfully. Output cleared.")
 	return nil
 }
 
 func CommitOneRoot(rootFolderName string, env ...[]string) error {
 	rootFolder := output.GetFolder(rootFolderName)
 	if len(rootFolder.Files) == 0 {
-		utils.Error("Root folder not found or has no files: " + rootFolderName)
+		utils.Error("[SEAL.FAIL]: Root folder '" + rootFolderName + "' not found or contains no files.")
 		return fmt.Errorf("root folder not found or has no files: %s", rootFolderName)
 	}
 
+	utils.Debug("[SEAL]: Targeting root folder for commit: " + rootFolderName)
+
 	err := git.CommitBatch(rootFolder, env...)
 	if err != nil {
-		utils.Error("Failed to commit batch: " + err.Error())
+		utils.Error("[SEAL.FAIL]: Failed to commit batch for folder '" + rootFolderName + "' - " + err.Error())
 		return fmt.Errorf("failed to commit batch: %s", err.Error())
 	}
 
-	utils.Info("Batch commit completed successfully for root folder: " + rootFolderName)
+	utils.Success("[SEAL.SUCCESS]: Batch commit completed successfully for root folder: " + rootFolderName)
 	return nil
 }
