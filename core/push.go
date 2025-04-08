@@ -11,7 +11,7 @@ import (
 func PushAllRoots(branchName string) error {
 	rootFolders, ok := config.Get("root_folders").([]interface{})
 	if !ok {
-		utils.Error("Invalid or missing root_folders configuration")
+		utils.Error("[DEPLOY]: ❌ Invalid or missing root_folders configuration")
 		return fmt.Errorf("invalid or missing root_folders configuration")
 	}
 
@@ -22,7 +22,7 @@ func PushAllRoots(branchName string) error {
 	for _, rootFolder := range rootFolders {
 		rootFolderStr, ok := rootFolder.(string)
 		if !ok {
-			utils.Error("Invalid root folder type")
+			utils.Error("[DEPLOY]: ⚠️ Invalid root folder type")
 			continue
 		}
 
@@ -30,36 +30,39 @@ func PushAllRoots(branchName string) error {
 
 		go func(folder string) {
 			defer rootFolderWg.Done()
-			utils.Debug("Root folder to push: " + folder)
+			utils.Debug("[DEPLOY]: 📂 Root folder to push: " + folder)
 
 			err := git.PushBranch(folder, branchName)
 			if err != nil {
-				utils.Error("Failed to push branch: " + err.Error())
+				utils.Error("[DEPLOY]: ❌ Failed to push branch for folder '" + folder + "' - " + err.Error())
 				mu.Lock()
 				errors = append(errors, fmt.Sprintf("Folder: %s, Error: %s", folder, err.Error()))
 				mu.Unlock()
 				return
 			}
+			utils.Success("[DEPLOY]: ✅ Successfully pushed branch for folder: " + folder)
 		}(rootFolderStr)
 	}
 
 	rootFolderWg.Wait()
 	if len(errors) > 0 {
-		utils.Error("Errors occurred during push operation")
+		utils.Error("[DEPLOY]: ❌ Errors occurred during push operation")
 		return fmt.Errorf("one or more errors occurred while pushing branches: %v", errors)
 	}
 
-	utils.Info("Push operation for all roots completed successfully")
+	utils.Success("[DEPLOY]: 🌐 Push operation for all roots completed successfully")
 	return nil
 }
 
 func PushOneRoot(rootFolderName, branchName string) error {
+	utils.Debug("[DEPLOY]: 📂 Targeting root folder for push: " + rootFolderName)
+
 	err := git.PushBranch(rootFolderName, branchName)
 	if err != nil {
-		utils.Error("Failed to push branch: " + err.Error())
+		utils.Error("[DEPLOY]: ❌ Failed to push branch for folder '" + rootFolderName + "' - " + err.Error())
 		return fmt.Errorf("failed to push branch: %s", err.Error())
 	}
 
-	utils.Info("Push operation for root folder " + rootFolderName + " completed successfully")
+	utils.Success("[DEPLOY]: ✅ Push operation for root folder '" + rootFolderName + "' completed successfully")
 	return nil
 }
