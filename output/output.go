@@ -39,31 +39,29 @@ func LoadOutput() {
 
 	file, err := os.Open(outputFilePath)
 	if os.IsNotExist(err) {
-		// utils.Error("Output file not found")
+		utils.Debug("[TRACE]: No existing output file found. Initializing fresh output.")
 		return
 	} else if err != nil {
-		utils.Error("Error loading output file: " + err.Error())
+		utils.Error("[TRACE]: 🚨 Error loading output file: " + err.Error())
 		return
 	}
 	defer file.Close()
 
 	decoder := json.NewDecoder(file)
 	if err := decoder.Decode(&outputData); err != nil {
-		utils.Error("Error decoding output file: " + err.Error())
+		utils.Error("[TRACE]: 🚨 Error decoding output file: " + err.Error())
 	}
 
-	// utils.Debug("Loaded output:\n" + utils.ToJSON(outputData))
+	utils.Debug("[TRACE]: Loaded output data successfully.")
 }
 
 func Set(file, rootFolder string, commitMessage string) {
 	mu.Lock()
 	defer mu.Unlock()
 
-	utils.Debug("Setting commit message for file: " + file + " in folder: " + rootFolder)
-	// rootFolder := getRootFolder(file)
+	utils.Debug("[TRACE]: Setting commit message for file: " + file + " in folder: " + rootFolder)
 	folder := findOrCreateFolder(rootFolder)
 
-	// Check if the file already exists in the folder and update it
 	updated := false
 	for i, entry := range folder.Files {
 		if entry.Name == file {
@@ -73,19 +71,17 @@ func Set(file, rootFolder string, commitMessage string) {
 		}
 	}
 
-	// If not updated, add a new file entry
 	if !updated {
 		folder.Files = append(folder.Files, FileEntry{Name: file, Message: commitMessage})
 	}
 
-	utils.Debug("Set commit message for file: " + file + " in folder: " + rootFolder)
+	utils.Debug("[TRACE]: Commit message set for file: " + file + " in folder: " + rootFolder)
 }
 
 func Get(file string, rootFolder string) string {
 	mu.RLock()
 	defer mu.RUnlock()
 
-	// rootFolder := getRootFolder(file)
 	folder := findFolder(rootFolder)
 	if folder == nil {
 		return ""
@@ -128,10 +124,9 @@ func Delete(file string, rootFolder string) {
 	mu.Lock()
 	defer mu.Unlock()
 
-	// rootFolder := getRootFolder(file)
 	folder := findFolder(rootFolder)
 	if folder == nil {
-		utils.Error("Folder not found: " + rootFolder)
+		utils.Error("[TRACE]: ⚠️ Folder not found: " + rootFolder)
 		return
 	}
 
@@ -142,12 +137,12 @@ func Delete(file string, rootFolder string) {
 		}
 	}
 
-	// Remove the folder if it's empty
 	if len(folder.Files) == 0 {
 		RemoveFolder(rootFolder)
 	}
 
 	SaveToFile()
+	utils.Debug("[TRACE]: File deleted and output saved.")
 }
 
 func Clear() {
@@ -161,12 +156,14 @@ func Clear() {
 	}
 
 	if err := os.Remove(outputFilePath); err != nil && !os.IsNotExist(err) {
-		utils.Error("Error deleting output file: " + err.Error())
+		utils.Error("[TRACE]: 🚨 Error deleting output file: " + err.Error())
+	} else {
+		utils.Debug("[TRACE]: Output file cleared successfully.")
 	}
 }
 
 func SaveToFile() {
-	utils.Debug("Saving output to file... with data: " + utils.ToJSON(outputData))
+	utils.Debug("[TRACE]: Saving output data to file...")
 	mu.RLock()
 	defer mu.RUnlock()
 
@@ -178,19 +175,18 @@ func SaveToFile() {
 
 	outputFile, err := os.OpenFile(outputFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
-		utils.Error("Error saving output file: " + err.Error())
+		utils.Error("[TRACE]: 🚨 Error saving output file: " + err.Error())
 		return
 	}
 	defer outputFile.Close()
 
 	encoder := json.NewEncoder(outputFile)
-	encoder.SetIndent("", "  ") // Format JSON with indentation
+	encoder.SetIndent("", "  ")
 	if err := encoder.Encode(outputData); err != nil {
-		utils.Error("Error saving output file: " + err.Error())
+		utils.Error("[TRACE]: 🚨 Error encoding output data: " + err.Error())
 	}
 
-	outputDataJSON, _ := json.Marshal(outputData)
-	utils.Debug("Output : " + string(outputDataJSON) + " saved to file: " + outputFilePath)
+	utils.Debug("[TRACE]: Output data saved successfully to: " + outputFilePath)
 }
 
 func findFolder(name string) *Folder {
@@ -220,4 +216,5 @@ func RemoveFolder(name string) {
 	}
 
 	SaveToFile()
+	utils.Debug("[TRACE]: Folder removed and output saved.")
 }
