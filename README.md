@@ -51,6 +51,9 @@ GitCury is your ultimate Git sidekick! Built with Go, it automates your Git work
 - **🖋️ CLI Commands for Everything**  
   GitCury's CLI is packed with commands to manage configurations, generate commit messages, commit changes, and push them—all with a single command. It's like magic, but real!
 
+- **🌐 Server Mode**  
+  GitCury can also run as a server, exposing RESTful APIs for managing configurations, generating commit messages, committing changes, and pushing them. This makes it ideal for integration with other tools or workflows.
+
 ## 🚀 Installation
 
 <details>
@@ -95,6 +98,12 @@ GitCury is your ultimate Git sidekick! Built with Go, it automates your Git work
     gitcury config
     ```
 
+5. **Run as a server (optional):**  
+   To enable server mode, uncomment the `main` function in `main.go` and configure the HTTP routes in `handlers/handlers.go`. Then, start the server:
+   ```bash
+   go run main.go
+   ```
+   The server will be available at `http://localhost:8080`.
 
 </details>
 
