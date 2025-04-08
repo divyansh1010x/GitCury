@@ -9,18 +9,24 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "gitcury",
-	Short: "🚀 GitCury CLI tool for automating git commands and generating commit messages",
+	Short: "⚡ GitCury - The neural interface for Git",
 	Long: `
-🌟 GitCury CLI 🌟
+██████╗ ██╗████████╗ ██████╗██╗   ██╗██████╗ ██╗   ██╗
+██╔════╝ ██║╚══██╔══╝██╔════╝██║   ██║██╔══██╗╚██╗ ██╔╝
+██║  ███╗██║   ██║   ██║     ██║   ██║██████╔╝ ╚████╔╝ 
+██║   ██║██║   ██║   ██║     ██║   ██║██╔══██╗  ╚██╔╝  
+╚██████╔╝██║   ██║   ╚██████╗╚██████╔╝██║  ██║   ██║   
+ ╚═════╝ ╚═╝   ╚═╝    ╚═════╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   
+                                                       
+>> NEURAL GIT INTERFACE v1.0.0 <<
 
-GitCury automates Git commit message generation using the Gemini API.
-It supports operations like:
+Automated Neural Network-Based Git Operations:
+• Neural commit message generation through Gemini API
+• Multi-repository simulation architecture
+• Advanced operational parameters via config protocol
+• Quantum state manipulation of Git repositories
 
-  - Generating commit messages for changed files
-  - Committing and pushing changes
-  - Scoping operations to configured root folders
-
-Simplify your Git workflow and boost productivity! 💻✨
+[SYSTEM]: Connection established. All subsystems online.
 `,
 }
 
