@@ -8,7 +8,7 @@ import (
 func ListFiles(directory string) ([]string, error) {
 	entries, err := os.ReadDir(directory)
 	if err != nil {
-		Error("Error reading directory: " + err.Error())
+		Debug("[FILES]: 🚨 Error reading directory: " + err.Error())
 		return nil, err
 	}
 
@@ -19,14 +19,16 @@ func ListFiles(directory string) ([]string, error) {
 		}
 	}
 
+	Debug("[FILES]: 📂 Successfully listed files in directory: " + directory)
 	return files, nil
 }
 
 func ToJSON(data interface{}) string {
 	jsonData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
-		Error("Error marshalling data: " + err.Error())
+		Debug("[JSON]: 🚨 Error marshalling data: " + err.Error())
 		return "{}"
 	}
+	Debug("[JSON]: ✨ Successfully marshalled data to JSON")
 	return string(jsonData)
 }
