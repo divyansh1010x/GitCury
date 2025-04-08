@@ -4,6 +4,7 @@ import (
 	"GitCury/config"
 	"GitCury/output"
 	"GitCury/utils"
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
@@ -16,14 +17,23 @@ func RunGitCmd(dir string, args ...string) (string, error) {
 	cmd := exec.Command("git", args...)
 	cmd.Dir = dir
 
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		utils.Error("Error in running command 'git " + strings.Join(args, " ") + "' in directory '" + dir + "': " + err.Error())
+	// output, err := cmd.CombinedOutput()
+	// if err != nil {
+	// 	utils.Error("Error in running command 'git " + strings.Join(args, " ") + "' in directory '" + dir + "': " + err.Error())
+	// 	return "", err
+	// }
+
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	if err := cmd.Run(); err != nil {
+		utils.Error(fmt.Sprintf("Command failed: %s\nStdout: %s\nStderr: %s\n", err, stdout.String(), stderr.String()))
 		return "", err
 	}
 
 	utils.Info("Successfully ran git command in directory '" + dir + "': git " + strings.Join(args, " "))
-	return string(output), nil
+	return stdout.String(), nil
 }
 
 var changedFilesCache = make(map[string]string)
