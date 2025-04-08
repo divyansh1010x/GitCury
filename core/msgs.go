@@ -12,8 +12,8 @@ import (
 
 func GetAllMsgs(numFiles ...int) error {
 	defaultNumFiles := 10 // Default value
-	if len(numFiles) == 0 {
-		numFiles = append(numFiles, defaultNumFiles)
+	if len(numFiles) == 0 || numFiles[0] <= 0 {
+		numFiles[0] = defaultNumFiles
 	}
 
 	utils.Debug("Number of files to prepare commit messages for: " + strconv.Itoa(numFiles[0]))
