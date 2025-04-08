@@ -250,6 +250,8 @@ or
 func init() {
 	// Add flags to the with-date subcommand
 	withDateCmd.Flags().StringVarP(&commitDateTime, "datetime", "d", "", "Specify the commit date and time in 'YYYY-MM-DDTHH:MM:SS' format")
+	withDateCmd.Flags().BoolVarP(&commitAllFlag, "all", "a", false, "Commit all files with generated messages")
+	withDateCmd.Flags().StringVarP(&folderName, "root", "r", "", "Commit files in the specified root folder with generated messages")
 
 	// Add the with-date subcommand to the commit command
 	commitCmd.AddCommand(withDateCmd)
