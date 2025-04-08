@@ -1,6 +1,6 @@
 <div align="center">
 
-# GitCury
+# 🌟 GitCury: Your Git Companion 🚀
 
 [<img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/go/go-original.svg" width="60">](https://go.dev/)
 [<img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/git/git-original.svg" width="60">](https://git-scm.com/)
@@ -12,21 +12,21 @@
 
 </div>
 
-## Overview
+## 🎉 Overview
 
-GitCury is a Go-based tool that automates Git commit message generation using the Gemini API. It not only streamlines your commit process but now leverages a configurable set of root folders to limit Git operations to specific areas of your file system. This means that the output commit messages are grouped by the designated root folders in the generated `output.json`.
+GitCury is your ultimate Git sidekick! Built with Go, it automates your Git workflow with AI-powered commit messages, root folder filtering, and CLI commands that make Git operations a breeze. Whether you're managing a single repo or juggling multiple projects, GitCury has your back. 🌈
 
-## Key Features
+## ✨ Key Features
 
-- **AI-Powered Commit Messages**  
-  Generate meaningful commit messages using the Gemini API. Messages are created based on file changes and differences.
+- **🤖 AI-Powered Commit Messages**  
+  Let the Gemini API craft meaningful commit messages for you based on file changes. No more staring at your terminal in despair!
 
-- **Root Folder Filtering**  
-  Configure multiple root folders in the `config.json` so that Git operations are scoped to specific directories. This is ideal when working on multi-repository projects or segmented codebases.
+- **📂 Root Folder Filtering**  
+  Scope Git operations to specific directories by configuring root folders in `config.json`. Perfect for multi-repo projects!
 
-- **Grouped Output**  
-  Commit messages are stored in `output.json` grouped by root folder. The structure looks like:  
-  ```
+- **📊 Grouped Output**  
+  Commit messages are neatly organized in `output.json` by root folder. Example:
+  ```json
   {
     "root_folder1": {
       "file1": "commit message",
@@ -35,21 +35,26 @@ GitCury is a Go-based tool that automates Git commit message generation using th
     "root_folder2": {
       "file3": "commit message",
       "file4": "commit message"
-    },
-    ...
+    }
   }
   ```
 
-- **Batch and Single-File Operations**  
-  Prepare, commit, and push operations can be performed either in batch (all root folders) or on specific folders.
+- **⚡ Batch and Single-File Operations**  
+  Perform Git operations across all root folders or focus on just one. Flexibility at its finest!
 
-- **Configurable Parameters**  
-  Easily update configuration settings (such as the number of files to commit and the root folders) via a simple API endpoint.
+- **🛠️ Configurable Parameters**  
+  Update settings like the number of files to commit or root folders via a simple API or CLI commands. No more manual edits!
 
-## Installation
+- **🎁 Hidden Gems**  
+  Explore the codebase to uncover advanced features and Easter eggs. Who doesn’t love surprises?
+
+- **🖋️ CLI Commands for Everything**  
+  GitCury's CLI is packed with commands to manage configurations, generate commit messages, commit changes, and push them—all with a single command. It's like magic, but real!
+
+## 🚀 Installation
 
 <details>
-<summary>Step-by-step guide</summary>
+<summary>Follow these simple steps:</summary>
 
 1. **Clone the repository:**
    ```bash
@@ -57,115 +62,148 @@ GitCury is a Go-based tool that automates Git commit message generation using th
    cd GitCury
    ```
 
-2. **Set up the configuration:**  
-   Edit the `config.json` file to update your GEMINI API key and list the root folders where Git operations should take place. An example configuration:
-   ```json
-   {
-     "GEMINI_API_KEY": "YOUR_API_KEY",
-     "app_name": "GitCury",
-     "numFilesToCommit": 5,
-     "root_folders": [
-       "/path/to/folder1",
-       "/path/to/folder2"
-     ],
-     "version": "1.0.0"
-   }
-   ```
-
-3. **Build the project:**
+2. **Build the project:**
    ```bash
    go build -o gitcury main.go
    ```
 
-4. **Run the application:**
+3. **Run the application:**
    ```bash
    ./gitcury
    ```
+
+4. **Set up the configuration:**  
+  Use GitCury's CLI to configure your GEMINI API key and root folders:
+
+  - Set your GEMINI API key:
+    ```bash
+    gitcury config set --key GEMINI_API_KEY --value YOUR_API_KEY
+    ```
+
+  - Add root folders:
+    ```bash
+    gitcury config set --key root_folders --value /path/to/folder1,/path/to/folder2
+    ```
+
+  - Optionally, configure the number of files to commit:
+    ```bash
+    gitcury config set --key numFilesToCommit --value 5
+    ```
+
+  - Verify your configuration:
+    ```bash
+    gitcury config
+    ```
+
+
 </details>
 
-## Usage & API Endpoints
+## 🛠️ CLI Commands
 
-- **Server Startup:**  
-  Start the server using:
+GitCury comes with a powerful CLI to make your Git workflow seamless. Here are some of the key commands:
+
+### **Configuration Management**
+- View the current configuration:
   ```bash
-  go run main.go
+  gitcury config
   ```
-  The server listens on port 8080.
+- Set a configuration key-value pair:
+  ```bash
+  gitcury config set --key <key> --value <value>
+  ```
+- Remove a configuration key:
+  ```bash
+  gitcury config remove --key <key>
+  ```
 
-- **Update / Retrieve Configuration:**  
-  - **GET /config:** Returns the current configuration.
-  - **POST /config:** Updates configuration settings (including root folders).
+### **Generate Commit Messages**
+- Generate commit messages for all root folders:
+  ```bash
+  gitcury getmsgs --all
+  ```
+- Generate commit messages for a specific folder:
+  ```bash
+  gitcury getmsgs --root <folder>
+  ```
 
-- **Prepare Commit Messages:**  
-  - **GET /getallmsgs:** Prepares commit messages for all configured root folders.  
-  - **GET /getonemsgs?rootFolder=/path/to/folder:** Prepares commit messages for a specific root folder.
+### **Commit Changes**
+- Commit all files with generated messages:
+  ```bash
+  gitcury commit --all
+  ```
+- Commit files in a specific root folder:
+  ```bash
+  gitcury commit --root <folder>
+  ```
 
-- **Commit Operations:**  
-  - **GET /commitall:** Commits files from all grouped folders as per the generated messages.
-  - **GET /commitone?rootFolder=/path/to/folder:** Commits files for a single root folder.
+### **Push Changes**
+- Push all changes to a branch:
+  ```bash
+  gitcury push --all --branch <branch>
+  ```
+- Push changes for a specific folder:
+  ```bash
+  gitcury push --root <folder> --branch <branch>
+  ```
 
-- **Push Operations:**  
-  - **GET /pushall?branch=branchName:** Pushes all committed changes to the specified branch.
-  - **GET /pushone?rootFolder=/path/to/folder&branch=branchName:** Pushes changes from a specific root folder.
+### **Output Management**
+- View all generated commit messages:
+  ```bash
+  gitcury output --log
+  ```
+- Edit the output file:
+  ```bash
+  gitcury output --edit
+  ```
+- Clear all generated commit messages:
+  ```bash
+  gitcury output --delete
+  ```
 
-## Example Workflow
+## 🎯 Example Workflow
 
-1. **Start the server:**
+1. **Generate commit messages:**
    ```bash
-   go run main.go
+   gitcury getmsgs --all
    ```
 
-2. **Prepare commit messages for changed files across all root folders:**
+2. **Commit changes:**
    ```bash
-   curl -X GET http://localhost:8080/getallmsgs
-   ```
-   or for a single folder:
-   ```bash
-   curl -X GET "http://localhost:8080/getonemsgs?rootFolder=/path/to/folder"
+   gitcury commit --all
    ```
 
-3. **Commit the prepared files:**
-   To commit all folders:
+3. **Push commits:**
    ```bash
-   curl -X GET http://localhost:8080/commitall
-   ```
-   or to commit one folder:
-   ```bash
-   curl -X GET "http://localhost:8080/commitone?rootFolder=/path/to/folder"
+   gitcury push --all --branch main
    ```
 
-4. **Push the commits:**
-   For all folders:
+4. **View logs:**
    ```bash
-   curl -X GET "http://localhost:8080/pushall?branch=main"
-   ```
-   For a specific folder:
-   ```bash
-   curl -X GET "http://localhost:8080/pushone?rootFolder=/path/to/folder&branch=main"
+   gitcury output --log
    ```
 
-## Contributing
+## 🤝 Contributing
 
-Contributions are welcome! To contribute:
+We ❤️ contributions! Here's how you can help:
 
-1. Fork the repository.
-2. Create a feature branch:
+1. Fork the repo.  
+2. Create a feature branch:  
    ```bash
    git checkout -b feature/NewFeature
    ```
-3. Make your changes and commit them:
+3. Commit your changes:  
    ```bash
-   git commit -m 'Add new feature'
+   git commit -m "Add NewFeature"
    ```
 4. Push your branch and open a Pull Request.
 
-## License
+## 📜 License
 
-GitCury is open-source, released under the MIT License. See the [LICENSE](LICENSE) file for details.
+GitCury is open-source and licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
+## 🌟 Acknowledgments
 
-- Gemini API for AI-powered commit message generation.
-- The open source community for continuous support and inspiration.
+- Thanks to the Gemini API for powering commit message generation.  
+- Shoutout to the open-source community for their inspiration and support.
 
-Happy coding! 🚀
+Happy coding with GitCury! 🎉✨
