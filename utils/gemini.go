@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/generative-ai-go/genai"
@@ -68,7 +69,7 @@ func SendToGemini(contextData map[string]string, apiKey string) (string, error) 
 	for retries := 0; retries < maxRetries; retries++ {
 		resp, err = model.GenerateContent(ctx, genai.Text(prompt))
 		if err != nil {
-			if status.Code(err) == 14 || status.Code(err) == 429 { // Retry on UNAVAILABLE or Too Many Requests
+			if strings.Contains(err.Error(), "googleapi: Error 429: You exceeded your current quota, please check your plan and billing details.") || status.Code(err) == 14 { // Retry on specific 429 error or UNAVAILABLE
 				Error(fmt.Sprintf("Received error code %d, retrying in %d seconds... (attempt %d/%d)", status.Code(err), retryDelay, retries+1, maxRetries))
 				time.Sleep(time.Duration(retryDelay) * time.Second)
 				continue
