@@ -179,9 +179,9 @@ func resolveEditor() string {
 }
 
 func resolveTraceFile() string {
-	traceFile, ok := config.Get("trace_file_path").(string)
+	traceFile, ok := config.Get("output_file_path").(string)
 	if !ok || traceFile == "" {
-		traceFile = os.Getenv("HOME") + "/traces.json" // Default to the user's home directory
+		traceFile = os.Getenv("HOME") + "/output.json" // Default to the user's home directory
 	} else {
 		traceFile = strings.TrimSpace(traceFile)
 	}
