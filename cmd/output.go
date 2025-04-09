@@ -99,68 +99,64 @@ import (
 )
 
 var (
-	purgeFlag bool
-	viewFlag  bool
-	editFlag  bool
+	deleteFlag bool
+	logFlag    bool
+	editFlag   bool
 )
 
-var traceCmd = &cobra.Command{
-	Use:   "trace",
-	Short: "Manage and inspect generated commit traces",
+var outputCmd = &cobra.Command{
+	Use:   "output",
+	Short: "Manage generated commit messages",
 	Long: `
-╔══════════════════════════════════════════════════╗
-║              TRACE: COMMIT TRACE MANAGER         ║
-╚══════════════════════════════════════════════════╝
+Manage generated commit messages and related commands.
 
-[INITIATING]: The Trace Protocol—interact with and manage generated commit traces.
+Alias:
+• ` + config.Aliases.Output + `
 
-Operational Modes:
-• --view : Display all generated commit traces.
-• --edit : Open the trace file for manual editing.
-• --purge : Obliterate all commit traces and related commands.
+Options:
+• --log : View all generated messages.
+• --edit : Edit the output file.
+• --delete : Delete all generated messages.
 
 Examples:
-• View all traces:
-	gitcury trace --view
+• View messages:
+	gitcury output --log
 
-• Edit the trace file:
-	gitcury trace --edit
+• Edit messages:
+	gitcury output --edit
 
-• Purge all traces:
-	gitcury trace --purge
-
-[NOTICE]: Ensure traces are generated before attempting to view or edit.
+• Delete messages:
+	gitcury output --delete
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		if purgeFlag {
+		if deleteFlag {
 			output.Clear()
-			utils.Success("[TRACE.PURGE]: 🌌 All commit traces and commands have been obliterated.")
+			utils.Info("[" + config.Aliases.Output + "]: All messages deleted.")
 			return
 		}
-		if viewFlag {
-			commitTraces := output.GetAll()
-			utils.Success("[TRACE.VIEW]: 🖥️ Displaying generated commit traces:")
-			utils.Print(utils.ToJSON(commitTraces))
+		if logFlag {
+			utils.Print(utils.ToJSON(output.GetAll()))
+			utils.Info("[" + config.Aliases.Output + "]: Messages displayed.")
 		} else if editFlag {
 			editor := resolveEditor()
-			traceFile := resolveTraceFile()
+			outputFile := resolveOutputFile()
 
-			if _, err := os.Stat(traceFile); os.IsNotExist(err) {
-				utils.Error("[TRACE.EDIT]: 🚨 Trace file not found. Ensure traces have been generated before editing.")
+			if _, err := os.Stat(outputFile); os.IsNotExist(err) {
+				utils.Error("[" + config.Aliases.Output + "]: Output file not found.")
 				return
 			}
 
-			cmd := exec.Command(editor, traceFile)
+			cmd := exec.Command(editor, outputFile)
 			cmd.Stdin = os.Stdin
 			cmd.Stdout = os.Stdout
 			cmd.Stderr = os.Stderr
 
 			if err := cmd.Run(); err != nil {
-				utils.Error("[TRACE.EDIT]: ⚠️ Failed to open the editor: " + err.Error())
+				utils.Error("[" + config.Aliases.Output + "]: Failed to open editor: " + err.Error())
 				return
 			}
 
-			utils.Success("[TRACE.EDIT]: ✨ Successfully edited the trace file.")
+			utils.Info("[" + config.Aliases.Output + "]: File edited successfully.")
 		} else {
 			cmd.Help()
 		}
@@ -168,29 +164,21 @@ Examples:
 }
 
 func resolveEditor() string {
-	editor, ok := config.Get("editor").(string)
-	if !ok || editor == "" {
-		editor = os.Getenv("EDITOR")
-		if editor == "" {
-			editor = "nano" // Default to nano if not set
-		}
+	editor := config.Get("editor").(string)
+	if editor == "" {
+		editor = "nano"
 	}
 	return editor
 }
 
-func resolveTraceFile() string {
-	traceFile, ok := config.Get("output_file_path").(string)
-	if !ok || traceFile == "" {
-		traceFile = os.Getenv("HOME") + "/output.json" // Default to the user's home directory
-	} else {
-		traceFile = strings.TrimSpace(traceFile)
-	}
-	return traceFile
+func resolveOutputFile() string {
+	outputFile := config.Get("output_file_path").(string)
+	return strings.TrimSpace(outputFile)
 }
 
 func init() {
-	traceCmd.Flags().BoolVarP(&purgeFlag, "purge", "p", false, "🌌 Purge all commit traces and related commands")
-	traceCmd.Flags().BoolVarP(&viewFlag, "view", "v", false, "🖥️ View all generated commit traces and their related commands")
-	traceCmd.Flags().BoolVarP(&editFlag, "edit", "e", false, "✏️ Edit the trace file using the configured editor")
-	rootCmd.AddCommand(traceCmd)
+	outputCmd.Flags().BoolVarP(&deleteFlag, "delete", "d", false, "Delete all messages")
+	outputCmd.Flags().BoolVarP(&logFlag, "log", "l", false, "View all messages")
+	outputCmd.Flags().BoolVarP(&editFlag, "edit", "e", false, "Edit the output file")
+	rootCmd.AddCommand(outputCmd)
 }
