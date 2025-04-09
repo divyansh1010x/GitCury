@@ -14,7 +14,7 @@
 
 ## 🎉 Overview
 
-GitCury is your ultimate Git sidekick! Built with Go, it automates your Git workflow with AI-powered commit messages, root folder filtering, and CLI commands that make Git operations a breeze. Whether you're managing a single repo or juggling multiple projects, GitCury has your back. 🌈
+GitCury is your ultimate Git sidekick! Built with Go, it automates your Git workflow with AI-powered commit messages, root folder filtering, alias-based commands, and CLI utilities that make Git operations a breeze. Whether you're managing a single repo or juggling multiple projects, GitCury has your back. 🌈
 
 ## ✨ Key Features
 
@@ -43,7 +43,10 @@ GitCury is your ultimate Git sidekick! Built with Go, it automates your Git work
   Perform Git operations across all root folders or focus on just one. Flexibility at its finest!
 
 - **🛠️ Configurable Parameters**  
-  Update settings like the number of files to commit or root folders via a simple API or CLI commands. No more manual edits!
+  Update settings like the number of files to commit, root folders, or aliases via a simple API or CLI commands. No more manual edits!
+
+- **🔑 Alias-Based Commands**  
+  Use intuitive aliases like `seal` for commit, `deploy` for push, and `genesis` for generating commit messages. Customize aliases to suit your workflow.
 
 - **🎁 Hidden Gems**  
   Explore the codebase to uncover advanced features and Easter eggs. Who doesn’t love surprises?
@@ -76,7 +79,7 @@ GitCury is your ultimate Git sidekick! Built with Go, it automates your Git work
    ```
 
 4. **Set up the configuration:**  
-  Use GitCury's CLI to configure your GEMINI API key and root folders:
+  Use GitCury's CLI to configure your GEMINI API key, root folders, and aliases:
 
   - Set your GEMINI API key:
     ```bash
@@ -91,6 +94,12 @@ GitCury is your ultimate Git sidekick! Built with Go, it automates your Git work
   - Optionally, configure the number of files to commit:
     ```bash
     gitcury config set --key numFilesToCommit --value 5
+    ```
+
+  - Customize aliases:
+    ```bash
+    gitcury alias --add commit seal
+    gitcury alias --add push deploy
     ```
 
   - Verify your configuration:
@@ -123,6 +132,20 @@ GitCury comes with a powerful CLI to make your Git workflow seamless. Here are s
 - Remove a configuration key:
   ```bash
   gitcury config remove --key <key>
+  ```
+
+### **Alias Management**
+- Add a new alias:
+  ```bash
+  gitcury alias --add <cmd> <alias>
+  ```
+- Remove an alias:
+  ```bash
+  gitcury alias --remove <alias>
+  ```
+- List all aliases:
+  ```bash
+  gitcury alias --list
   ```
 
 ### **Generate Commit Messages**
@@ -216,3 +239,4 @@ GitCury is open-source and licensed under the MIT License. See the [LICENSE](LIC
 - Shoutout to the open-source community for their inspiration and support.
 
 Happy coding with GitCury! 🎉✨
+
