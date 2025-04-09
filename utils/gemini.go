@@ -13,6 +13,16 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+var (
+	maxRetries int
+	retryDelay int
+)
+
+func SetTimeoutVar(retries, delay int) {
+	maxRetries = retries
+	retryDelay = delay
+}
+
 func printResponse(resp *genai.GenerateContentResponse) {
 	if resp == nil {
 		return
@@ -23,8 +33,6 @@ func printResponse(resp *genai.GenerateContentResponse) {
 }
 
 func SendToGemini(contextData map[string]string, apiKey string) (string, error) {
-	maxRetries := 5
-	retryDelay := 5 // seconds
 
 	ctx := context.Background()
 	client, err := genai.NewClient(ctx, option.WithAPIKey(apiKey))
