@@ -51,9 +51,78 @@
 // 	rootCmd.AddCommand(pushCmd)
 // }
 
+// package cmd
+
+// import (
+// 	"GitCury/core"
+// 	"GitCury/utils"
+
+// 	"github.com/spf13/cobra"
+// )
+
+// var (
+// 	targetFolder string
+// 	deployAll    bool
+// 	targetBranch string
+// )
+
+// var deployCmd = &cobra.Command{
+// 	Use:   "deploy",
+// 	Short: "Transmit changes to the remote repository",
+// 	Long: `
+// ╔══════════════════════════════════════════════════╗
+// ║              DEPLOY: REMOTE TRANSMISSION         ║
+// ╚══════════════════════════════════════════════════╝
+
+// [INITIATING]: The Deploy Protocol—synchronizing your committed changes with the remote repository.
+
+// Operational Modes:
+// • --all : Transmit all changes across all root folders.
+// • --root <folder> : Specify a root folder for localized transmission.
+
+// Examples:
+// • Transmit all changes:
+// 	gitcury deploy --all --branch main
+
+// • Target a specific root folder:
+// 	gitcury deploy --root my-folder --branch dev
+
+// [NOTICE]: Ensure all necessary commits are sealed using the 'seal' command before deployment.
+// `,
+// 	Run: func(cmd *cobra.Command, args []string) {
+// 		if deployAll {
+// 			utils.Info("[DEPLOY]: Initiating transmission for all root folders.")
+// 			err := core.PushAllRoots(targetBranch)
+// 			if err != nil {
+// 				utils.Error("[DEPLOY.FAIL]: ⚠️ Error transmitting all changes: " + err.Error())
+// 				return
+// 			}
+// 			utils.Success("[DEPLOY.SUCCESS]: 🌐 All changes successfully transmitted to the remote repository.")
+// 		} else if targetFolder != "" {
+// 			utils.Info("[DEPLOY]: Targeting root folder: " + targetFolder)
+// 			err := core.PushOneRoot(targetFolder, targetBranch)
+// 			if err != nil {
+// 				utils.Error("[DEPLOY.FAIL]: 🚨 Error transmitting changes for folder '" + targetFolder + "': " + err.Error())
+// 				return
+// 			}
+// 			utils.Success("[DEPLOY.SUCCESS]: 📂 Changes from folder '" + targetFolder + "' successfully transmitted to the remote repository.")
+// 		} else {
+// 			utils.Error("[DEPLOY.FAIL]: ❗ You must specify either --all or --root flag.")
+// 		}
+// 	},
+// }
+
+// func init() {
+// 	deployCmd.Flags().BoolVarP(&deployAll, "all", "a", false, "🌐 Transmit all changes to the remote repository")
+// 	deployCmd.Flags().StringVarP(&targetFolder, "root", "r", "", "📂 Transmit changes from the specified folder to the remote repository")
+// 	deployCmd.Flags().StringVarP(&targetBranch, "branch", "b", "", "🌿 Specify the branch to transmit to (default: current branch)")
+// 	rootCmd.AddCommand(deployCmd)
+// }
+
 package cmd
 
 import (
+	"GitCury/config"
 	"GitCury/core"
 	"GitCury/utils"
 
@@ -66,55 +135,52 @@ var (
 	targetBranch string
 )
 
-var deployCmd = &cobra.Command{
-	Use:   "deploy",
-	Short: "Transmit changes to the remote repository",
+var pushCmd = &cobra.Command{
+	Use:   "push",
+	Short: "Push changes to the remote repository",
 	Long: `
-╔══════════════════════════════════════════════════╗
-║              DEPLOY: REMOTE TRANSMISSION         ║
-╚══════════════════════════════════════════════════╝
+Push committed changes to the remote repository.
 
-[INITIATING]: The Deploy Protocol—synchronizing your committed changes with the remote repository.
+Aliases:
+• ` + config.Aliases.Push + `
 
-Operational Modes:
-• --all : Transmit all changes across all root folders.
-• --root <folder> : Specify a root folder for localized transmission.
+Options:
+• --all : Push all changes across all root folders.
+• --root <folder> : Push changes in a specific root folder.
 
 Examples:
-• Transmit all changes:
-	gitcury deploy --all --branch main
+• Push all changes:
+	gitcury push --all --branch main
 
-• Target a specific root folder:
-	gitcury deploy --root my-folder --branch dev
-
-[NOTICE]: Ensure all necessary commits are sealed using the 'seal' command before deployment.
+• Push changes in a folder:
+	gitcury push --root my-folder --branch dev
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if deployAll {
-			utils.Info("[DEPLOY]: Initiating transmission for all root folders.")
+			utils.Info("[" + config.Aliases.Push + "]: Pushing all changes to the remote repository.")
 			err := core.PushAllRoots(targetBranch)
 			if err != nil {
-				utils.Error("[DEPLOY.FAIL]: ⚠️ Error transmitting all changes: " + err.Error())
+				utils.Error("[" + config.Aliases.Push + "]: Error pushing all changes: " + err.Error())
 				return
 			}
-			utils.Success("[DEPLOY.SUCCESS]: 🌐 All changes successfully transmitted to the remote repository.")
+			utils.Success("[" + config.Aliases.Push + "]: All changes pushed successfully.")
 		} else if targetFolder != "" {
-			utils.Info("[DEPLOY]: Targeting root folder: " + targetFolder)
+			utils.Info("[" + config.Aliases.Push + "]: Pushing changes from folder: " + targetFolder)
 			err := core.PushOneRoot(targetFolder, targetBranch)
 			if err != nil {
-				utils.Error("[DEPLOY.FAIL]: 🚨 Error transmitting changes for folder '" + targetFolder + "': " + err.Error())
+				utils.Error("[" + config.Aliases.Push + "]: Error pushing changes from folder '" + targetFolder + "': " + err.Error())
 				return
 			}
-			utils.Success("[DEPLOY.SUCCESS]: 📂 Changes from folder '" + targetFolder + "' successfully transmitted to the remote repository.")
+			utils.Success("[" + config.Aliases.Push + "]: Changes from folder '" + targetFolder + "' pushed successfully.")
 		} else {
-			utils.Error("[DEPLOY.FAIL]: ❗ You must specify either --all or --root flag.")
+			utils.Error("[" + config.Aliases.Push + "]: You must specify either --all or --root flag.")
 		}
 	},
 }
 
 func init() {
-	deployCmd.Flags().BoolVarP(&deployAll, "all", "a", false, "🌐 Transmit all changes to the remote repository")
-	deployCmd.Flags().StringVarP(&targetFolder, "root", "r", "", "📂 Transmit changes from the specified folder to the remote repository")
-	deployCmd.Flags().StringVarP(&targetBranch, "branch", "b", "", "🌿 Specify the branch to transmit to (default: current branch)")
-	rootCmd.AddCommand(deployCmd)
+	pushCmd.Flags().BoolVarP(&deployAll, "all", "a", false, "Push all changes to the remote repository")
+	pushCmd.Flags().StringVarP(&targetFolder, "root", "r", "", "Push changes from the specified folder to the remote repository")
+	pushCmd.Flags().StringVarP(&targetBranch, "branch", "b", "", "Specify the branch to push to (default: current branch)")
+	rootCmd.AddCommand(pushCmd)
 }
