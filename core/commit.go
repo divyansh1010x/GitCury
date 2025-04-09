@@ -1,6 +1,7 @@
 package core
 
 import (
+	"GitCury/config"
 	"GitCury/git"
 	"GitCury/output"
 	"GitCury/utils"
@@ -20,11 +21,11 @@ func CommitAllRoots(env ...[]string) error {
 
 		go func(rootFolder output.Folder) {
 			defer rootFolderWg.Done()
-			utils.Debug("[SEAL]: Targeting root folder for commit: " + rootFolder.Name)
+			utils.Debug("[" + config.Aliases.Commit + "]: Targeting root folder for commit: " + rootFolder.Name)
 
 			err := git.CommitBatch(rootFolder, env...)
 			if err != nil {
-				utils.Error("[SEAL.FAIL]: Failed to commit batch for folder '" + rootFolder.Name + "' - " + err.Error())
+				utils.Error("[" + config.Aliases.Commit + ".FAIL]: Failed to commit batch for folder '" + rootFolder.Name + "' - " + err.Error())
 				mu.Lock()
 				errors = append(errors, fmt.Sprintf("Folder: %s, Error: %s", rootFolder.Name, err.Error()))
 				mu.Unlock()
@@ -36,31 +37,31 @@ func CommitAllRoots(env ...[]string) error {
 	rootFolderWg.Wait()
 
 	if len(errors) > 0 {
-		utils.Error("[SEAL.FAIL]: Batch commit completed with errors")
-		utils.Debug("[SEAL.FAIL]: Errors encountered: " + fmt.Sprint(errors))
+		utils.Error("[" + config.Aliases.Commit + ".FAIL]: Batch commit completed with errors")
+		utils.Debug("[" + config.Aliases.Commit + ".FAIL]: Errors encountered: " + fmt.Sprint(errors))
 		return fmt.Errorf("one or more errors occurred while committing files: %v", errors)
 	}
 
 	output.Clear()
-	utils.Success("[SEAL.SUCCESS]: Batch commit completed successfully. Output cleared.")
+	utils.Success("[" + config.Aliases.Commit + ".SUCCESS]: Batch commit completed successfully. Output cleared.")
 	return nil
 }
 
 func CommitOneRoot(rootFolderName string, env ...[]string) error {
 	rootFolder := output.GetFolder(rootFolderName)
 	if len(rootFolder.Files) == 0 {
-		utils.Error("[SEAL.FAIL]: Root folder '" + rootFolderName + "' not found or contains no files.")
+		utils.Error("[" + config.Aliases.Commit + ".FAIL]: Root folder '" + rootFolderName + "' not found or contains no files.")
 		return fmt.Errorf("root folder not found or has no files: %s", rootFolderName)
 	}
 
-	utils.Debug("[SEAL]: Targeting root folder for commit: " + rootFolderName)
+	utils.Debug("[" + config.Aliases.Commit + "]: Targeting root folder for commit: " + rootFolderName)
 
 	err := git.CommitBatch(rootFolder, env...)
 	if err != nil {
-		utils.Error("[SEAL.FAIL]: Failed to commit batch for folder '" + rootFolderName + "' - " + err.Error())
+		utils.Error("[" + config.Aliases.Commit + ".FAIL]: Failed to commit batch for folder '" + rootFolderName + "' - " + err.Error())
 		return fmt.Errorf("failed to commit batch: %s", err.Error())
 	}
 
-	utils.Success("[SEAL.SUCCESS]: Batch commit completed successfully for root folder: " + rootFolderName)
+	utils.Success("[" + config.Aliases.Commit + ".SUCCESS]: Batch commit completed successfully for root folder: " + rootFolderName)
 	return nil
 }
