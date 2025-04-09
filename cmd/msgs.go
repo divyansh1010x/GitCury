@@ -71,9 +71,92 @@
 // 	rootCmd.AddCommand(getMsgsCmd)
 // }
 
+// package cmd
+
+// import (
+// 	"GitCury/core"
+// 	"GitCury/output"
+// 	"GitCury/utils"
+
+// 	"github.com/spf13/cobra"
+// )
+
+// var (
+// 	numFiles       int
+// 	rootFolderName string
+// 	allFlag        bool
+// )
+
+// var genesisCmd = &cobra.Command{
+// 	Use:   "genesis",
+// 	Short: "Forge commit messages for altered files",
+// 	Long: `
+// ╔══════════════════════════════════════════════════════════╗
+// ║                  GENESIS: MESSAGE FORGER                 ║
+// ╚══════════════════════════════════════════════════════════╝
+
+// [INITIATING]: The Genesis Protocol—crafting commit messages with precision.
+
+// Operational Modes:
+// • --all : 🌐 Forge commit messages for all altered files across all root folders.
+// • --root <folder> : 📂 Specify a root folder to localize commit message generation.
+
+// Examples:
+// • Forge for all folders:
+// 	gitcury genesis --all --num 5
+
+// • Target a specific root folder:
+// 	gitcury genesis --root my-folder --num 5
+
+// [NOTICE]: Ensure proper configuration of root folders to optimize message crafting.
+// `,
+// 	Run: func(cmd *cobra.Command, args []string) {
+// 		if allFlag {
+// 			utils.Info("[GENESIS]: 🌌 Forging messages for all root folders.")
+// 			err := core.GetAllMsgs(numFiles)
+// 			if err != nil {
+// 				utils.Error("[GENESIS.FAIL]: ❌ " + err.Error())
+// 				return
+// 			}
+
+// 			allOutput := output.GetAll()
+// 			utils.Success("[GENESIS.SUCCESS]: ✨ Commit messages crafted for all root folders.")
+// 			utils.Print(utils.ToJSON(allOutput))
+// 		} else if rootFolderName != "" {
+// 			utils.Info("[GENESIS]: 📂 Targeting root folder: " + rootFolderName)
+// 			err := core.GetMsgsForRootFolder(rootFolderName, numFiles)
+// 			if err != nil {
+// 				utils.Error("[GENESIS.FAIL]: ❌ " + err.Error())
+// 				return
+// 			}
+
+// 			rootFolder := output.GetFolder(rootFolderName)
+// 			if len(rootFolder.Files) == 0 {
+// 				utils.Error("[GENESIS.FAIL]: ⚠️ No altered files detected in the specified root folder.")
+// 				return
+// 			}
+
+// 			utils.Success("[GENESIS.SUCCESS]: ✨ Commit messages crafted for root folder: " + rootFolderName)
+// 			utils.Print(utils.ToJSON(rootFolder))
+// 		} else {
+// 			utils.Error("[GENESIS.FAIL]: ❗ Specify either --all or --root flag to proceed.")
+// 		}
+// 	},
+// }
+
+// func init() {
+// 	genesisCmd.Flags().IntVarP(&numFiles, "num", "n", 0, "🔢 Limit the number of files per commit (overrides config)")
+// 	genesisCmd.Flags().StringVarP(&rootFolderName, "root", "r", "", "📂 Specify a root folder for localized message crafting")
+// 	genesisCmd.Flags().BoolVarP(&allFlag, "all", "a", false, "🌐 Forge messages for all altered files across all root folders")
+
+// 	rootCmd.AddCommand(genesisCmd)
+// }
+
+
 package cmd
 
 import (
+	"GitCury/config"
 	"GitCury/core"
 	"GitCury/output"
 	"GitCury/utils"
@@ -87,67 +170,66 @@ var (
 	allFlag        bool
 )
 
-var genesisCmd = &cobra.Command{
-	Use:   "genesis",
-	Short: "Forge commit messages for altered files",
+var getMsgsCmd = &cobra.Command{
+	Use:   "getmsgs",
+	Short: "Generate commit messages for changed files",
 	Long: `
-╔══════════════════════════════════════════════════════════╗
-║                  GENESIS: MESSAGE FORGER                 ║
-╚══════════════════════════════════════════════════════════╝
+Generate commit messages for changed files.
 
-[INITIATING]: The Genesis Protocol—crafting commit messages with precision.
+Aliases:
+• ` + config.Aliases.GetMsgs + `
 
-Operational Modes:
-• --all : 🌐 Forge commit messages for all altered files across all root folders.
-• --root <folder> : 📂 Specify a root folder to localize commit message generation.
+Options:
+• --all : Generate commit messages for all changed files in all root folders.
+• --root <folder> : Generate commit messages for changed files in a specific root folder.
 
 Examples:
-• Forge for all folders:
-	gitcury genesis --all --num 5
+• Generate messages for all folders:
+	gitcury getmsgs --all --num 5
 
-• Target a specific root folder:
-	gitcury genesis --root my-folder --num 5
+• Generate messages for a specific folder:
+	gitcury getmsgs --root my-folder --num 5
 
-[NOTICE]: Ensure proper configuration of root folders to optimize message crafting.
+[NOTICE]: Ensure proper configuration of root folders to optimize message generation.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if allFlag {
-			utils.Info("[GENESIS]: 🌌 Forging messages for all root folders.")
+			utils.Info("[" + config.Aliases.GetMsgs + "]: Generating messages for all root folders.")
 			err := core.GetAllMsgs(numFiles)
 			if err != nil {
-				utils.Error("[GENESIS.FAIL]: ❌ " + err.Error())
+				utils.Error("[" + config.Aliases.GetMsgs + "]: Error encountered - " + err.Error())
 				return
 			}
 
 			allOutput := output.GetAll()
-			utils.Success("[GENESIS.SUCCESS]: ✨ Commit messages crafted for all root folders.")
+			utils.Success("[" + config.Aliases.GetMsgs + "]: Commit messages generated for all root folders successfully.")
 			utils.Print(utils.ToJSON(allOutput))
 		} else if rootFolderName != "" {
-			utils.Info("[GENESIS]: 📂 Targeting root folder: " + rootFolderName)
+			utils.Info("[" + config.Aliases.GetMsgs + "]: Targeting root folder: " + rootFolderName)
 			err := core.GetMsgsForRootFolder(rootFolderName, numFiles)
 			if err != nil {
-				utils.Error("[GENESIS.FAIL]: ❌ " + err.Error())
+				utils.Error("[" + config.Aliases.GetMsgs + "]: Error encountered - " + err.Error())
 				return
 			}
 
 			rootFolder := output.GetFolder(rootFolderName)
 			if len(rootFolder.Files) == 0 {
-				utils.Error("[GENESIS.FAIL]: ⚠️ No altered files detected in the specified root folder.")
+				utils.Error("[" + config.Aliases.GetMsgs + "]: No changed files detected in the specified root folder.")
 				return
 			}
 
-			utils.Success("[GENESIS.SUCCESS]: ✨ Commit messages crafted for root folder: " + rootFolderName)
+			utils.Success("[" + config.Aliases.GetMsgs + "]: Commit messages generated for root folder: " + rootFolderName + " successfully.")
 			utils.Print(utils.ToJSON(rootFolder))
 		} else {
-			utils.Error("[GENESIS.FAIL]: ❗ Specify either --all or --root flag to proceed.")
+			utils.Error("[" + config.Aliases.GetMsgs + "]: You must specify either --all or --root flag.")
 		}
 	},
 }
 
 func init() {
-	genesisCmd.Flags().IntVarP(&numFiles, "num", "n", 0, "🔢 Limit the number of files per commit (overrides config)")
-	genesisCmd.Flags().StringVarP(&rootFolderName, "root", "r", "", "📂 Specify a root folder for localized message crafting")
-	genesisCmd.Flags().BoolVarP(&allFlag, "all", "a", false, "🌐 Forge messages for all altered files across all root folders")
+	getMsgsCmd.Flags().IntVarP(&numFiles, "num", "n", 0, "Limit the number of files per commit (overrides config)")
+	getMsgsCmd.Flags().StringVarP(&rootFolderName, "root", "r", "", "Specify a root folder for localized message generation")
+	getMsgsCmd.Flags().BoolVarP(&allFlag, "all", "a", false, "Generate messages for all changed files across all root folders")
 
-	rootCmd.AddCommand(genesisCmd)
+	rootCmd.AddCommand(getMsgsCmd)
 }
