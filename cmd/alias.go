@@ -74,7 +74,7 @@ Examples:
 }
 
 func ReampAlias(root *cobra.Command) {
-	utils.Info("[ALIAS]: Re-mapping aliases to commands.")
+	utils.Debug("[ALIAS]: Re-mapping aliases to commands.")
 	for cmdName, alias := range Aliases {
 		cmd, _, err := root.Find([]string{cmdName})
 		if err != nil {
@@ -86,13 +86,13 @@ func ReampAlias(root *cobra.Command) {
 			continue
 		}
 		cmd.Aliases = append(cmd.Aliases, alias)
-		utils.Success("[ALIAS]: Alias '" + alias + "' mapped to command '" + cmdName + "'.")
+		utils.Debug("[ALIAS]: Alias '" + alias + "' mapped to command '" + cmdName + "'.")
 	}
 }
 
 func init() {
 	rootCmd.AddCommand(aliasCmd)
-	aliasCmd.Flags().StringArrayP("add", "a", []string{}, "Add a new alias for a command")
+	aliasCmd.Flags().StringSliceP("add", "a", []string{}, "Add a new alias for a command")
 	aliasCmd.Flags().StringP("remove", "r", "", "Remove an existing alias")
 	aliasCmd.Flags().BoolP("list", "l", false, "List all existing aliases")
 }
