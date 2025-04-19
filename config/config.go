@@ -179,9 +179,10 @@ func Set(key string, value any) {
 	defer mu.Unlock()
 	settings[key] = value
 
+	utils.Debug("[" + Aliases.Config + "]: 🔧 Setting configuration key: " + key + " with value: " + utils.ToJSON(value))
 	utils.Debug("[" + Aliases.Config + "]: 💾 Saving updated configuration...")
 
-	configFilePath := os.Getenv("HOME") + "/.gitcury/ json"
+	configFilePath := os.Getenv("HOME") + "/.gitcury/config.json"
 
 	file, err := os.OpenFile(configFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
@@ -222,7 +223,7 @@ func Remove(key string) {
 		mu.RLock()
 		defer mu.RUnlock()
 
-		configFilePath := os.Getenv("HOME") + "/.gitcury/ json"
+		configFilePath := os.Getenv("HOME") + "/.gitcury/config.json"
 
 		file, err := os.OpenFile(configFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 		if err != nil {
@@ -242,7 +243,7 @@ func Delete() {
 	utils.Debug("[" + Aliases.Config + "]: 🗑️ Deleting configuration file...")
 	mu.Lock()
 	defer mu.Unlock()
-	configFilePath := os.Getenv("HOME") + "/.gitcury/ json"
+	configFilePath := os.Getenv("HOME") + "/.gitcury/config.json"
 	if err := os.Remove(configFilePath); err != nil {
 		utils.Error("[" + Aliases.Config + "]: ⚠️ Error deleting configuration file: " + err.Error())
 	}
