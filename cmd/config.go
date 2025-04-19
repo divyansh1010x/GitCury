@@ -391,6 +391,9 @@ Examples:
 
 • Update root folders:
 	gitcury set --key root_folders --value /path/to/folder1,/path/to/folder2
+	
+• Set numeric value:
+	gitcury set --key numFilesToCommit --value 10
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if configSetKey == "" || configSetValue == "" {
@@ -405,6 +408,17 @@ Examples:
 			}
 			config.Set(configSetKey, values)
 			utils.Success("[" + config.Aliases.Config + "]: Directive set: " + configSetKey + " = " + utils.ToJSON(values))
+		} else if utils.IsNumeric(configSetValue) {
+			// Handle numeric values (convert to int if possible)
+			intValue, err := utils.ParseInt(configSetValue)
+			if err == nil {
+				config.Set(configSetKey, intValue)
+				utils.Success("[" + config.Aliases.Config + "]: Directive set: " + configSetKey + " = " + configSetValue)
+			} else {
+				// Fall back to string if conversion fails
+				config.Set(configSetKey, configSetValue)
+				utils.Success("[" + config.Aliases.Config + "]: Directive set: " + configSetKey + " = " + configSetValue)
+			}
 		} else {
 			config.Set(configSetKey, configSetValue)
 			utils.Success("[" + config.Aliases.Config + "]: Directive set: " + configSetKey + " = " + configSetValue)
