@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 )
 
@@ -31,4 +32,30 @@ func ToJSON(data interface{}) string {
 	}
 	Debug("[JSON]: ✨ Successfully marshalled data to JSON")
 	return string(jsonData)
+}
+
+func IsNumeric(s string) bool {
+	for _, char := range s {
+		if char < '0' || char > '9' {
+			return false
+		}
+	}
+
+	Debug("[NUMERIC]: 🔢 String is numeric: " + s)
+	return len(s) > 0
+}
+
+func ParseInt(s string) (int, error) {
+	if !IsNumeric(s) {
+		Error("[PARSE]: 🚨 Error parsing string to int: " + s)
+		return 0, fmt.Errorf("invalid number: %s", s)
+	}
+
+	result := 0
+	for _, char := range s {
+		result = result*10 + int(char-'0')
+	}
+
+	Debug("[PARSE]: 🔢 Successfully parsed string to int: " + s)
+	return result, nil
 }
