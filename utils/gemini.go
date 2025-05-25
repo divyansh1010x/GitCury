@@ -32,7 +32,7 @@ func printResponse(resp *genai.GenerateContentResponse) {
 	}
 }
 
-func SendToGemini(contextData map[string]string, apiKey string) (string, error) {
+func SendToGemini(contextData map[string]map[string]string, apiKey string) (string, error) {
 
 	ctx := context.Background()
 	client, err := genai.NewClient(ctx, option.WithAPIKey(apiKey))
@@ -70,8 +70,12 @@ func SendToGemini(contextData map[string]string, apiKey string) (string, error) 
 	revert – revert a previous commit
 	`))
 
-	prompt := `file: "` + contextData["file"] + `"\n` +
-		`type: "` + contextData["type"] + `",\n\n diff: "` + contextData["diff"] + `"`
+	var promptBuilder strings.Builder
+	promptBuilder.WriteString("Summarize the following file changes:\n\n")
+	for file, data := range contextData {
+		promptBuilder.WriteString(fmt.Sprintf("File: %s\nType: %s\nDiff:\n%s\n\n", file, data["type"], data["diff"]))
+	}
+	prompt := promptBuilder.String()
 
 	var resp *genai.GenerateContentResponse
 	for retries := 0; retries < maxRetries; retries++ {

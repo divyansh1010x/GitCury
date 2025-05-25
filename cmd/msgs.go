@@ -168,13 +168,14 @@ var (
 	numFiles       int
 	rootFolderName string
 	allFlag        bool
+	groupFlag	   bool				
 )
 
 var getMsgsCmd = &cobra.Command{
 	Use:   "getmsgs",
-	Short: "Generate commit messages for changed files",
+	Short: "Generate commit messages for changed files and grouping options",
 	Long: `
-Generate commit messages for changed files.
+Generate commit messages for changed files and grouping options.
 
 Aliases:
 • ` + config.Aliases.GetMsgs + `
@@ -182,6 +183,9 @@ Aliases:
 Options:
 • --all : Generate commit messages for all changed files in all root folders.
 • --root <folder> : Generate commit messages for changed files in a specific root folder.
+• --num <number> : Limit the number of files per commit (overrides config).
+• --group : Group commit messages by file type.
+• --help : Display this help message.
 
 Examples:
 • Generate messages for all folders:
@@ -190,12 +194,26 @@ Examples:
 • Generate messages for a specific folder:
 	gitcury getmsgs --root my-folder --num 5
 
+• Generate messages for all folders with grouping:
+	gitcury getmsgs --all --num 5 --group
+
+• Generate messages for a specific folder with grouping:
+	gitcury getmsgs --root my-folder --num 5 --group
+
 [NOTICE]: Ensure proper configuration of root folders to optimize message generation.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if allFlag {
 			utils.Info("[" + config.Aliases.GetMsgs + "]: Generating messages for all root folders.")
-			err := core.GetAllMsgs(numFiles)
+			var err error
+
+			if groupFlag {
+				utils.Debug("[" + config.Aliases.GetMsgs + "]: Grouping logic enabled via --group flag for all folders.")
+				err = core.GroupAndGetAllMsgs(numFiles)
+			} else {
+				err = core.GetAllMsgs(numFiles)
+			}
+			
 			if err != nil {
 				utils.Error("[" + config.Aliases.GetMsgs + "]: Error encountered - " + err.Error())
 				return
@@ -206,23 +224,29 @@ Examples:
 			utils.Print(utils.ToJSON(allOutput))
 		} else if rootFolderName != "" {
 			utils.Info("[" + config.Aliases.GetMsgs + "]: Targeting root folder: " + rootFolderName)
-			err := core.GetMsgsForRootFolder(rootFolderName, numFiles)
+		
+			var err error
+			if groupFlag {
+				utils.Debug("[" + config.Aliases.GetMsgs + "]: Grouping logic enabled via --group flag.")
+				err = core.GroupAndGetMsgsForRootFolder(rootFolderName, numFiles)
+			} else {
+				err = core.GetMsgsForRootFolder(rootFolderName, numFiles)
+			}
+		
 			if err != nil {
 				utils.Error("[" + config.Aliases.GetMsgs + "]: Error encountered - " + err.Error())
 				return
 			}
-
+		
 			rootFolder := output.GetFolder(rootFolderName)
 			if len(rootFolder.Files) == 0 {
 				utils.Error("[" + config.Aliases.GetMsgs + "]: No changed files detected in the specified root folder.")
 				return
 			}
-
+		
 			utils.Success("[" + config.Aliases.GetMsgs + "]: Commit messages generated for root folder: " + rootFolderName + " successfully.")
 			utils.Print(utils.ToJSON(rootFolder))
-		} else {
-			utils.Error("[" + config.Aliases.GetMsgs + "]: You must specify either --all or --root flag.")
-		}
+		}		
 	},
 }
 
@@ -230,6 +254,7 @@ func init() {
 	getMsgsCmd.Flags().IntVarP(&numFiles, "num", "n", 0, "Limit the number of files per commit (overrides config)")
 	getMsgsCmd.Flags().StringVarP(&rootFolderName, "root", "r", "", "Specify a root folder for localized message generation")
 	getMsgsCmd.Flags().BoolVarP(&allFlag, "all", "a", false, "Generate messages for all changed files across all root folders")
+	getMsgsCmd.Flags().BoolVarP(&groupFlag, "group", "g" , false, "Group commit messages by file type")
 
 	rootCmd.AddCommand(getMsgsCmd)
 }
