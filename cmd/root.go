@@ -71,10 +71,54 @@ Simplify your Git workflow with AI:
 }
 
 func Execute() {
-	config.LoadConfig()
+	// Ensure config is loaded
+	err := utils.SafeExecute("LoadConfig", func() error {
+		return config.LoadConfig()
+	})
+
+	if err != nil {
+		utils.Error("Failed to load configuration: " + err.Error())
+		utils.Info("Falling back to default configuration")
+		// Continue with defaults
+	}
+
+	// Add a version flag to the root command
+	rootCmd.PersistentFlags().BoolP("version", "v", false, "Print the version number of GitCury")
+
+	// Add common flags
+	rootCmd.PersistentFlags().BoolP("quiet", "q", false, "Minimize output, only show errors")
+	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Enable debug output")
+
+	// Add a hook to handle flags before executing the command
+	cobra.OnInitialize(func() {
+		// Check if version flag is set
+		versionFlag, _ := rootCmd.Flags().GetBool("version")
+		if versionFlag {
+			version := config.Get("version").(string)
+			if version == "" {
+				version = "1.0.0"
+			}
+			utils.Info("GitCury version " + version)
+			os.Exit(0)
+		}
+
+		// Handle quiet flag
+		quietFlag, _ := rootCmd.Flags().GetBool("quiet")
+		if quietFlag {
+			utils.SetLogLevel("error")
+		}
+
+		// Handle debug flag
+		debugFlag, _ := rootCmd.Flags().GetBool("debug")
+		if debugFlag {
+			utils.SetLogLevel("debug")
+		}
+	})
+
+	// Remap aliases
 	ReampAlias(rootCmd)
 
-	// Override the default help template to include aliases
+	// Override the default help template to include aliases and better formatting
 	cobra.AddTemplateFunc("aliasList", func(cmd *cobra.Command) string {
 		if len(cmd.Aliases) > 0 {
 			return cmd.NameAndAliases()
@@ -82,29 +126,35 @@ func Execute() {
 		return ""
 	})
 
-	rootCmd.SetHelpTemplate(`{{.UseLine}}
-{{.Long}}
+	rootCmd.SetHelpTemplate(`{{with (or .Long .Short)}}{{. | trimTrailingWhitespaces}}{{end}}
 
-{{if .HasAvailableSubCommands}}Available Commands:
-  {{printf "\n  %-15s %-20s %s" "Name" "Aliases" "Description"}}
-{{range .Commands}}{{if (or .IsAvailableCommand (eq .Name "help"))}}
-  {{printf "%-15s %-20s %s" .Name (aliasList .) .Short}}{{end}}{{end}}{{end}}
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                             AVAILABLE COMMANDS                               ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
-{{if .HasAvailableLocalFlags}}Flags:
-{{.LocalFlags.FlagUsages | trimTrailingWhitespaces}}{{end}}
+{{if .HasAvailableSubCommands}}{{range .Commands}}{{if (or .IsAvailableCommand (eq .Name "help"))}}  {{rpad .Name 15}} {{rpad (aliasList .) 20}} {{.Short}}
+{{end}}{{end}}{{end}}
 
-{{if .HasAvailableInheritedFlags}}Global Flags:
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                              COMMAND FLAGS                                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+{{if .HasAvailableLocalFlags}}{{.LocalFlags.FlagUsages | trimTrailingWhitespaces}}{{end}}
+
+{{if .HasAvailableInheritedFlags}}╔══════════════════════════════════════════════════════════════════════════════╗
+║                              GLOBAL FLAGS                                    ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
 {{.InheritedFlags.FlagUsages | trimTrailingWhitespaces}}{{end}}
 
-{{if .HasHelpSubCommands}}Additional help topics:
-{{range .Commands}}{{if .IsAdditionalHelpTopicCommand}}
-  {{rpad .CommandPath .CommandPathPadding}} {{.Short}}{{end}}{{end}}{{end}}
-
 Use "{{.CommandPath}} [command] --help" for more information about a command.
+For complete documentation, visit: https://github.com/lakshyajain-0291/GitCury
 `)
 
+	// Use custom error handling with user-friendly messages
 	if err := rootCmd.Execute(); err != nil {
-		utils.Error("Error executing command: " + err.Error())
+		// Convert error to user-friendly message
+		utils.Error(utils.ToUserFriendlyMessage(err))
 		os.Exit(1)
 	}
 }
