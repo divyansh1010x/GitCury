@@ -316,7 +316,6 @@
 // 	rootCmd.AddCommand(nexusCmd)
 // }
 
-
 package cmd
 
 import (
@@ -473,7 +472,7 @@ func init() {
 	removeCmd.Flags().StringVarP(&configRemoveKey, "key", "k", "", "Directive key to remove")
 	removeCmd.Flags().StringVarP(&configRemoveRoot, "root", "r", "", "Specific root folder to remove")
 
-	configCmd.Flags().BoolVarP(&deleteConfig, "delete", "d", false, "Delete all directives from the configuration")
+	configCmd.Flags().BoolVarP(&deleteConfig, "delete", "x", false, "Delete all directives from the configuration")
 	configCmd.AddCommand(removeCmd)
 	configCmd.AddCommand(setCmd)
 
