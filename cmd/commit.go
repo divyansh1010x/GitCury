@@ -1,271 +1,9 @@
-// // package cmd
-
-// // import (
-// // 	"GitCury/core"
-// // 	"GitCury/utils"
-
-// // 	"github.com/spf13/cobra"
-// // )
-
-// // var (
-// // 	commitAllFlag bool
-// // 	folderName    string
-// // )
-// // var commitCmd = &cobra.Command{
-// // 	Use:   "commit",
-// // 	Short: "Commit files with generated messages",
-// // 	Long: `
-// // This command commits files with generated messages.
-// // You can use the --all flag to commit all files with generated messages,
-// // or use the --root flag to specify a particular root folder.
-// // For example:
-// //   gitcury commit --all
-// // or
-// //   gitcury commit --root my-folder`,
-// // 	Run: func(cmd *cobra.Command, args []string) {
-// // 		if commitAllFlag {
-// // 			err := core.CommitAllRoots()
-// // 			if err != nil {
-// // 				utils.Error(err.Error())
-// // 				return
-// // 			}
-// // 			utils.Info("Successfully committed all files with generated messages.")
-// // 		} else if folderName != "" {
-// // 			err := core.CommitOneRoot(folderName)
-// // 			if err != nil {
-// // 				utils.Error(err.Error())
-// // 				return
-// // 			}
-// // 			utils.Info("Successfully committed files in the specified folder with generated messages.")
-// // 		} else {
-// // 			utils.Error("You must specify either --all or --root flag.")
-// // 		}
-// // 	},
-// // }
-
-// // func init() {
-// // 	commitCmd.Flags().BoolVarP(&commitAllFlag, "all", "a", false, "Commit all files with generated messages")
-// // 	commitCmd.Flags().StringVarP(&folderName, "root", "r", "", "Commit files in the specified root folder with generated messages")
-// // 	rootCmd.AddCommand(commitCmd)
-// // }
-
-// // package cmd
-
-// // import (
-// // 	"GitCury/core"
-// // 	"GitCury/utils"
-// // 	"os"
-// // 	"os/exec"
-// // 	"time"
-
-// // 	"github.com/spf13/cobra"
-// // )
-
-// // var (
-// // 	commitDateTime string
-// // 	commitAllFlag  bool
-// // 	folderName     string
-// // )
-
-// // var commitCmd = &cobra.Command{
-// // 	Use:   "commit",
-// // 	Short: "Commit files with generated messages",
-// // 	Long: `
-// // This command commits files with generated messages.
-// // You can use the --all flag to commit all files with generated messages,
-// // or use the --root flag to specify a particular root folder.
-// // For example:
-// //   gitcury commit --all
-// // or
-// //   gitcury commit --root my-folder`,
-// // 	Run: func(cmd *cobra.Command, args []string) {
-// // 		if commitAllFlag {
-// // 			err := core.CommitAllRoots()
-// // 			if err != nil {
-// // 				utils.Error(err.Error())
-// // 				return
-// // 			}
-// // 			utils.Info("Successfully committed all files with generated messages.")
-// // 		} else if folderName != "" {
-// // 			err := core.CommitOneRoot(folderName)
-// // 			if err != nil {
-// // 				utils.Error(err.Error())
-// // 				return
-// // 			}
-// // 			utils.Info("Successfully committed files in the specified folder with generated messages.")
-// // 		} else {
-// // 			utils.Error("You must specify either --all or --root flag.")
-// // 		}
-// // 	},
-// // }
-
-// // var commitWithDateCmd = &cobra.Command{
-// // 	Use:   "with-date",
-// // 	Short: "Commit files with a specified date and time",
-// // 	Long: `
-// // This subcommand allows you to temporarily change the system date and time,
-// // commit files with generated messages, and then restore the original date and time.
-// // For example:
-// //   gitcury commit with-date --datetime "2023-01-01T12:00:00" --all
-// // or
-// //   gitcury commit with-date --datetime "2023-01-01T12:00:00" --root my-folder`,
-// // 	Run: func(cmd *cobra.Command, args []string) {
-// // 		if commitDateTime == "" {
-// // 			utils.Error("You must specify the --datetime flag in the format 'YYYY-MM-DDTHH:MM:SS'.")
-// // 			return
-// // 		}
-
-// // 		// Parse the provided date-time
-// // 		_, err := time.Parse("2006-01-02T15:04:05", commitDateTime)
-// // 		if err != nil {
-// // 			utils.Error("Invalid date-time format. Use 'YYYY-MM-DDTHH:MM:SS'.")
-// // 			return
-// // 		}
-
-// // 		// Set environment variables for the commit
-// // 		utils.Info("Setting commit date and time to: " + commitDateTime)
-// // 		env := append(os.Environ(),
-// // 			"GIT_AUTHOR_DATE="+commitDateTime,
-// // 			"GIT_COMMITTER_DATE="+commitDateTime,
-// // 		)
-// // 	},
-// // }
-
-// // func restoreOriginalDateTime(originalDateTime string) {
-// // 	utils.Info("Restoring original system date and time...")
-// // 	restoreDateTimeCmd := exec.Command("sudo", "date", "-s", originalDateTime)
-// // 	if err := restoreDateTimeCmd.Run(); err != nil {
-// // 		utils.Error("Failed to restore original system date and time: " + err.Error())
-// // 	} else {
-// // 		utils.Info("Successfully restored original system date and time.")
-// // 	}
-// // }
-
-// // func init() {
-// // 	commitWithDateCmd.Flags().BoolVarP(&commitAllFlag, "all", "a", false, "Commit all files with generated messages")
-// // 	commitWithDateCmd.Flags().StringVarP(&folderName, "root", "r", "", "Commit files in the specified root folder with generated messages")
-// // 	commitWithDateCmd.Flags().StringVarP(&commitDateTime, "datetime", "d", "", "Specify the commit date and time in 'YYYY-MM-DDTHH:MM:SS' format")
-// // 	commitCmd.AddCommand(commitWithDateCmd)
-// // 	rootCmd.AddCommand(commitCmd)
-// // }
-
 // package cmd
 
 // import (
+// 	"GitCury/config"
 // 	"GitCury/core"
-// 	"GitCury/utils"
-// 	"os"
-// 	"time"
-
-// 	"github.com/spf13/cobra"
-// )
-
-// var (
-// 	commitDateTime string
-// 	commitAllFlag  bool
-// 	folderName     string
-// )
-
-// var commitCmd = &cobra.Command{
-// 	Use:   "commit",
-// 	Short: "Commit files with generated messages",
-// 	Long: `
-// The 'commit' command allows you to commit files with generated messages.
-// You can commit all files or specify a root folder for commits.
-// For example:
-//   gitcury commit --all
-// or
-//   gitcury commit --root my-folder`,
-// 	Run: func(cmd *cobra.Command, args []string) {
-// 		if commitAllFlag {
-// 			err := core.CommitAllRoots()
-// 			if err != nil {
-// 				utils.Error(err.Error())
-// 				return
-// 			}
-// 			utils.Info("Successfully committed all files with generated messages.")
-// 		} else if folderName != "" {
-// 			err := core.CommitOneRoot(folderName)
-// 			if err != nil {
-// 				utils.Error(err.Error())
-// 				return
-// 			}
-// 			utils.Info("Successfully committed files in the specified folder with generated messages.")
-// 		} else {
-// 			utils.Error("You must specify either --all or --root flag.")
-// 		}
-// 	},
-// }
-
-// var withDateCmd = &cobra.Command{
-// 	Use:   "with-date",
-// 	Short: "Commit files with a specified date and time",
-// 	Long: `
-// The 'with-date' subcommand allows you to commit files with a specified date and time.
-// This is achieved without changing the system date by using Git's environment variables.
-// For example:
-//   gitcury commit with-date --datetime "2023-01-01T12:00:00" --all
-// or
-//   gitcury commit with-date --datetime "2023-01-01T12:00:00" --root my-folder`,
-// 	Run: func(cmd *cobra.Command, args []string) {
-// 		if commitDateTime == "" {
-// 			utils.Error("You must specify the --datetime flag in the format 'YYYY-MM-DDTHH:MM:SS'.")
-// 			return
-// 		}
-
-// 		// Validate the date-time format
-// 		_, err := time.Parse("2006-01-02T15:04:05", commitDateTime)
-// 		if err != nil {
-// 			utils.Error("Invalid date-time format. Use 'YYYY-MM-DDTHH:MM:SS'.")
-// 			return
-// 		}
-
-// 		// Set Git's environment variables
-// 		env := append(os.Environ(),
-// 			"GIT_AUTHOR_DATE="+commitDateTime,
-// 			"GIT_COMMITTER_DATE="+commitDateTime,
-// 		)
-
-// 		utils.Info("Setting commit date and time to: " + commitDateTime)
-
-// 		// Execute the commit logic
-// 		var commitErr error
-// 		if commitAllFlag {
-// 			commitErr = core.CommitAllRoots(env)
-// 		} else if folderName != "" {
-// 			commitErr = core.CommitOneRoot(folderName, env)
-// 		} else {
-// 			utils.Error("You must specify either --all or --root flag.")
-// 			return
-// 		}
-
-// 		if commitErr != nil {
-// 			utils.Error("Failed to commit: " + commitErr.Error())
-// 			return
-// 		}
-// 		utils.Info("Successfully committed files with the specified date and time.")
-// 	},
-// }
-
-// func init() {
-// 	// Add flags to the with-date subcommand
-// 	withDateCmd.Flags().StringVarP(&commitDateTime, "datetime", "d", "", "Specify the commit date and time in 'YYYY-MM-DDTHH:MM:SS' format")
-// 	withDateCmd.Flags().BoolVarP(&commitAllFlag, "all", "a", false, "Commit all files with generated messages")
-// 	withDateCmd.Flags().StringVarP(&folderName, "root", "r", "", "Commit files in the specified root folder with generated messages")
-
-// 	// Add the with-date subcommand to the commit command
-// 	commitCmd.AddCommand(withDateCmd)
-
-// 	commitCmd.Flags().BoolVarP(&commitAllFlag, "all", "a", false, "Commit all files with generated messages")
-// 	commitCmd.Flags().StringVarP(&folderName, "root", "r", "", "Commit files in the specified root folder with generated messages")
-// 	// Add the commit command to the root command
-// 	rootCmd.AddCommand(commitCmd)
-// }
-
-// package cmd
-
-// import (
-// 	"GitCury/core"
+// 	"GitCury/git"
 // 	"GitCury/utils"
 // 	"os"
 // 	"time"
@@ -279,129 +17,216 @@
 // 	folderName   string
 // )
 
-// var sealCmd = &cobra.Command{
-// 	Use:   "seal",
-// 	Short: "Seal changes with autogenerated commit messages",
+// var commitCmd = &cobra.Command{
+// 	Use:   "commit",
+// 	Short: "Commit changes with autogenerated commit messages",
 // 	Long: `
-// ╔══════════════════════════════════════════════════╗
-// ║              SEAL: COMMIT MESSAGE ENGRAVER       ║
-// ╚══════════════════════════════════════════════════╝
+// Commit changes with autogenerated commit messages.
 
-// [INITIATING]: The Seal Protocol—engraving changes with precision.
+// Aliases:
+// • ` + config.Aliases.Commit + `
 
-// Operational Modes:
-// • --all : Seal all changes across all root folders.
-// • --root <folder> : Specify a root folder for localized sealing.
+// Options:
+// • --all : Commit all changes with autogenerated messages.
+// • --root <folder> : Commit changes in a specific root folder with autogenerated messages.
 
 // Examples:
-// • Seal all changes:
-// 	gitcury seal --all
+// • Commit all changes:
+// 	gitcury commit --all
 
-// • Target a specific root folder:
-// 	gitcury seal --root my-folder
+// • Commit changes in a folder:
+// 	gitcury commit --root my-folder
 
-// [NOTICE]: Ensure commit messages are generated before sealing.
+// [NOTICE]: Ensure the commit messages are generated before committing.
 // `,
 // 	Run: func(cmd *cobra.Command, args []string) {
-// 		if sealAllFlag {
-// 			utils.Info("[SEAL]: Engraving all changes across root folders.")
-// 			err := core.CommitAllRoots()
-// 			if err != nil {
-// 				utils.Error("[SEAL.FAIL]: ❌ Error encountered - " + err.Error())
-// 				return
+// 		// Use our SafeExecute function to add panic recovery
+// 		err := utils.SafeExecute("CommitChanges", func() error {
+// 			if sealAllFlag {
+// 				utils.Info("[" + config.Aliases.Commit + "]: Committing all changes across root folders.")
+// 				err := core.CommitAllRoots()
+// 				if err != nil {
+// 					return utils.NewGitError(
+// 						"Failed to commit all changes",
+// 						err,
+// 						map[string]interface{}{
+// 							"operation": "CommitAllRoots",
+// 						},
+// 					)
+// 				}
+// 				utils.Success("[" + config.Aliases.Commit + "]: All changes committed successfully.")
+// 			} else if folderName != "" {
+// 				// Validate the folder exists
+// 				if _, err := os.Stat(folderName); os.IsNotExist(err) {
+// 					return utils.NewValidationError(
+// 						"Root folder does not exist",
+// 						err,
+// 						map[string]interface{}{
+// 							"folderName": folderName,
+// 						},
+// 					)
+// 				}
+
+// 				utils.Info("[" + config.Aliases.Commit + "]: Targeting root folder: " + folderName)
+// 				err := core.CommitOneRoot(folderName)
+// 				if err != nil {
+// 					return utils.NewGitError(
+// 						"Failed to commit changes in folder",
+// 						err,
+// 						map[string]interface{}{
+// 							"operation": "CommitOneRoot",
+// 							"folder": folderName,
+// 						},
+// 					)
+// 				}
+// 				utils.Success("[" + config.Aliases.Commit + "]: Changes in the specified folder committed successfully.")
+// 			} else {
+// 				return utils.NewValidationError(
+// 					"You must specify either --all or --root flag",
+// 					nil,
+// 					map[string]interface{}{
+// 						"availableFlags": []string{"--all", "--root"},
+// 					},
+// 				)
 // 			}
-// 			utils.Success("[SEAL.SUCCESS]: 🔒 All changes sealed successfully.")
-// 		} else if folderName != "" {
-// 			utils.Info("[SEAL]: Targeting root folder: " + folderName)
-// 			err := core.CommitOneRoot(folderName)
-// 			if err != nil {
-// 				utils.Error("[SEAL.FAIL]: ❌ Error encountered - " + err.Error())
-// 				return
-// 			}
-// 			utils.Success("[SEAL.SUCCESS]: 🔒 Changes in the specified folder sealed successfully.")
-// 		} else {
-// 			utils.Error("[SEAL.FAIL]: ❗ You must specify either --all or --root flag.")
+// 			return nil
+// 		})
+
+// 		if err != nil {
+// 			utils.Error(utils.ToUserFriendlyMessage(err))
 // 		}
 // 	},
 // }
 
 // var withDateCmd = &cobra.Command{
 // 	Use:   "with-date",
-// 	Short: "⏳ Seal changes with a specified timestamp",
+// 	Short: "Commit changes with a specified timestamp",
 // 	Long: `
-// ╔══════════════════════════════════════════════════╗
-// ║        SEAL WITH DATE: PRECISION ENGRAVING       ║
-// ╚══════════════════════════════════════════════════╝
+// Commit changes with a specific date and time.
 
-// [INITIATING]: The Seal with Date Protocol—engraving changes with a specific timestamp.
-
-// Operational Modes:
-// • --all : Seal all changes across all root folders with a timestamp.
-// • --root <folder> : Specify a root folder for localized sealing with a timestamp.
+// Options:
+// • --all : Commit all changes with the given timestamp.
+// • --root <folder> : Commit changes in a specific folder with the given timestamp.
 
 // Examples:
-// • Seal all changes with a timestamp:
-// 	gitcury seal with-date --datetime "2025-01-01T12:00:00" --all
+// • Commit all changes with a timestamp:
+// 	gitcury commit with-date --datetime "2025-01-01T12:00:00" --all
 
-// • Target a specific root folder with a timestamp:
-// 	gitcury seal with-date --datetime "2025-01-01T12:00:00" --root my-folder
+// • Commit changes in a folder with a timestamp:
+// 	gitcury commit with-date --datetime "2025-01-01T12:00:00" --root my-folder
 
-// [NOTICE]: Ensure the timestamp is in the format 'YYYY-MM-DDTHH:MM:SS'.
+// [NOTICE]: Ensure the date and time format is 'YYYY-MM-DDTHH:MM:SS'.
+// [NOTICE]: The system date and time will not be changed; only the commit date and time will be set.
+// [NOTICE]: Use with caution, as this may affect commit history and collaboration.
 // `,
 // 	Run: func(cmd *cobra.Command, args []string) {
-// 		if sealDateTime == "" {
-// 			utils.Error("[SEAL.FAIL]: ❗ You must specify the --datetime flag in the format 'YYYY-MM-DDTHH:MM:SS'.")
-// 			return
-// 		}
+// 		err := utils.SafeExecute("CommitWithDate", func() error {
+// 			if sealDateTime == "" {
+// 				return utils.NewValidationError(
+// 					"Datetime parameter is required",
+// 					nil,
+// 					map[string]interface{}{
+// 						"requiredFormat": "YYYY-MM-DDTHH:MM:SS",
+// 						"example": "2025-01-01T12:00:00",
+// 					},
+// 				)
+// 			}
 
-// 		// Validate date-time format
-// 		_, err := time.Parse("2006-01-02T15:04:05", sealDateTime)
+// 			// Validate date-time format
+// 			_, err := time.Parse("2006-01-02T15:04:05", sealDateTime)
+// 			if err != nil {
+// 				return utils.NewValidationError(
+// 					"Invalid datetime format",
+// 					err,
+// 					map[string]interface{}{
+// 						"providedValue": sealDateTime,
+// 						"requiredFormat": "YYYY-MM-DDTHH:MM:SS",
+// 						"example": "2025-01-01T12:00:00",
+// 					},
+// 				)
+// 			}
+
+// 			// Set Git environment variables for the commit
+// 			env := append(os.Environ(),
+// 				"GIT_AUTHOR_DATE="+sealDateTime,
+// 				"GIT_COMMITTER_DATE="+sealDateTime,
+// 			)
+// 			utils.Info("[" + config.Aliases.Commit + "]: Setting commit date and time to: " + sealDateTime)
+
+// 			// Execute commit logic
+// 			if sealAllFlag {
+// 				utils.Info("[" + config.Aliases.Commit + "]: Committing all changes with custom timestamp.")
+// 				err := core.CommitAllRoots(env)
+// 				if err != nil {
+// 					return utils.NewGitError(
+// 						"Failed to commit all changes with custom timestamp",
+// 						err,
+// 						map[string]interface{}{
+// 							"operation": "CommitAllRoots",
+// 							"timestamp": sealDateTime,
+// 						},
+// 					)
+// 				}
+// 			} else if folderName != "" {
+// 				// Validate the folder exists
+// 				if _, err := os.Stat(folderName); os.IsNotExist(err) {
+// 					return utils.NewValidationError(
+// 						"Root folder does not exist",
+// 						err,
+// 						map[string]interface{}{
+// 							"folderName": folderName,
+// 						},
+// 					)
+// 				}
+
+// 				utils.Info("[" + config.Aliases.Commit + "]: Committing changes in folder with custom timestamp: " + folderName)
+// 				err := core.CommitOneRoot(folderName, env)
+// 				if err != nil {
+// 					return utils.NewGitError(
+// 						"Failed to commit changes in folder with custom timestamp",
+// 						err,
+// 						map[string]interface{}{
+// 							"operation": "CommitOneRoot",
+// 							"folder": folderName,
+// 							"timestamp": sealDateTime,
+// 						},
+// 					)
+// 				}
+// 			} else {
+// 				return utils.NewValidationError(
+// 					"You must specify either --all or --root flag",
+// 					nil,
+// 					map[string]interface{}{
+// 						"availableFlags": []string{"--all", "--root"},
+// 					},
+// 				)
+// 			}
+
+// 			utils.Success("[" + config.Aliases.Commit + "]: Changes committed with the specified timestamp successfully.")
+// 			return nil
+// 		})
+
 // 		if err != nil {
-// 			utils.Error("[SEAL.FAIL]: ❌ Invalid date-time format. Use 'YYYY-MM-DDTHH:MM:SS'.")
-// 			return
+// 			utils.Error(utils.ToUserFriendlyMessage(err))
 // 		}
-
-// 		// Set Git environment variables for the commit
-// 		env := append(os.Environ(),
-// 			"GIT_AUTHOR_DATE="+sealDateTime,
-// 			"GIT_COMMITTER_DATE="+sealDateTime,
-// 		)
-// 		utils.Info("[SEAL]: Setting commit date and time to: " + sealDateTime)
-
-// 		// Execute commit logic
-// 		var commitErr error
-// 		if sealAllFlag {
-// 			commitErr = core.CommitAllRoots(env)
-// 		} else if folderName != "" {
-// 			commitErr = core.CommitOneRoot(folderName, env)
-// 		} else {
-// 			utils.Error("[SEAL.FAIL]: ❗ You must specify either --all or --root flag.")
-// 			return
-// 		}
-
-// 		if commitErr != nil {
-// 			utils.Error("[SEAL.FAIL]: ❌ Failed to seal changes - " + commitErr.Error())
-// 			return
-// 		}
-// 		utils.Success("[SEAL.SUCCESS]: 🔒 Changes sealed with the specified timestamp successfully.")
 // 	},
 // }
 
 // func init() {
 // 	// Add flags for the with-date subcommand
-// 	withDateCmd.Flags().StringVarP(&sealDateTime, "datetime", "d", "", "⏳ Specify the commit date and time in 'YYYY-MM-DDTHH:MM:SS' format")
-// 	withDateCmd.Flags().BoolVarP(&sealAllFlag, "all", "a", false, "🔒 Seal all changes with autogenerated messages")
-// 	withDateCmd.Flags().StringVarP(&folderName, "root", "r", "", "📂 Seal changes in the specified root folder with autogenerated messages")
+// 	withDateCmd.Flags().StringVarP(&sealDateTime, "datetime", "d", "", "Specify the commit date and time in 'YYYY-MM-DDTHH:MM:SS' format")
+// 	withDateCmd.Flags().BoolVarP(&sealAllFlag, "all", "a", false, "Commit all changes with autogenerated messages")
+// 	withDateCmd.Flags().StringVarP(&folderName, "root", "r", "", "Commit changes in the specified root folder with autogenerated messages")
 
 // 	// Add the with-date subcommand to the seal command
-// 	sealCmd.AddCommand(withDateCmd)
+// 	commitCmd.AddCommand(withDateCmd)
 
 // 	// Add flags to the main seal command
-// 	sealCmd.Flags().BoolVarP(&sealAllFlag, "all", "a", false, "🔒 Seal all changes with autogenerated messages")
-// 	sealCmd.Flags().StringVarP(&folderName, "root", "r", "", "📂 Seal changes in the specified root folder with autogenerated messages")
+// 	commitCmd.Flags().BoolVarP(&sealAllFlag, "all", "a", false, "Commit all changes with autogenerated messages")
+// 	commitCmd.Flags().StringVarP(&folderName, "root", "r", "", "Commit changes in the specified root folder with autogenerated messages")
 
 // 	// Add the seal command to the root command
-// 	rootCmd.AddCommand(sealCmd)
+// 	rootCmd.AddCommand(commitCmd)
 // }
 
 package cmd
@@ -409,6 +234,8 @@ package cmd
 import (
 	"GitCury/config"
 	"GitCury/core"
+	"GitCury/git"
+	"GitCury/output"
 	"GitCury/utils"
 	"os"
 	"time"
@@ -445,24 +272,60 @@ Examples:
 [NOTICE]: Ensure the commit messages are generated before committing.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		if sealAllFlag {
-			utils.Info("[" + config.Aliases.Commit + "]: Committing all changes across root folders.")
-			err := core.CommitAllRoots()
-			if err != nil {
-				utils.Error("[" + config.Aliases.Commit + "]: Error encountered - " + err.Error())
-				return
+		// Use our SafeExecute function to add panic recovery
+		err := utils.SafeExecute("CommitChanges", func() error {
+			if sealAllFlag {
+				utils.Info("[" + config.Aliases.Commit + "]: Committing all changes across root folders.")
+				err := core.CommitAllRoots()
+				if err != nil {
+					return utils.NewGitError(
+						"Failed to commit all changes",
+						err,
+						map[string]interface{}{
+							"operation": "CommitAllRoots",
+						},
+					)
+				}
+				utils.Success("[" + config.Aliases.Commit + "]: All changes committed successfully.")
+			} else if folderName != "" {
+				// Validate the folder exists
+				if _, err := os.Stat(folderName); os.IsNotExist(err) {
+					return utils.NewValidationError(
+						"Root folder does not exist",
+						err,
+						map[string]interface{}{
+							"folderName": folderName,
+						},
+					)
+				}
+
+				utils.Info("[" + config.Aliases.Commit + "]: Targeting root folder: " + folderName)
+				err := core.CommitOneRoot(folderName)
+				if err != nil {
+					return utils.NewGitError(
+						"Failed to commit changes in folder",
+						err,
+						map[string]interface{}{
+							"operation": "CommitOneRoot",
+							"folder":    folderName,
+						},
+					)
+				}
+				utils.Success("[" + config.Aliases.Commit + "]: Changes in the specified folder committed successfully.")
+			} else {
+				return utils.NewValidationError(
+					"You must specify either --all or --root flag",
+					nil,
+					map[string]interface{}{
+						"availableFlags": []string{"--all", "--root"},
+					},
+				)
 			}
-			utils.Success("[" + config.Aliases.Commit + "]: All changes committed successfully.")
-		} else if folderName != "" {
-			utils.Info("[" + config.Aliases.Commit + "]: Targeting root folder: " + folderName)
-			err := core.CommitOneRoot(folderName)
-			if err != nil {
-				utils.Error("[" + config.Aliases.Commit + "]: Error encountered - " + err.Error())
-				return
-			}
-			utils.Success("[" + config.Aliases.Commit + "]: Changes in the specified folder committed successfully.")
-		} else {
-			utils.Error("[" + config.Aliases.Commit + "]: You must specify either --all or --root flag.")
+			return nil
+		})
+
+		if err != nil {
+			utils.Error(utils.ToUserFriendlyMessage(err))
 		}
 	},
 }
@@ -489,41 +352,138 @@ Examples:
 [NOTICE]: Use with caution, as this may affect commit history and collaboration.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		if sealDateTime == "" {
-			utils.Error("[" + config.Aliases.Commit + "]: You must specify the --datetime flag in the format 'YYYY-MM-DDTHH:MM:SS'.")
-			return
-		}
+		err := utils.SafeExecute("CommitWithDate", func() error {
+			if sealDateTime == "" {
+				return utils.NewValidationError(
+					"Datetime parameter is required",
+					nil,
+					map[string]interface{}{
+						"requiredFormat": "YYYY-MM-DDTHH:MM:SS",
+						"example":        "2025-01-01T12:00:00",
+					},
+				)
+			}
 
-		// Validate date-time format
-		_, err := time.Parse("2006-01-02T15:04:05", sealDateTime)
+			// Validate date-time format
+			parsedTime, err := time.Parse("2006-01-02T15:04:05", sealDateTime)
+			if err != nil {
+				return utils.NewValidationError(
+					"Invalid datetime format",
+					err,
+					map[string]interface{}{
+						"providedValue":  sealDateTime,
+						"requiredFormat": "YYYY-MM-DDTHH:MM:SS",
+						"example":        "2025-01-01T12:00:00",
+					},
+				)
+			}
+
+			// Check if the date is in the future
+			now := time.Now()
+			if parsedTime.After(now) {
+				utils.Warning("[" + config.Aliases.Commit + "]: The specified datetime is in the future. This may cause issues with Git history.")
+
+				// Ask for confirmation before proceeding with future date
+				details := []string{
+					"You are attempting to create a commit with a future date: " + sealDateTime,
+					"Current date and time: " + now.Format(time.RFC3339),
+					"This may cause confusion in git history and affect collaboration.",
+				}
+
+				if !utils.ConfirmActionWithDetails("Commit with future date?", details, false) {
+					return utils.NewUserError(
+						"Operation cancelled by user",
+						nil,
+						map[string]interface{}{
+							"providedDate": sealDateTime,
+							"currentDate":  now.Format(time.RFC3339),
+						},
+					)
+				}
+			}
+
+			// Format date-time for Git environment variables (ISO 8601 format)
+			formattedDateTime := parsedTime.Format(time.RFC3339)
+
+			// Set Git environment variables for the commit
+			env := append(os.Environ(),
+				"GIT_AUTHOR_DATE="+formattedDateTime,
+				"GIT_COMMITTER_DATE="+formattedDateTime,
+			)
+			utils.Info("[" + config.Aliases.Commit + "]: Setting commit date and time to: " + formattedDateTime)
+
+			// Execute commit logic
+			if sealAllFlag {
+				utils.Info("[" + config.Aliases.Commit + "]: Committing all changes with custom timestamp.")
+				err := core.CommitAllRoots(env)
+				if err != nil {
+					return utils.NewGitError(
+						"Failed to commit all changes with custom timestamp",
+						err,
+						map[string]interface{}{
+							"operation": "CommitAllRoots",
+							"timestamp": formattedDateTime,
+						},
+					)
+				}
+			} else if folderName != "" {
+				// Validate the folder exists
+				if _, err := os.Stat(folderName); os.IsNotExist(err) {
+					return utils.NewValidationError(
+						"Root folder does not exist",
+						err,
+						map[string]interface{}{
+							"folderName": folderName,
+							"suggestion": "Check the folder path and try again",
+						},
+					)
+				}
+
+				utils.Info("[" + config.Aliases.Commit + "]: Committing changes in folder with custom timestamp: " + folderName)
+
+				// Use git recovery mechanism for safer operations with progress reporting
+				err := git.SafeGitOperation(folderName, "CommitWithDate", func() error {
+					// Get all files that need to be committed
+					folder := output.GetFolder(folderName)
+					if len(folder.Files) == 0 {
+						return utils.NewValidationError(
+							"No files to commit in folder",
+							nil,
+							map[string]interface{}{
+								"folder": folderName,
+							},
+						)
+					}
+
+					// Use enhanced commit with progress reporting
+					return git.ProgressCommitBatch(folder, env)
+				})
+
+				if err != nil {
+					return err
+				}
+			} else {
+				return utils.NewValidationError(
+					"You must specify either --all or --root flag",
+					nil,
+					map[string]interface{}{
+						"availableFlags": []string{"--all", "--root"},
+						"examples": []string{
+							"gitcury commit with-date --datetime \"2025-01-01T12:00:00\" --all",
+							"gitcury commit with-date --datetime \"2025-01-01T12:00:00\" --root my-folder",
+						},
+					},
+				)
+			}
+
+			utils.Success("[" + config.Aliases.Commit + "]: Changes committed with the specified timestamp successfully.")
+			return nil
+		})
+
 		if err != nil {
-			utils.Error("[" + config.Aliases.Commit + "]: Invalid date-time format. Use 'YYYY-MM-DDTHH:MM:SS'.")
-			return
+			utils.Error(utils.ToUserFriendlyMessage(err))
+			cmd.PrintErrln("Error: " + utils.ToUserFriendlyMessage(err))
 		}
-
-		// Set Git environment variables for the commit
-		env := append(os.Environ(),
-			"GIT_AUTHOR_DATE="+sealDateTime,
-			"GIT_COMMITTER_DATE="+sealDateTime,
-		)
-		utils.Info("[" + config.Aliases.Commit + "]: Setting commit date and time to: " + sealDateTime)
-
-		// Execute commit logic
-		var commitErr error
-		if sealAllFlag {
-			commitErr = core.CommitAllRoots(env)
-		} else if folderName != "" {
-			commitErr = core.CommitOneRoot(folderName, env)
-		} else {
-			utils.Error("[" + config.Aliases.Commit + "]: You must specify either --all or --root flag.")
-			return
-		}
-
-		if commitErr != nil {
-			utils.Error("[" + config.Aliases.Commit + "]: Failed to commit changes - " + commitErr.Error())
-			return
-		}
-		utils.Success("[" + config.Aliases.Commit + "]: Changes committed with the specified timestamp successfully.")
 	},
 }
 
