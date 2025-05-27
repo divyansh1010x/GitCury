@@ -164,7 +164,7 @@ func SendToGemini(contextData map[string]map[string]string, apiKey string, custo
 	if len(customInstructions) > 0 && customInstructions[0] != "" {
 		userInstructions := customInstructions[0]
 		Debug("[GEMINI]: 📝 Found custom commit instructions")
-		
+
 		// Sanitize the instructions to prevent misuse (warnings handled inside function)
 		sanitized := SanitizeUserInstructions(userInstructions)
 
@@ -184,7 +184,7 @@ func SendToGemini(contextData map[string]map[string]string, apiKey string, custo
 
 	// Save the instruction for testing
 	lastSystemInstruction = baseInstruction
-	
+
 	model.SystemInstruction = genai.NewUserContent(genai.Text(baseInstruction))
 
 	var promptBuilder strings.Builder
@@ -368,7 +368,7 @@ func SanitizeUserInstructions(instructions string) string {
 
 	sanitized := instructions
 	actuallyFiltered := false
-	
+
 	// Check each blocked phrase case-insensitively but preserve original case
 	for _, phrase := range blockedPhrases {
 		lowered := strings.ToLower(sanitized)
