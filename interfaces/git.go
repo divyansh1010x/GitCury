@@ -21,6 +21,8 @@ type GitRunner interface {
 
 // OutputManager defines the interface for output operations
 type OutputManager interface {
+	Set(file, rootFolder, commitMessage string)
+	Get(file, rootFolder string) string
 	GetAll() output.OutputData
 	GetFolder(rootFolder string) output.Folder
 	RemoveFolder(name string)
