@@ -25,7 +25,7 @@ type FileEmbedding struct {
 
 // Repository-level mutex system to prevent concurrent Git operations on the same repository
 var (
-	repoMutexes = make(map[string]*sync.Mutex)
+	repoMutexes      = make(map[string]*sync.Mutex)
 	repoMutexMapLock sync.RWMutex
 )
 
@@ -33,24 +33,24 @@ var (
 func getRepoMutex(repoDir string) *sync.Mutex {
 	// Clean the path to ensure consistency
 	cleanPath := filepath.Clean(repoDir)
-	
+
 	repoMutexMapLock.RLock()
 	mutex, exists := repoMutexes[cleanPath]
 	repoMutexMapLock.RUnlock()
-	
+
 	if exists {
 		return mutex
 	}
-	
+
 	// If mutex doesn't exist, create it
 	repoMutexMapLock.Lock()
 	defer repoMutexMapLock.Unlock()
-	
+
 	// Double-check in case another goroutine created it
 	if mutex, exists := repoMutexes[cleanPath]; exists {
 		return mutex
 	}
-	
+
 	// Create new mutex for this repository
 	mutex = &sync.Mutex{}
 	repoMutexes[cleanPath] = mutex
@@ -61,14 +61,14 @@ func getRepoMutex(repoDir string) *sync.Mutex {
 // withRepoLock executes a function while holding the repository-level lock
 func withRepoLock(repoDir string, operation string, fn func() error) error {
 	mutex := getRepoMutex(repoDir)
-	
+
 	utils.Debug(fmt.Sprintf("[GIT.MUTEX]: Acquiring lock for %s in repo: %s", operation, repoDir))
 	mutex.Lock()
 	defer func() {
 		mutex.Unlock()
 		utils.Debug(fmt.Sprintf("[GIT.MUTEX]: Released lock for %s in repo: %s", operation, repoDir))
 	}()
-	
+
 	return fn()
 }
 
@@ -152,7 +152,7 @@ var cacheMu sync.RWMutex
 func GetAllChangedFiles(dir string) ([]string, error) {
 	output, err := RunGitCmd(dir, nil, "status", "--porcelain")
 	if err != nil {
-		utils.Error("[GIT.STATUS.FAIL]: Failed to get git status: " + err.Error(), dir)
+		utils.Error("[GIT.STATUS.FAIL]: Failed to get git status: "+err.Error(), dir)
 		return nil, err
 	}
 
@@ -219,13 +219,13 @@ func GetAllChangedFiles(dir string) ([]string, error) {
 						utils.Debug("[GIT.IGNORED]: Skipping ignored file: " + absInner)
 						continue
 					}
-					
+
 					// Check if file is binary
 					if IsBinaryFile(absInner) {
 						utils.Debug("[GIT.BINARY]: Skipping binary file: " + absInner)
 						continue
 					}
-					
+
 					changedFiles = append(changedFiles, absInner)
 					changedFilesCache[absInner] = "??"
 				}
@@ -236,13 +236,13 @@ func GetAllChangedFiles(dir string) ([]string, error) {
 				utils.Debug("[GIT.IGNORED]: Skipping ignored file: " + abs)
 				continue
 			}
-			
+
 			// Check if file is binary (only for existing files)
 			if !strings.HasPrefix(status, "D") && IsBinaryFile(abs) {
 				utils.Debug("[GIT.BINARY]: Skipping binary file: " + abs)
 				continue
 			}
-			
+
 			changedFiles = append(changedFiles, abs)
 		}
 	}
@@ -325,27 +325,27 @@ func GenCommitMessage(files []string, dir string) (string, error) {
 		// Enhanced error reporting with file details
 		filesList := make([]string, 0, len(files))
 		fileDetails := make([]string, 0, len(files))
-		
+
 		for _, file := range files {
 			fileName := filepath.Base(file)
 			filesList = append(filesList, fileName)
-			
+
 			// Add file diagnostic information
 			if info, statErr := os.Stat(file); statErr == nil {
 				size := info.Size()
 				isBinary := IsBinaryFile(file)
 				isIgnored := IsIgnoredFile(file)
-				fileDetails = append(fileDetails, fmt.Sprintf("%s (size: %d bytes, binary: %v, ignored: %v)", 
+				fileDetails = append(fileDetails, fmt.Sprintf("%s (size: %d bytes, binary: %v, ignored: %v)",
 					fileName, size, isBinary, isIgnored))
 			} else {
 				fileDetails = append(fileDetails, fmt.Sprintf("%s (stat error: %v)", fileName, statErr))
 			}
 		}
-		
+
 		filesInfo := strings.Join(filesList, ", ")
 		utils.Error("[GEMINI.FAIL]: Error generating group commit message: "+err.Error(), filesInfo)
 		utils.Debug("[GEMINI.FAIL.DETAILS]: File details: " + strings.Join(fileDetails, "; "))
-		
+
 		return "", err
 	}
 
@@ -436,27 +436,27 @@ func GenCommitMessageWithContext(files []string, dir string, contextPrompt strin
 		// Enhanced error reporting with file details
 		filesList := make([]string, 0, len(files))
 		fileDetails := make([]string, 0, len(files))
-		
+
 		for _, file := range files {
 			fileName := filepath.Base(file)
 			filesList = append(filesList, fileName)
-			
+
 			// Add file diagnostic information
 			if info, statErr := os.Stat(file); statErr == nil {
 				size := info.Size()
 				isBinary := IsBinaryFile(file)
 				isIgnored := IsIgnoredFile(file)
-				fileDetails = append(fileDetails, fmt.Sprintf("%s (size: %d bytes, binary: %v, ignored: %v)", 
+				fileDetails = append(fileDetails, fmt.Sprintf("%s (size: %d bytes, binary: %v, ignored: %v)",
 					fileName, size, isBinary, isIgnored))
 			} else {
 				fileDetails = append(fileDetails, fmt.Sprintf("%s (stat error: %v)", fileName, statErr))
 			}
 		}
-		
+
 		filesInfo := strings.Join(filesList, ", ")
 		utils.Error("[GEMINI.FAIL]: Error generating context-enhanced commit message: "+err.Error(), filesInfo)
 		utils.Debug("[GEMINI.FAIL.DETAILS]: File details: " + strings.Join(fileDetails, "; "))
-		
+
 		return "", err
 	}
 
@@ -475,23 +475,23 @@ func BatchProcessGetMessages(allChangedFiles []string, rootFolder string) error 
 			defer fileWg.Done()
 
 			utils.Debug("[GIT.BATCH]: Processing file: " + file)
-			
+
 			// Add pre-processing file validation
 			if info, statErr := os.Stat(file); statErr == nil {
-				utils.Debug(fmt.Sprintf("[GIT.BATCH.FILE]: %s (size: %d bytes, binary: %v, ignored: %v)", 
+				utils.Debug(fmt.Sprintf("[GIT.BATCH.FILE]: %s (size: %d bytes, binary: %v, ignored: %v)",
 					filepath.Base(file), info.Size(), IsBinaryFile(file), IsIgnoredFile(file)))
 			}
-			
+
 			message, err := GenCommitMessage([]string{file}, rootFolder) // <-- wrapped in slice
 			if err != nil {
 				// Enhanced error reporting with file analysis
 				fileInfo := filepath.Base(file)
 				if info, statErr := os.Stat(file); statErr == nil {
-					fileInfo = fmt.Sprintf("%s (size: %d bytes, binary: %v)", 
+					fileInfo = fmt.Sprintf("%s (size: %d bytes, binary: %v)",
 						filepath.Base(file), info.Size(), IsBinaryFile(file))
 				}
-				
-				utils.Error("[GIT.BATCH.FAIL]: Failed to generate commit message for file: " + file + " - " + err.Error(), file)
+
+				utils.Error("[GIT.BATCH.FAIL]: Failed to generate commit message for file: "+file+" - "+err.Error(), file)
 				utils.Debug("[GIT.BATCH.FAIL.ANALYSIS]: File analysis: " + fileInfo)
 				fileMu.Lock()
 				fileErrors = append(fileErrors, err)
@@ -515,12 +515,12 @@ func BatchProcessGetMessages(allChangedFiles []string, rootFolder string) error 
 				errorFileNames = append(errorFileNames, filepath.Base(structErr.ProcessedFile))
 			}
 		}
-		
+
 		filesInfo := "multiple files"
 		if len(errorFileNames) > 0 {
 			filesInfo = strings.Join(errorFileNames, ", ")
 		}
-		
+
 		utils.Error("[GIT.BATCH.FAIL]: Batch processing completed with errors", filesInfo)
 		return fmt.Errorf("one or more errors occurred while preparing commit messages")
 	}
@@ -570,21 +570,21 @@ func CommitBatch(rootFolder output.Folder, env ...[]string) error {
 	// Process each commit sequentially within the repository to avoid Git conflicts
 	for message, files := range messageToFiles {
 		utils.Debug(fmt.Sprintf("[GIT.COMMIT]: Processing commit with %d files: %s", len(files), message))
-		
+
 		// Use repository-level locking to serialize Git operations within the same repo
 		err := withRepoLock(rootFolder.Name, "stage_and_commit", func() error {
 			// Stage all files for this commit sequentially
 			for _, file := range files {
 				utils.Debug("[GIT.COMMIT]: Adding file to commit: " + file)
-				
+
 				// Use SafeGitOperation to handle index.lock and other recovery scenarios
 				err := SafeGitOperation(rootFolder.Name, "add file", func() error {
 					_, gitErr := RunGitCmdWithTimeout(rootFolder.Name, envMap, 15*time.Second, "add", file)
 					return gitErr
 				})
-				
+
 				if err != nil {
-					utils.Error("[GIT.COMMIT.FAIL]: Failed to add file to commit: " + err.Error(), file)
+					utils.Error("[GIT.COMMIT.FAIL]: Failed to add file to commit: "+err.Error(), file)
 					return utils.NewGitError(
 						"Failed to stage file",
 						err,
@@ -596,20 +596,20 @@ func CommitBatch(rootFolder output.Folder, env ...[]string) error {
 					)
 				}
 			}
-			
+
 			// Perform the actual commit after all files are staged
 			utils.Debug(fmt.Sprintf("[GIT.COMMIT]: Committing %d file(s) with message: %s", len(files), message))
-			
+
 			// Use SafeGitOperation to handle index.lock and other recovery scenarios
 			err := SafeGitOperation(rootFolder.Name, "commit", func() error {
 				_, gitErr := RunGitCmdWithTimeout(rootFolder.Name, envMap, 30*time.Second, "commit", "-m", message)
 				return gitErr
 			})
-			
+
 			if err != nil {
 				// Join filenames for error context
 				filesList := strings.Join(files, ", ")
-				utils.Error("[GIT.COMMIT.FAIL]: Failed to commit files with message '" + message + "': " + err.Error(), filesList)
+				utils.Error("[GIT.COMMIT.FAIL]: Failed to commit files with message '"+message+"': "+err.Error(), filesList)
 				return utils.NewGitError(
 					"Failed to commit files",
 					err,
@@ -621,10 +621,10 @@ func CommitBatch(rootFolder output.Folder, env ...[]string) error {
 					filesList,
 				)
 			}
-			
+
 			return nil
 		})
-		
+
 		if err != nil {
 			errMu.Lock()
 			commitErrs = append(commitErrs, err)
@@ -642,12 +642,12 @@ func CommitBatch(rootFolder output.Folder, env ...[]string) error {
 				errorFileNames = append(errorFileNames, filepath.Base(structErr.ProcessedFile))
 			}
 		}
-		
+
 		filesInfo := rootFolder.Name
 		if len(errorFileNames) > 0 {
 			filesInfo = strings.Join(errorFileNames, ", ")
 		}
-		
+
 		return utils.NewGitError(
 			"Failed to stage one or more files for commit",
 			fmt.Errorf("%d errors occurred during staging", len(commitErrs)),
@@ -671,13 +671,13 @@ func PushBranch(rootFolderName string, branch string) error {
 	}
 
 	utils.Debug("[GIT.PUSH]: Pushing branch: " + branch + " in folder: " + rootFolderName)
-	
+
 	// Use SafeGitOperation to handle index.lock and other recovery scenarios
 	err := SafeGitOperation(rootFolderName, "push", func() error {
 		_, gitErr := RunGitCmd(rootFolderName, nil, "push", "origin", branch)
 		return gitErr
 	})
-	
+
 	if err != nil {
 		utils.Error("[GIT.PUSH.FAIL]: Failed to push branch: " + err.Error())
 		return fmt.Errorf("failed to push branch: %s", err.Error())
@@ -756,7 +756,7 @@ func attemptSemanticGrouping(files []string, rootFolder string, numClusters int)
 	var embeddingErrors []error
 
 	// Rate limiter for embedding generation to prevent API quota issues
-	const maxConcurrentEmbeddings = 1  // Reduced from 2 to prevent rate limits
+	const maxConcurrentEmbeddings = 1 // Reduced from 2 to prevent rate limits
 	semaphore := make(chan struct{}, maxConcurrentEmbeddings)
 	var embeddingWg sync.WaitGroup
 	var dataMu sync.Mutex
@@ -771,7 +771,7 @@ func attemptSemanticGrouping(files []string, rootFolder string, numClusters int)
 			defer func() { <-semaphore }()
 
 			// Increased delay to prevent overwhelming the API (rate limiting)
-			time.Sleep(5000 * time.Millisecond)  // Increased from 2000ms to 5000ms
+			time.Sleep(5000 * time.Millisecond) // Increased from 2000ms to 5000ms
 
 			diff, err := GetFileDiff(file, rootFolder)
 			if err != nil || strings.TrimSpace(diff) == "" {
@@ -816,7 +816,7 @@ func attemptSemanticGrouping(files []string, rootFolder string, numClusters int)
 	// If we have too few successful embeddings, fall back to simple processing
 	minFilesForClustering := 3
 	if len(fileData) < minFilesForClustering {
-		return fmt.Errorf("insufficient files for semantic grouping (%d/%d successful, need at least %d)", 
+		return fmt.Errorf("insufficient files for semantic grouping (%d/%d successful, need at least %d)",
 			len(fileData), len(files), minFilesForClustering)
 	}
 
@@ -829,7 +829,7 @@ func attemptSemanticGrouping(files []string, rootFolder string, numClusters int)
 
 	// Perform semantic grouping
 	utils.Debug(fmt.Sprintf("[GIT.BATCH]: Clustering %d files into %d groups", len(fileData), actualClusters))
-	
+
 	vectors := make([][]float32, len(fileData))
 	for i, f := range fileData {
 		vectors[i] = f.Embedding
@@ -886,7 +886,7 @@ func generateGroupCommitMessages(groupMap map[int][]FileEmbedding, rootFolder st
 			for i, f := range group {
 				filePaths = append(filePaths, f.Path)
 				if i < 3 { // Include diff context for first 3 files
-					groupContext.WriteString(fmt.Sprintf("File: %s\nDiff excerpt: %s\n\n", 
+					groupContext.WriteString(fmt.Sprintf("File: %s\nDiff excerpt: %s\n\n",
 						filepath.Base(f.Path), truncateString(f.Diff, 200)))
 				}
 			}
@@ -923,7 +923,7 @@ The files were grouped together based on semantic similarity of their changes.`,
 				output.Set(f.Path, rootFolder, message)
 			}
 
-			utils.Success(fmt.Sprintf("[GIT.BATCH]: Successfully processed group %d (%d files): %s", 
+			utils.Success(fmt.Sprintf("[GIT.BATCH]: Successfully processed group %d (%d files): %s",
 				label, len(group), truncateString(message, 60)))
 		}(label, group)
 	}
@@ -947,7 +947,7 @@ func fallbackToSimpleProcessing(files []string, rootFolder string) error {
 	var errorMu sync.Mutex
 
 	// Rate limiter for simple processing
-	const maxConcurrentSimple = 1  // Reduced from 5 to prevent rate limits
+	const maxConcurrentSimple = 1 // Reduced from 5 to prevent rate limits
 	semaphore := make(chan struct{}, maxConcurrentSimple)
 
 	for _, file := range files {
@@ -960,7 +960,7 @@ func fallbackToSimpleProcessing(files []string, rootFolder string) error {
 			defer func() { <-semaphore }()
 
 			// Increased delay for rate limiting
-			time.Sleep(3000 * time.Millisecond)  // Increased from 100ms to 3000ms
+			time.Sleep(3000 * time.Millisecond) // Increased from 100ms to 3000ms
 
 			utils.Debug(fmt.Sprintf("[GIT.BATCH]: Processing file individually: %s", file))
 
@@ -1042,7 +1042,7 @@ func IsBinaryFile(filePath string) bool {
 func IsIgnoredFile(filePath string) bool {
 	fileName := filepath.Base(filePath)
 	ext := filepath.Ext(filePath)
-	
+
 	// Common binary file extensions
 	binaryExtensions := []string{
 		".exe", ".bin", ".dll", ".so", ".dylib", ".a", ".o", ".obj",
@@ -1051,23 +1051,23 @@ func IsIgnoredFile(filePath string) bool {
 		".mp3", ".mp4", ".avi", ".mov", ".wmv", ".flv",
 		".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx",
 	}
-	
+
 	for _, binExt := range binaryExtensions {
 		if strings.EqualFold(ext, binExt) {
 			return true
 		}
 	}
-	
+
 	// Ignore common build artifacts and executables without extensions
 	ignoreNames := []string{
 		"gitcury", "gencli.exe", "gitcury.exe",
 	}
-	
+
 	for _, ignoreName := range ignoreNames {
 		if strings.EqualFold(fileName, ignoreName) {
 			return true
 		}
 	}
-	
+
 	return false
 }
