@@ -2,12 +2,16 @@ package output_test
 
 import (
 	"GitCury/output"
+	"GitCury/tests/testutils"
 	"os"
 	"testing"
 )
 
 // Helper to set up test environment
 func setupOutputTest(t *testing.T) func() {
+	// Setup config environment first
+	configCleanup := testutils.SetupTestEnvironment(t)
+
 	// Save original state
 	originalData := output.GetAll()
 
@@ -23,6 +27,8 @@ func setupOutputTest(t *testing.T) func() {
 				output.Set(file.Name, folder.Name, file.Message)
 			}
 		}
+		// Call config cleanup
+		configCleanup()
 	}
 }
 
