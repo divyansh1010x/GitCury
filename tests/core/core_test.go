@@ -4,12 +4,16 @@ import (
 	"GitCury/core"
 	"GitCury/output"
 	"GitCury/tests/mocks"
+	"GitCury/tests/testutils"
 	"os"
 	"testing"
 )
 
 // TestCommitOneRoot tests committing changes for a single root folder
 func TestCommitOneRoot(t *testing.T) {
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
 	// Create mock git runner
 	mockGitRunner := mocks.NewMockGitRunner()
 
@@ -43,6 +47,9 @@ func TestCommitOneRoot(t *testing.T) {
 
 // TestCommitAllRoots tests committing changes for all root folders
 func TestCommitAllRoots(t *testing.T) {
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
 	// This test requires proper dependency injection to replace git and output packages
 	// For now, test with empty output as a basic sanity check
 
@@ -68,6 +75,9 @@ func TestCommitAllRoots(t *testing.T) {
 
 // TestGetAllMsgs tests generating commit messages for all root folders
 func TestGetAllMsgs(t *testing.T) {
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
 	// Skip test if GEMINI_API_KEY is not set to avoid panic
 	if os.Getenv("GEMINI_API_KEY") == "" {
 		t.Skip("Skipping TestGetAllMsgs as GEMINI_API_KEY is not set")
@@ -86,6 +96,9 @@ func TestGetAllMsgs(t *testing.T) {
 
 // TestGetMsgsForRootFolder tests generating commit messages for a single root folder
 func TestGetMsgsForRootFolder(t *testing.T) {
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
 	// This test requires proper dependency injection to replace git and output packages
 	// For now, test with a non-existent folder as a basic sanity check
 
@@ -98,6 +111,9 @@ func TestGetMsgsForRootFolder(t *testing.T) {
 
 // TestPushOneRoot tests pushing changes for a single root folder
 func TestPushOneRoot(t *testing.T) {
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
 	// This test requires proper dependency injection to replace git package
 	// For now, test with a non-existent folder as a basic sanity check
 
@@ -111,6 +127,9 @@ func TestPushOneRoot(t *testing.T) {
 
 // TestPushAllRoots tests pushing changes for all root folders
 func TestPushAllRoots(t *testing.T) {
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
 	// This test requires proper dependency injection to replace git and config packages
 	// For now, test with a basic branch name as a sanity check
 
