@@ -1,0 +1,286 @@
+{
+  "totalTests": 39,
+  "passedTests": 37,
+  "failedTests": 2,
+  "skippedTests": 0,
+  "totalDuration": 4110000000,
+  "results": [
+    {
+      "name": "TestLoadConfig",
+      "package": "GitCury/tests/config",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.979452759+05:30"
+    },
+    {
+      "name": "TestGetConfigPath",
+      "package": "GitCury/tests/config",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.979791416+05:30"
+    },
+    {
+      "name": "TestSetConfig",
+      "package": "GitCury/tests/config",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.980055373+05:30"
+    },
+    {
+      "name": "TestEndToEndWorkflow",
+      "package": "GitCury/tests",
+      "success": false,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.980306017+05:30"
+    },
+    {
+      "name": "TestEndToEndWithMocks",
+      "package": "GitCury/tests",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.980574974+05:30"
+    },
+    {
+      "name": "TestLoadConfigDefaults",
+      "package": "GitCury/tests/config",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.980918629+05:30"
+    },
+    {
+      "name": "TestSet",
+      "package": "GitCury/tests/output",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.981427081+05:30"
+    },
+    {
+      "name": "TestGet",
+      "package": "GitCury/tests/output",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.981819038+05:30"
+    },
+    {
+      "name": "TestGetFolder",
+      "package": "GitCury/tests/output",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.982205654+05:30"
+    },
+    {
+      "name": "TestGetAll",
+      "package": "GitCury/tests/output",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.982675988+05:30"
+    },
+    {
+      "name": "TestRemoveFolder",
+      "package": "GitCury/tests/output",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.983074627+05:30"
+    },
+    {
+      "name": "TestClear",
+      "package": "GitCury/tests/output",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.983521666+05:30"
+    },
+    {
+      "name": "TestSaveToFile",
+      "package": "GitCury/tests/output",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.983948915+05:30"
+    },
+    {
+      "name": "TestCommitOneRoot",
+      "package": "GitCury/tests/core",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.984378013+05:30"
+    },
+    {
+      "name": "TestCommitAllRoots",
+      "package": "GitCury/tests/core",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.985234652+05:30"
+    },
+    {
+      "name": "TestGetAllMsgs",
+      "package": "GitCury/tests/core",
+      "success": false,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.985740346+05:30"
+    },
+    {
+      "name": "TestGetMsgsForRootFolder",
+      "package": "GitCury/tests/core",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.986204745+05:30"
+    },
+    {
+      "name": "TestPushOneRoot",
+      "package": "GitCury/tests/core",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.986729474+05:30"
+    },
+    {
+      "name": "TestSafeExecute",
+      "package": "GitCury/tests/utils",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.987157589+05:30"
+    },
+    {
+      "name": "TestNewWorkerPool",
+      "package": "GitCury/tests/utils",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.987747391+05:30"
+    },
+    {
+      "name": "TestWorkerPoolSubmit",
+      "package": "GitCury/tests/utils",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.988235872+05:30"
+    },
+    {
+      "name": "TestPushAllRoots",
+      "package": "GitCury/tests/core",
+      "success": true,
+      "duration": 1140000000,
+      "timestamp": "2025-05-26T10:47:52.988952774+05:30"
+    },
+    {
+      "name": "TestErrorHelpers",
+      "package": "GitCury/tests/utils",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.989478125+05:30"
+    },
+    {
+      "name": "TestToUserFriendlyMessage",
+      "package": "GitCury/tests/utils",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.989960293+05:30"
+    },
+    {
+      "name": "TestLogger",
+      "package": "GitCury/tests/utils",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.990485236+05:30"
+    },
+    {
+      "name": "TestFileUtils",
+      "package": "GitCury/tests/utils",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.991012313+05:30"
+    },
+    {
+      "name": "TestRunGitCmd",
+      "package": "GitCury/tests/git",
+      "success": true,
+      "duration": 10000000,
+      "timestamp": "2025-05-26T10:47:52.991925663+05:30"
+    },
+    {
+      "name": "TestGenerateEmbeddings",
+      "package": "GitCury/tests/embeddings",
+      "success": true,
+      "duration": 2880000000,
+      "timestamp": "2025-05-26T10:47:52.992625999+05:30"
+    },
+    {
+      "name": "TestRunGitCmdWithTimeout",
+      "package": "GitCury/tests/git",
+      "success": true,
+      "duration": 10000000,
+      "timestamp": "2025-05-26T10:47:52.993174079+05:30"
+    },
+    {
+      "name": "TestGetAllChangedFiles",
+      "package": "GitCury/tests/git",
+      "success": true,
+      "duration": 10000000,
+      "timestamp": "2025-05-26T10:47:52.993731034+05:30"
+    },
+    {
+      "name": "TestIsGitRepository",
+      "package": "GitCury/tests/git",
+      "success": true,
+      "duration": 10000000,
+      "timestamp": "2025-05-26T10:47:52.994329689+05:30"
+    },
+    {
+      "name": "TestGetGitConfigValue",
+      "package": "GitCury/tests/git",
+      "success": true,
+      "duration": 10000000,
+      "timestamp": "2025-05-26T10:47:52.994948667+05:30"
+    },
+    {
+      "name": "TestSetGitConfigValue",
+      "package": "GitCury/tests/git",
+      "success": true,
+      "duration": 10000000,
+      "timestamp": "2025-05-26T10:47:52.99553646+05:30"
+    },
+    {
+      "name": "TestCheckRepositoryHealth",
+      "package": "GitCury/tests/git",
+      "success": true,
+      "duration": 10000000,
+      "timestamp": "2025-05-26T10:47:52.996135357+05:30"
+    },
+    {
+      "name": "TestRecoverFromGitError",
+      "package": "GitCury/tests/git",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.996749805+05:30"
+    },
+    {
+      "name": "TestGetFileDiff",
+      "package": "GitCury/tests/embeddings",
+      "success": true,
+      "duration": 10000000,
+      "timestamp": "2025-05-26T10:47:52.997547119+05:30"
+    },
+    {
+      "name": "TestGenerateCommitMessage",
+      "package": "GitCury/tests/embeddings",
+      "success": true,
+      "duration": 10000000,
+      "timestamp": "2025-05-26T10:47:52.998251735+05:30"
+    },
+    {
+      "name": "TestCosineSimilarity",
+      "package": "GitCury/tests/embeddings",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.998945552+05:30"
+    },
+    {
+      "name": "TestFindSimilarCommits",
+      "package": "GitCury/tests/embeddings",
+      "success": true,
+      "duration": 0,
+      "timestamp": "2025-05-26T10:47:52.999636055+05:30"
+    }
+  ],
+  "timestamp": "2025-05-26T10:47:49.130781824+05:30",
+  "gitCuryVersion": "development",
+  "goVersion": "go version go1.24.1 linux/amd64",
+  "operatingSystem": "/"
+}
