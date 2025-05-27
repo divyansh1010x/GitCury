@@ -64,7 +64,7 @@ func LoadConfig() error {
 		// Prompt user about creating default config
 		utils.Info("🔧 Configuration file not found at " + configFilePath)
 		utils.Info("📝 Creating default configuration file with recommended settings...")
-		
+
 		// Set default settings if the file does not exist
 		settings = map[string]interface{}{
 			"app_name":         "GitCury",
@@ -141,7 +141,7 @@ func LoadConfig() error {
 	if err := validateConfig(); err != nil {
 		return err
 	}
-	
+
 	// Check critical configuration and stop if missing
 	criticalMissing := checkCriticalConfig()
 	if len(criticalMissing) > 0 {
@@ -214,7 +214,7 @@ func LoadConfig() error {
 	if ok && logLevel != "" {
 		utils.SetLogLevel(logLevel)
 	}
-	
+
 	// Initialize API configuration
 	api.LoadConfig(settings)
 
@@ -227,7 +227,7 @@ func LoadConfig() error {
 // checkCriticalConfig checks for critical configuration values and prompts user with commands if missing
 func checkCriticalConfig() []string {
 	var criticalMissing []string
-	
+
 	// Check for GEMINI_API_KEY - this is critical for main functionality
 	geminiKey, exists := settings["GEMINI_API_KEY"]
 	if !exists || geminiKey == "" {
@@ -254,7 +254,7 @@ func checkCriticalConfig() []string {
 			settings["GEMINI_API_KEY"] = envKey
 		}
 	}
-	
+
 	// Check for root_folders - critical for knowing where to work
 	rootFolders, exists := settings["root_folders"]
 	if !exists {
@@ -291,7 +291,7 @@ func checkCriticalConfig() []string {
 			utils.Error("")
 		}
 	}
-	
+
 	// Check for numFilesToCommit - not critical but important for functionality
 	if _, exists := settings["numFilesToCommit"]; !exists {
 		utils.Warning("")
@@ -303,7 +303,7 @@ func checkCriticalConfig() []string {
 		// Set a default value
 		settings["numFilesToCommit"] = 5
 	}
-	
+
 	return criticalMissing
 }
 
