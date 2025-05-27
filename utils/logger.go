@@ -40,11 +40,15 @@ func Debug(message string) {
 
 // Info logs a message at the info level
 func Info(message string) {
+	if LogLevel == "error" {
+		return // Suppress info messages in quiet mode
+	}
 	fmt.Printf("\n%s%s[SYS     ] ⚡ %s %s\n", Green, BlackBg, Reset, message)
 }
 
 // Success logs a success message
 func Success(message string) {
+	// Always show success messages, even in quiet mode
 	fmt.Printf("\n%s%s[SUCCESS ] 💻 %s %s\n", Green, BlackBg, Reset, message)
 }
 
@@ -75,6 +79,9 @@ func Error(message string, fileContext ...string) {
 
 // Warning logs warning message
 func Warning(message string) {
+	if LogLevel == "error" {
+		return // Suppress warning messages in quiet mode
+	}
 	fmt.Printf("\n%s%s[ALERT   ] 🔥 %s %s\n", Yellow, BlackBg, Reset, message)
 }
 
