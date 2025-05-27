@@ -152,7 +152,6 @@
 // 	rootCmd.AddCommand(genesisCmd)
 // }
 
-
 package cmd
 
 import (
@@ -165,11 +164,11 @@ import (
 )
 
 var (
-	numFiles            int
-	rootFolderName      string
-	allFlag             bool
-	commitInstructions  string
-	groupFlag	   bool				
+	numFiles           int
+	rootFolderName     string
+	allFlag            bool
+	groupFlag          bool
+	customInstructions string
 )
 
 var getMsgsCmd = &cobra.Command{
@@ -201,15 +200,36 @@ Examples:
 • Generate messages for a specific folder with grouping:
 	gitcury getmsgs --root my-folder --num 5 --group
 
+• Generate messages with custom instructions:
+	gitcury getmsgs --all --instructions "Don't add keywords like 'feat' or others in front of commit msgs and make humanize msgs"
+
 [NOTICE]: Ensure proper configuration of root folders to optimize message generation.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		// If custom instructions are provided, save them to config
-		if commitInstructions != "" {
-			utils.Info("Using custom commit message instructions: " + commitInstructions)
-			config.Set("commit_instructions", commitInstructions)
+		// Handle custom instructions temporarily (not saved to config)
+		var originalInstructions interface{}
+		var hadInstructions bool
+		if customInstructions != "" {
+			// Store original instructions if they exist
+			originalInstructions = config.Get("commit_instructions")
+			hadInstructions = originalInstructions != nil && originalInstructions != ""
+
+			// Set custom instructions temporarily
+			config.Set("commit_instructions", customInstructions)
+			utils.Debug("[" + config.Aliases.GetMsgs + "]: Using custom instructions (temporary): " + customInstructions)
+
+			// Defer cleanup to ensure instructions are removed
+			defer func() {
+				if hadInstructions {
+					config.Set("commit_instructions", originalInstructions)
+					utils.Debug("[" + config.Aliases.GetMsgs + "]: Restored original commit instructions")
+				} else {
+					config.Remove("commit_instructions")
+					utils.Debug("[" + config.Aliases.GetMsgs + "]: Removed temporary custom instructions")
+				}
+			}()
 		}
-		
+
 		if allFlag {
 			utils.Info("[" + config.Aliases.GetMsgs + "]: Generating messages for all root folders.")
 			var err error
@@ -220,7 +240,7 @@ Examples:
 			} else {
 				err = core.GetAllMsgs(numFiles)
 			}
-			
+
 			if err != nil {
 				utils.Error("[" + config.Aliases.GetMsgs + "]: Error encountered - " + err.Error())
 				return
@@ -231,7 +251,7 @@ Examples:
 			utils.Print(utils.ToJSON(allOutput))
 		} else if rootFolderName != "" {
 			utils.Info("[" + config.Aliases.GetMsgs + "]: Targeting root folder: " + rootFolderName)
-		
+
 			var err error
 			if groupFlag {
 				utils.Debug("[" + config.Aliases.GetMsgs + "]: Grouping logic enabled via --group flag.")
@@ -239,21 +259,23 @@ Examples:
 			} else {
 				err = core.GetMsgsForRootFolder(rootFolderName, numFiles)
 			}
-		
+
 			if err != nil {
 				utils.Error("[" + config.Aliases.GetMsgs + "]: Error encountered - " + err.Error())
 				return
 			}
-		
+
 			rootFolder := output.GetFolder(rootFolderName)
 			if len(rootFolder.Files) == 0 {
 				utils.Error("[" + config.Aliases.GetMsgs + "]: No changed files detected in the specified root folder.")
 				return
 			}
-		
+
 			utils.Success("[" + config.Aliases.GetMsgs + "]: Commit messages generated for root folder: " + rootFolderName + " successfully.")
 			utils.Print(utils.ToJSON(rootFolder))
-		}		
+		} else {
+			utils.Error("[" + config.Aliases.GetMsgs + "]: You must specify either --all or --root flag.")
+		}
 	},
 }
 
@@ -261,8 +283,8 @@ func init() {
 	getMsgsCmd.Flags().IntVarP(&numFiles, "num", "n", 0, "Limit the number of files per commit (overrides config)")
 	getMsgsCmd.Flags().StringVarP(&rootFolderName, "root", "r", "", "Specify a root folder for localized message generation")
 	getMsgsCmd.Flags().BoolVarP(&allFlag, "all", "a", false, "Generate messages for all changed files across all root folders")
-	getMsgsCmd.Flags().BoolVarP(&groupFlag, "group", "g" , false, "Group commit messages by file type")
-	getMsgsCmd.Flags().StringVarP(&commitInstructions, "instructions", "i", "", "Custom instructions for commit message generation")
+	getMsgsCmd.Flags().BoolVarP(&groupFlag, "group", "g", false, "Group commit messages by file type")
+	getMsgsCmd.Flags().StringVarP(&customInstructions, "instructions", "i", "", "Custom instructions for commit message generation (not saved to config)")
 
 	rootCmd.AddCommand(getMsgsCmd)
 }
