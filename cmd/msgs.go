@@ -165,9 +165,10 @@ import (
 )
 
 var (
-	numFiles       int
-	rootFolderName string
-	allFlag        bool
+	numFiles            int
+	rootFolderName      string
+	allFlag             bool
+	commitInstructions  string
 	groupFlag	   bool				
 )
 
@@ -203,6 +204,12 @@ Examples:
 [NOTICE]: Ensure proper configuration of root folders to optimize message generation.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		// If custom instructions are provided, save them to config
+		if commitInstructions != "" {
+			utils.Info("Using custom commit message instructions: " + commitInstructions)
+			config.Set("commit_instructions", commitInstructions)
+		}
+		
 		if allFlag {
 			utils.Info("[" + config.Aliases.GetMsgs + "]: Generating messages for all root folders.")
 			var err error
@@ -255,6 +262,7 @@ func init() {
 	getMsgsCmd.Flags().StringVarP(&rootFolderName, "root", "r", "", "Specify a root folder for localized message generation")
 	getMsgsCmd.Flags().BoolVarP(&allFlag, "all", "a", false, "Generate messages for all changed files across all root folders")
 	getMsgsCmd.Flags().BoolVarP(&groupFlag, "group", "g" , false, "Group commit messages by file type")
+	getMsgsCmd.Flags().StringVarP(&commitInstructions, "instructions", "i", "", "Custom instructions for commit message generation")
 
 	rootCmd.AddCommand(getMsgsCmd)
 }
