@@ -322,12 +322,13 @@ import (
 	"GitCury/config"
 	"GitCury/utils"
 	"encoding/json"
+	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
 )
 
-var deleteConfig bool
+var deleteConfig bool // Flag to reset configuration to defaults
 var configSetKey string
 var configSetValue string
 var configRemoveKey string
@@ -335,144 +336,235 @@ var configRemoveRoot string
 
 var configCmd = &cobra.Command{
 	Use:   "config",
-	Short: "Access the central configuration nexus",
+	Short: "Manage GitCury configuration",
 	Long: `
-Access and manage the central configuration nexus.
+Manage GitCury configuration settings.
 
 Aliases:
 • ` + config.Aliases.Config + `
 
-Capabilities:
-• 🔑 API authentication protocols
-• 📂 File system access points
-• 🧠 Neural network parameters
-• 🛠️ System memory allocation
-
 Configuration Keys:
-• GEMINI_API_KEY (Required): API key for Gemini service.
-• root_folders (Optional): Comma-separated list of root folder paths.
-• numFilesToCommit (Optional): Max number of files per commit (default: 5).
-• app_name (Optional): Application name (default: "GitCury").
-• version (Optional): Application version (default: "1.0.0").
-• log_level (Optional): Logging level (default: "info").
-• editor (Optional): Text editor for editing commit messages (default: "nano").
-• output_file_path (Optional): Path to output file (default: "$HOME/.gitcury/output.json").
-• retries (Optional): Number of retries for operations (default: 3).
-• timeout (Optional): Timeout duration for operations (default: 30 seconds).
+• GEMINI_API_KEY (Required): API key for Gemini service
+• root_folders (Optional): Comma-separated list of root folder paths
+• numFilesToCommit (Optional): Max number of files per commit (default: 5)
+• app_name (Optional): Application name (default: "GitCury")
+• version (Optional): Application version (default: "1.0.0")
+• log_level (Optional): Logging level (default: "info")
+• editor (Optional): Text editor for editing commit messages (default: "nano")
+• output_file_path (Optional): Path to output file (default: "$HOME/.gitcury/output.json")
+• retries (Optional): Number of retries for operations (default: 3)
+• timeout (Optional): Timeout duration for operations (default: 30 seconds)
 
-[NOTICE]: Unauthorized changes may destabilize the system.
+Examples:
+• View current configuration:
+	gitcury config
+
+• Set API key:
+	gitcury config set --key GEMINI_API_KEY --value YOUR_API_KEY_HERE
+
+• Update root folders:
+	gitcury config set --key root_folders --value /path/to/folder1,/path/to/folder2
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if deleteConfig {
-			utils.Info("[" + config.Aliases.Config + "]: Deleting all configuration directives.")
+			utils.Info("Resetting all configuration to defaults...")
 			config.Delete()
-			utils.Success("[" + config.Aliases.Config + "]: Configuration nexus obliterated.")
+			utils.Success("Configuration reset successfully.")
 			return
 		}
 
+		// Always show config, even if there are missing values
 		conf := config.GetAll()
+
+		// Ensure we have at least basic config structure
+		if conf == nil || len(conf) == 0 {
+			conf = map[string]interface{}{
+				"app_name":         "GitCury",
+				"version":          "1.0.0",
+				"root_folders":     []string{"."},
+				"numFilesToCommit": 5,
+				"editor":           "nano",
+				"retries":          3,
+				"timeout":          30,
+				"logLevel":         "info",
+			}
+
+			// Save this basic config
+			for key, value := range conf {
+				config.Set(key, value)
+			}
+
+			utils.Info("📝 Created basic configuration with default values")
+		}
+
+		// Check if API key is missing and provide helpful guidance
+		apiKey, hasApiKey := conf["GEMINI_API_KEY"]
+		envKey := os.Getenv("GEMINI_API_KEY")
+
+		if !hasApiKey || apiKey == "" {
+			if envKey == "" {
+				utils.Info("📋 Current Configuration (⚠️  API key missing)")
+				utils.Info("════════════════════════════════════════")
+			} else {
+				utils.Info("📋 Current Configuration (✅ API key from environment)")
+				utils.Info("════════════════════════════════════════")
+				conf["GEMINI_API_KEY"] = "[FROM ENVIRONMENT: " + envKey[:10] + "...]"
+			}
+		} else {
+			// Mask the API key for security
+			if keyStr, ok := apiKey.(string); ok && len(keyStr) > 10 {
+				conf["GEMINI_API_KEY"] = keyStr[:10] + "..." + " (configured)"
+			}
+			utils.Info("📋 Current Configuration (✅ API key configured)")
+			utils.Info("════════════════════════════════════════")
+		}
+
+		// Display config in a user-friendly format
 		b, _ := json.MarshalIndent(conf, "", "  ")
-		utils.Print("\n======== " + config.Aliases.Config + " CONFIGURATION STATUS ========\n")
 		utils.Print(string(b))
-		utils.Print("\n============================================\n")
+		utils.Print("")
+
+		// Provide helpful guidance if API key is missing
+		if (!hasApiKey || apiKey == "") && envKey == "" {
+			utils.Info("🔑 Next Steps:")
+			utils.Info("   To use GitCury's AI features, set your Gemini API key:")
+			utils.Info("")
+			utils.Info("   gitcury config set --key GEMINI_API_KEY --value YOUR_API_KEY_HERE")
+			utils.Info("")
+			utils.Info("📖 Get your free API key:")
+			utils.Info("   🔗 https://aistudio.google.com/app/apikey")
+			utils.Info("")
+			utils.Info("💡 Tip: You can also set the environment variable:")
+			utils.Info("   export GEMINI_API_KEY=your_key_here")
+			utils.Info("")
+		} else {
+			utils.Info("✅ Configuration looks good! You're ready to use GitCury.")
+			utils.Info("")
+			utils.Info("💡 Try these commands:")
+			utils.Info("   gitcury getmsgs    # Generate AI commit messages")
+			utils.Info("   gitcury commit     # Commit changes")
+			utils.Info("   gitcury --help     # See all available commands")
+			utils.Info("")
+		}
 	},
 }
 
 var setCmd = &cobra.Command{
 	Use:   "set",
-	Short: "Set key-value pairs in the configuration",
+	Short: "Set configuration values",
 	Long: `
-Set or update directives in the configuration nexus.
+Set or update configuration values.
 
 Examples:
-• Set a new directive:
-	gitcury set --key GEMINI_API_KEY --value YOUR_API_KEY
+• Set API key:
+	gitcury config set --key GEMINI_API_KEY --value YOUR_API_KEY_HERE
 
 • Update root folders:
-	gitcury set --key root_folders --value /path/to/folder1,/path/to/folder2
+	gitcury config set --key root_folders --value /path/to/folder1,/path/to/folder2
 	
 • Set numeric value:
-	gitcury set --key numFilesToCommit --value 10
+	gitcury config set --key numFilesToCommit --value 10
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if configSetKey == "" || configSetValue == "" {
-			utils.Error("[" + config.Aliases.Config + "]: Setting failed. Missing --key or --value.")
+			utils.Error("Both --key and --value are required.")
+			utils.Info("Example: gitcury config set --key GEMINI_API_KEY --value YOUR_API_KEY")
 			return
 		}
 
+		// Special handling for root_folders
 		if configSetKey == "root_folders" {
 			values := strings.Split(configSetValue, ",")
 			for i := range values {
 				values[i] = strings.TrimSpace(values[i])
 			}
 			config.Set(configSetKey, values)
-			utils.Success("[" + config.Aliases.Config + "]: Directive set: " + configSetKey + " = " + utils.ToJSON(values))
+			utils.Success("✅ Configuration updated: " + configSetKey + " = " + utils.ToJSON(values))
 		} else if utils.IsNumeric(configSetValue) {
-			// Handle numeric values (convert to int if possible)
+			// Handle numeric values
 			intValue, err := utils.ParseInt(configSetValue)
 			if err == nil {
 				config.Set(configSetKey, intValue)
-				utils.Success("[" + config.Aliases.Config + "]: Directive set: " + configSetKey + " = " + configSetValue)
+				utils.Success("✅ Configuration updated: " + configSetKey + " = " + configSetValue)
 			} else {
 				// Fall back to string if conversion fails
 				config.Set(configSetKey, configSetValue)
-				utils.Success("[" + config.Aliases.Config + "]: Directive set: " + configSetKey + " = " + configSetValue)
+				utils.Success("✅ Configuration updated: " + configSetKey + " = " + configSetValue)
 			}
 		} else {
 			config.Set(configSetKey, configSetValue)
-			utils.Success("[" + config.Aliases.Config + "]: Directive set: " + configSetKey + " = " + configSetValue)
+			utils.Success("✅ Configuration updated: " + configSetKey + " = " + configSetValue)
+		}
+
+		// Provide extra guidance for API key
+		if configSetKey == "GEMINI_API_KEY" {
+			utils.Info("")
+			utils.Info("🎉 API key configured! You can now use GitCury's AI features.")
+			utils.Info("💡 Try: gitcury commit --help")
 		}
 	},
 }
 
 var removeCmd = &cobra.Command{
 	Use:   "remove",
-	Short: "Remove directives from the configuration",
+	Short: "Remove configuration values",
 	Long: `
-Remove directives or root folders from the configuration nexus.
+Remove configuration keys or specific root folders.
 
 Examples:
 • Remove a configuration key:
-	gitcury remove --key theme
+	gitcury config remove --key theme
 
 • Remove a specific root folder:
-	gitcury remove --root /path/to/folder1
+	gitcury config remove --root /path/to/folder1
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if configRemoveKey != "" {
-			utils.Info("[" + config.Aliases.Config + "]: Removing directive: " + configRemoveKey)
+			utils.Info("Removing configuration key: " + configRemoveKey)
 			config.Remove(configRemoveKey)
-			utils.Success("[" + config.Aliases.Config + "]: Directive removed: " + configRemoveKey)
+			utils.Success("✅ Configuration key removed: " + configRemoveKey)
 		} else if configRemoveRoot != "" {
 			rootFolders, ok := config.Get("root_folders").([]string)
 			if !ok {
-				utils.Error("[" + config.Aliases.Config + "]: Root folders directive missing or corrupted.")
+				utils.Error("Root folders configuration missing or has invalid format.")
 				return
 			}
 
 			updatedFolders := []string{}
+			found := false
 			for _, folder := range rootFolders {
 				if folder != configRemoveRoot {
 					updatedFolders = append(updatedFolders, folder)
+				} else {
+					found = true
 				}
 			}
 
+			if !found {
+				utils.Warning("Root folder not found in configuration: " + configRemoveRoot)
+				return
+			}
+
 			config.Set("root_folders", updatedFolders)
-			utils.Success("[" + config.Aliases.Config + "]: Root folder removed: " + configRemoveRoot)
+			utils.Success("✅ Root folder removed: " + configRemoveRoot)
 		} else {
-			utils.Error("[" + config.Aliases.Config + "]: Specify either --key or --root for remove operation.")
+			utils.Error("Specify either --key or --root for remove operation.")
+			utils.Info("Examples:")
+			utils.Info("  gitcury config remove --key SOME_KEY")
+			utils.Info("  gitcury config remove --root /path/to/folder")
 		}
 	},
 }
 
 func init() {
-	setCmd.Flags().StringVarP(&configSetKey, "key", "k", "", "Directive key to set")
-	setCmd.Flags().StringVarP(&configSetValue, "value", "v", "", "Directive value to set")
+	setCmd.Flags().StringVarP(&configSetKey, "key", "k", "", "Configuration key to set")
+	setCmd.Flags().StringVarP(&configSetValue, "value", "v", "", "Configuration value to set")
 
-	removeCmd.Flags().StringVarP(&configRemoveKey, "key", "k", "", "Directive key to remove")
+	removeCmd.Flags().StringVarP(&configRemoveKey, "key", "k", "", "Configuration key to remove")
 	removeCmd.Flags().StringVarP(&configRemoveRoot, "root", "r", "", "Specific root folder to remove")
 
-	configCmd.Flags().BoolVarP(&deleteConfig, "delete", "x", false, "Delete all directives from the configuration")
+	// Avoid shorthand flag to prevent conflicts with other commands
+	configCmd.Flags().BoolVar(&deleteConfig, "reset", false, "Reset all configuration to defaults")
 	configCmd.AddCommand(removeCmd)
 	configCmd.AddCommand(setCmd)
 
