@@ -15,10 +15,10 @@ import (
 
 // Circuit breaker for rate limiting
 var (
-	lastFailureTime      time.Time
-	consecutiveFailures   int
+	lastFailureTime         time.Time
+	consecutiveFailures     int
 	circuitBreakerThreshold = 3
-	circuitBreakerTimeout = 5 * time.Minute
+	circuitBreakerTimeout   = 5 * time.Minute
 )
 
 // checkCircuitBreaker returns true if we should skip the request due to circuit breaker
@@ -42,7 +42,7 @@ func GenerateEmbedding(text string) ([]float32, error) {
 			nil,
 			map[string]interface{}{
 				"consecutiveFailures": consecutiveFailures,
-				"nextRetryAfter":     time.Until(lastFailureTime.Add(circuitBreakerTimeout)).String(),
+				"nextRetryAfter":      time.Until(lastFailureTime.Add(circuitBreakerTimeout)).String(),
 			},
 		)
 	}
@@ -133,9 +133,9 @@ func GenerateEmbedding(text string) ([]float32, error) {
 
 	// Use the retry mechanism with a more conservative configuration for rate limit issues
 	retryConfig := utils.RetryConfig{
-		MaxRetries:   3,                      // Reduced from 10
-		InitialDelay: 5 * time.Second,       // Reduced from 30
-		MaxDelay:     30 * time.Second,      // Reduced from 120
+		MaxRetries:   3,                // Reduced from 10
+		InitialDelay: 5 * time.Second,  // Reduced from 30
+		MaxDelay:     30 * time.Second, // Reduced from 120
 		Factor:       2.0,
 	}
 
