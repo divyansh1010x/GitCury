@@ -7,14 +7,38 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var Aliases = func() map[string]string {
-	rawAliases := config.Get("aliases").(map[string]interface{})
-	convertedAliases := make(map[string]string)
-	for key, value := range rawAliases {
-		convertedAliases[key] = value.(string)
+var Aliases = make(map[string]string)
+
+func loadAliases() {
+	if len(Aliases) > 0 {
+		return // Already loaded
 	}
-	return convertedAliases
-}()
+
+	rawAliases := config.Get("aliases")
+	if rawAliases == nil {
+		// Use default aliases if none configured
+		Aliases = map[string]string{
+			"commit":  config.DefaultAliases.Commit,
+			"push":    config.DefaultAliases.Push,
+			"getmsgs": config.DefaultAliases.GetMsgs,
+			"output":  config.DefaultAliases.Output,
+			"config":  config.DefaultAliases.Config,
+			"setup":   config.DefaultAliases.Setup,
+			"boom":    config.DefaultAliases.Boom,
+		}
+		return
+	}
+
+	if aliasMap, ok := rawAliases.(map[string]interface{}); ok {
+		convertedAliases := make(map[string]string)
+		for key, value := range aliasMap {
+			if strValue, ok := value.(string); ok {
+				convertedAliases[key] = strValue
+			}
+		}
+		Aliases = convertedAliases
+	}
+}
 
 var aliasCmd = &cobra.Command{
 	Use:   "alias",
@@ -40,6 +64,7 @@ Examples:
 [NOTICE]: Ensure aliases do not conflict with existing commands.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		loadAliases() // Ensure aliases are loaded
 		if cmd.Flag("add").Changed {
 			if len(args) != 2 {
 				utils.Error("[ALIAS]: Invalid arguments. Usage: --add <command> <alias>")
@@ -74,6 +99,7 @@ Examples:
 }
 
 func ReampAlias(root *cobra.Command) {
+	loadAliases() // Ensure aliases are loaded before remapping
 	utils.Debug("[ALIAS]: Re-mapping aliases to commands.")
 	for cmdName, alias := range Aliases {
 		cmd, _, err := root.Find([]string{cmdName})
