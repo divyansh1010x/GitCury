@@ -11,7 +11,7 @@ import (
 func PushAllRoots(branchName string) error {
 	rootFolders, ok := config.Get("root_folders").([]interface{})
 	if !ok {
-		utils.Error("[" + config.Aliases.Push + "]: ❌ Invalid or missing root_folders configuration", "config")
+		utils.Error("["+config.Aliases.Push+"]: ❌ Invalid or missing root_folders configuration", "config")
 		return utils.NewValidationError(
 			"Invalid or missing root_folders configuration",
 			nil,
@@ -29,7 +29,7 @@ func PushAllRoots(branchName string) error {
 	for _, rootFolder := range rootFolders {
 		rootFolderStr, ok := rootFolder.(string)
 		if !ok {
-			utils.Error("[" + config.Aliases.Push + "]: ⚠️ Invalid root folder type", "config")
+			utils.Error("["+config.Aliases.Push+"]: ⚠️ Invalid root folder type", "config")
 			continue
 		}
 
@@ -46,8 +46,8 @@ func PushAllRoots(branchName string) error {
 				if structErr, ok := err.(*utils.StructuredError); ok && structErr.ProcessedFile != "" {
 					fileInfo = structErr.ProcessedFile
 				}
-				
-				utils.Error("[" + config.Aliases.Push + "]: ❌ Failed to push branch for folder '" + folder + "' - " + err.Error(), fileInfo)
+
+				utils.Error("["+config.Aliases.Push+"]: ❌ Failed to push branch for folder '"+folder+"' - "+err.Error(), fileInfo)
 				mu.Lock()
 				errors = append(errors, fmt.Sprintf("Folder: %s, File: %s, Error: %s", folder, fileInfo, err.Error()))
 				mu.Unlock()
@@ -60,7 +60,7 @@ func PushAllRoots(branchName string) error {
 	rootFolderWg.Wait()
 	if len(errors) > 0 {
 		filesInfo := "multiple_folders"
-		utils.Error("[" + config.Aliases.Push + "]: ❌ Errors occurred during push operation", filesInfo)
+		utils.Error("["+config.Aliases.Push+"]: ❌ Errors occurred during push operation", filesInfo)
 		return utils.NewGitError(
 			"One or more errors occurred while pushing branches",
 			fmt.Errorf("multiple push errors"),
@@ -85,8 +85,8 @@ func PushOneRoot(rootFolderName, branchName string) error {
 		if structErr, ok := err.(*utils.StructuredError); ok && structErr.ProcessedFile != "" {
 			fileInfo = structErr.ProcessedFile
 		}
-		
-		utils.Error("[" + config.Aliases.Push + "]: ❌ Failed to push branch for folder '" + rootFolderName + "' - " + err.Error(), fileInfo)
+
+		utils.Error("["+config.Aliases.Push+"]: ❌ Failed to push branch for folder '"+rootFolderName+"' - "+err.Error(), fileInfo)
 		return utils.NewGitError(
 			"Failed to push branch for folder",
 			err,
