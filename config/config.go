@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 )
 
@@ -39,6 +40,24 @@ var (
 )
 
 func init() {
+	// Skip config loading during tests to avoid initialization issues
+	if isTestMode() {
+		// Set minimal defaults for testing
+		Aliases = DefaultAliases
+		return
+	}
+
+	// Allow config commands to run even with missing critical config
+	if isConfigCommand() {
+		// Load config but don't exit on critical errors for config commands
+		err := LoadConfigForConfigCommands()
+		if err != nil {
+			// For config commands, just log warnings, don't exit
+			utils.Debug("[Config]: " + err.Error())
+		}
+		return
+	}
+
 	err := LoadConfig()
 	if err != nil {
 		// Check if it's a critical config error
@@ -55,6 +74,63 @@ func init() {
 		// For non-critical errors, just log them
 		utils.Warning("[Config]: " + err.Error())
 	}
+}
+
+// isTestMode detects if we're running in test mode
+func isTestMode() bool {
+	// Check for common test environment indicators
+	for _, arg := range os.Args {
+		if strings.Contains(arg, "test") || strings.Contains(arg, ".test") {
+			return true
+		}
+	}
+	// Check if GITCURY_TEST_MODE environment variable is set
+	return os.Getenv("GITCURY_TEST_MODE") == "true"
+}
+
+// isConfigCommand detects if we're running a config command
+func isConfigCommand() bool {
+	// Improved detection for config commands
+	if len(os.Args) < 2 {
+		return false
+	}
+
+	// Check if the command is the config command itself or its alias
+	for i, arg := range os.Args {
+		// Direct config command or its alias
+		if arg == "config" || arg == DefaultAliases.Config || arg == "nexus" {
+			return true
+		}
+
+		// Check for config subcommands
+		if i > 0 {
+			prevArg := os.Args[i-1]
+			if prevArg == "config" || prevArg == DefaultAliases.Config || prevArg == "nexus" {
+				// Any subcommand of config should be considered a config command
+				return true
+			}
+		}
+
+		// Also check for flags that belong to config command
+		if (arg == "--delete" || arg == "--reset") && i > 0 {
+			prevArg := os.Args[i-1]
+			if prevArg == "config" || prevArg == DefaultAliases.Config || prevArg == "nexus" {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+// contains checks if a slice contains a string
+func contains(slice []string, item string) bool {
+	for _, s := range slice {
+		if s == item {
+			return true
+		}
+	}
+	return false
 }
 
 func LoadConfig() error {
@@ -142,18 +218,24 @@ func LoadConfig() error {
 		return err
 	}
 
-	// Check critical configuration and stop if missing
+	// Check critical configuration - no longer stops execution for config commands
 	criticalMissing := checkCriticalConfig()
-	if len(criticalMissing) > 0 {
-		utils.Error("[Config]: Critical configuration missing: " + fmt.Sprint(criticalMissing))
-		return utils.NewConfigError(
-			"Critical configuration missing",
-			nil,
-			map[string]interface{}{
-				"missing_fields": criticalMissing,
-				"stop_execution": true,
-			},
-		)
+	if len(criticalMissing) > 0 && !isConfigCommand() {
+		// Only stop execution for non-config commands when API key is missing
+		if contains(criticalMissing, "GEMINI_API_KEY") {
+			utils.Error("")
+			utils.Error("💥 GitCury cannot start due to missing API key.")
+			utils.Error("   Please set your GEMINI_API_KEY as shown above and try again.")
+			utils.Error("")
+			return utils.NewConfigError(
+				"Critical configuration missing",
+				nil,
+				map[string]interface{}{
+					"missing_fields": criticalMissing,
+					"stop_execution": true,
+				},
+			)
+		}
 	}
 
 	// Set up aliases
@@ -224,9 +306,138 @@ func LoadConfig() error {
 	return nil
 }
 
-// checkCriticalConfig checks for critical configuration values and prompts user with commands if missing
+// LoadConfigForConfigCommands loads config specifically for config commands - minimal warnings and no critical errors
+func LoadConfigForConfigCommands() error {
+	configFilePath := os.Getenv("HOME") + "/.gitcury/config.json"
+	utils.Debug("[Config]: Loading config for config commands from " + configFilePath)
+
+	// Ensure config directory exists
+	configDir := filepath.Dir(configFilePath)
+	if err := os.MkdirAll(configDir, 0755); err != nil {
+		utils.Debug("[Config]: Error creating config directory: " + err.Error())
+		// Continue with in-memory config
+	}
+
+	file, err := os.Open(configFilePath)
+	if os.IsNotExist(err) {
+		// Create default config without warnings for config commands
+		utils.Debug("[Config]: Config file not found, creating basic defaults")
+		settings = map[string]interface{}{
+			"app_name":         "GitCury",
+			"version":          "1.0.0",
+			"root_folders":     []string{"."},
+			"config_dir":       os.Getenv("HOME") + "/.gitcury",
+			"output_file_path": os.Getenv("HOME") + "/.gitcury/output.json",
+			"editor":           "nano",
+			"aliases": map[string]interface{}{
+				"getmsgs": DefaultAliases.GetMsgs,
+				"commit":  DefaultAliases.Commit,
+				"push":    DefaultAliases.Push,
+				"output":  DefaultAliases.Output,
+				"config":  DefaultAliases.Config,
+				"setup":   DefaultAliases.Setup,
+				"boom":    DefaultAliases.Boom,
+			},
+			"retries":       3,
+			"timeout":       30,
+			"maxConcurrent": 5,
+			"logLevel":      "info",
+		}
+
+		// Save the default settings silently
+		if err := saveConfigToFile(configFilePath); err != nil {
+			utils.Debug("[Config]: Could not save default configuration: " + err.Error())
+			// Continue with in-memory config
+		} else {
+			utils.Debug("[Config]: Created default config for config commands")
+		}
+
+		// Set up aliases with default values
+		Aliases = DefaultAliases
+		return nil
+	} else if err != nil {
+		utils.Debug("[Config]: Could not open config file: " + err.Error() + " - using defaults")
+		// Set minimal defaults even if file read fails
+		settings = map[string]interface{}{
+			"app_name":     "GitCury",
+			"version":      "1.0.0",
+			"root_folders": []string{"."},
+			"editor":       "nano",
+			"logLevel":     "info",
+			"retries":      3,
+			"timeout":      30,
+		}
+		Aliases = DefaultAliases
+		return nil
+	}
+	defer file.Close()
+
+	// Parse the config file
+	decoder := json.NewDecoder(file)
+	if err := decoder.Decode(&settings); err != nil {
+		utils.Debug("[Config]: Could not parse config file: " + err.Error() + " - using defaults")
+		// Set minimal defaults even if parsing fails
+		settings = map[string]interface{}{
+			"app_name":     "GitCury",
+			"version":      "1.0.0",
+			"root_folders": []string{"."},
+			"editor":       "nano",
+			"logLevel":     "info",
+		}
+		Aliases = DefaultAliases
+		return nil
+	}
+
+	// Minimal validation - just ensure basic fields exist
+	if _, exists := settings["app_name"]; !exists {
+		settings["app_name"] = "GitCury"
+	}
+	if _, exists := settings["version"]; !exists {
+		settings["version"] = "1.0.0"
+	}
+	if _, exists := settings["root_folders"]; !exists {
+		settings["root_folders"] = []string{"."}
+	}
+
+	// Set up aliases quietly
+	aliasesMap, ok := settings["aliases"].(map[string]interface{})
+	if !ok {
+		Aliases = DefaultAliases
+	} else {
+		// Convert the map to our Alias struct with defaults
+		Aliases = Alias{
+			Commit:  getStringOrDefault(aliasesMap, "commit", DefaultAliases.Commit),
+			Push:    getStringOrDefault(aliasesMap, "push", DefaultAliases.Push),
+			GetMsgs: getStringOrDefault(aliasesMap, "getmsgs", DefaultAliases.GetMsgs),
+			Output:  getStringOrDefault(aliasesMap, "output", DefaultAliases.Output),
+			Config:  getStringOrDefault(aliasesMap, "config", DefaultAliases.Config),
+			Setup:   getStringOrDefault(aliasesMap, "setup", DefaultAliases.Setup),
+			Boom:    getStringOrDefault(aliasesMap, "boom", DefaultAliases.Boom),
+		}
+	}
+
+	// Set log level if available, but don't complain if not
+	if logLevel, ok := settings["logLevel"].(string); ok && logLevel != "" {
+		utils.SetLogLevel(logLevel)
+	}
+
+	utils.Debug("[Config]: Configuration loaded for config commands")
+	return nil
+}
+
+// getStringOrDefault is a helper function to safely get string values from a map
+func getStringOrDefault(m map[string]interface{}, key, defaultValue string) string {
+	if val, ok := m[key].(string); ok && val != "" {
+		return val
+	}
+	return defaultValue
+}
+
+// checkCriticalConfig checks for critical configuration values and provides helpful guidance
 func checkCriticalConfig() []string {
 	var criticalMissing []string
+	var hasApiKey bool
+	var configChanged bool
 
 	// Check for GEMINI_API_KEY - this is critical for main functionality
 	geminiKey, exists := settings["GEMINI_API_KEY"]
@@ -235,73 +446,94 @@ func checkCriticalConfig() []string {
 		envKey := os.Getenv("GEMINI_API_KEY")
 		if envKey == "" {
 			criticalMissing = append(criticalMissing, "GEMINI_API_KEY")
-			utils.Error("")
-			utils.Error("🚫 CRITICAL: GEMINI_API_KEY is required but not configured!")
-			utils.Error("")
-			utils.Error("💡 To fix this issue, run one of these commands:")
-			utils.Error("   📝 Set via config file:")
-			utils.Error("      ./gitcury config set --key GEMINI_API_KEY --value YOUR_API_KEY_HERE")
-			utils.Error("")
-			utils.Error("   🌍 Set via environment variable:")
-			utils.Error("      export GEMINI_API_KEY=YOUR_API_KEY_HERE")
-			utils.Error("")
-			utils.Error("📖 Get your free API key from:")
-			utils.Error("   🔗 https://aistudio.google.com/app/apikey")
-			utils.Error("")
-			utils.Error("⚠️  GitCury cannot function without this API key.")
+			hasApiKey = false
 		} else {
 			utils.Debug("[Config]: Using GEMINI_API_KEY from environment variables")
 			settings["GEMINI_API_KEY"] = envKey
+			hasApiKey = true
+			configChanged = true
 		}
+	} else {
+		hasApiKey = true
 	}
 
-	// Check for root_folders - critical for knowing where to work
+	// Check for root_folders - auto-set reasonable defaults
 	rootFolders, exists := settings["root_folders"]
 	if !exists {
-		criticalMissing = append(criticalMissing, "root_folders")
-		utils.Error("")
-		utils.Error("🚫 CRITICAL: root_folders configuration is missing!")
-		utils.Error("")
-		utils.Error("💡 To fix this, add your project directories:")
-		utils.Error("   📝 Add current directory:")
-		utils.Error("      ./gitcury config set --key root_folders --value '[\".\"]'")
-		utils.Error("")
-		utils.Error("   📁 Add specific directories:")
-		utils.Error("      ./gitcury config set --key root_folders --value '[\"/path/to/project1\",\"/path/to/project2\"]'")
-		utils.Error("")
+		utils.Debug("[Config]: Setting default root_folders to current directory")
+		settings["root_folders"] = []string{"."}
+		configChanged = true
 	} else {
 		// Check if root_folders is empty or invalid
 		if folders, ok := rootFolders.([]interface{}); ok {
 			if len(folders) == 0 {
-				criticalMissing = append(criticalMissing, "root_folders")
-				utils.Error("")
-				utils.Error("🚫 CRITICAL: root_folders is empty!")
-				utils.Error("")
-				utils.Error("💡 Add at least one project directory:")
-				utils.Error("   ./gitcury config set --key root_folders --value '[\".\"]'")
-				utils.Error("")
+				utils.Debug("[Config]: Empty root_folders detected, setting to current directory")
+				settings["root_folders"] = []string{"."}
+				configChanged = true
 			}
 		} else {
-			criticalMissing = append(criticalMissing, "root_folders")
-			utils.Error("")
-			utils.Error("🚫 CRITICAL: root_folders has invalid format!")
-			utils.Error("")
-			utils.Error("💡 Fix the format:")
-			utils.Error("   ./gitcury config set --key root_folders --value '[\".\"]'")
-			utils.Error("")
+			utils.Debug("[Config]: Invalid root_folders format detected, setting to current directory")
+			settings["root_folders"] = []string{"."}
+			configChanged = true
 		}
 	}
 
-	// Check for numFilesToCommit - not critical but important for functionality
+	// Auto-set other important defaults
 	if _, exists := settings["numFilesToCommit"]; !exists {
-		utils.Warning("")
-		utils.Warning("⚠️  RECOMMENDED: numFilesToCommit not set, using default (5)")
-		utils.Warning("")
-		utils.Warning("💡 To set a custom value:")
-		utils.Warning("   ./gitcury config set --key numFilesToCommit --value 10")
-		utils.Warning("")
-		// Set a default value
+		utils.Debug("[Config]: Setting default numFilesToCommit to 5")
 		settings["numFilesToCommit"] = 5
+		configChanged = true
+	}
+
+	if _, exists := settings["editor"]; !exists {
+		utils.Debug("[Config]: Setting default editor to nano")
+		settings["editor"] = "nano"
+		configChanged = true
+	}
+
+	if _, exists := settings["retries"]; !exists {
+		utils.Debug("[Config]: Setting default retries to 3")
+		settings["retries"] = 3
+		configChanged = true
+	}
+
+	if _, exists := settings["timeout"]; !exists {
+		utils.Debug("[Config]: Setting default timeout to 30")
+		settings["timeout"] = 30
+		configChanged = true
+	}
+
+	if _, exists := settings["logLevel"]; !exists {
+		utils.Debug("[Config]: Setting default logLevel to info")
+		settings["logLevel"] = "info"
+		configChanged = true
+	}
+
+	// Save config if defaults were auto-set
+	if configChanged {
+		configFilePath := os.Getenv("HOME") + "/.gitcury/config.json"
+		if err := saveConfigToFile(configFilePath); err != nil {
+			utils.Debug("[Config]: Warning: Failed to save auto-set defaults: " + err.Error())
+		} else {
+			utils.Debug("[Config]: Auto-set defaults saved to config file")
+		}
+	}
+
+	// Only show API key guidance if missing and if this is not a config command
+	if !hasApiKey && !isConfigCommand() {
+		utils.Info("")
+		utils.Info("🔑 API Key Setup Required")
+		utils.Info("   GitCury needs a Gemini API key for AI-powered features.")
+		utils.Info("")
+		utils.Info("📝 Quick setup:")
+		utils.Info("   gitcury config set --key GEMINI_API_KEY --value YOUR_API_KEY_HERE")
+		utils.Info("")
+		utils.Info("🌍 Or set environment variable:")
+		utils.Info("   export GEMINI_API_KEY=YOUR_API_KEY_HERE")
+		utils.Info("")
+		utils.Info("📖 Get your free API key:")
+		utils.Info("   🔗 https://aistudio.google.com/app/apikey")
+		utils.Info("")
 	}
 
 	return criticalMissing
@@ -435,31 +667,27 @@ func Remove(key string) {
 	defer mu.Unlock()
 	delete(settings, key)
 
-	go func() {
-		mu.RLock()
-		defer mu.RUnlock()
+	// Save synchronously to ensure the change is persisted immediately
+	configFilePath := os.Getenv("HOME") + "/.gitcury/config.json"
 
-		configFilePath := os.Getenv("HOME") + "/.gitcury/ json"
+	file, err := os.OpenFile(configFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		utils.Error("[" + Aliases.Config + "]: ⚠️ Error saving configuration after removal: " + err.Error())
+		return
+	}
+	defer file.Close()
 
-		file, err := os.OpenFile(configFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
-		if err != nil {
-			utils.Error("[" + Aliases.Config + "]: ⚠️ Error saving configuration after removal: " + err.Error())
-			return
-		}
-		defer file.Close()
-
-		encoder := json.NewEncoder(file)
-		if err := encoder.Encode(settings); err != nil {
-			utils.Error("[" + Aliases.Config + "]: ⚠️ Error saving configuration after removal: " + err.Error())
-		}
-	}()
+	encoder := json.NewEncoder(file)
+	if err := encoder.Encode(settings); err != nil {
+		utils.Error("[" + Aliases.Config + "]: ⚠️ Error saving configuration after removal: " + err.Error())
+	}
 }
 
 func Delete() {
 	utils.Debug("[" + Aliases.Config + "]: 🗑️ Deleting configuration file...")
 	mu.Lock()
 	defer mu.Unlock()
-	configFilePath := os.Getenv("HOME") + "/.gitcury/ json"
+	configFilePath := os.Getenv("HOME") + "/.gitcury/config.json"
 	if err := os.Remove(configFilePath); err != nil {
 		utils.Error("[" + Aliases.Config + "]: ⚠️ Error deleting configuration file: " + err.Error())
 	}
