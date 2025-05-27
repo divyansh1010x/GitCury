@@ -3,43 +3,37 @@ package embeddings_test
 
 import (
 	"GitCury/embeddings"
-	"GitCury/tests/mocks"
 	"GitCury/tests/testutils"
+	"os"
+	"strings"
 	"testing"
 )
 
 // TestGenerateEmbeddings tests generating embeddings
 func TestGenerateEmbeddings(t *testing.T) {
-	// Create a temporary directory for testing
-	tempDir := testutils.CreateTempDir(t)
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
 
-	// Set up a git repository
-	testutils.SetupGitRepo(t, tempDir)
+	// Test invalid API key scenario (no actual API call)
+	t.Run("Invalid API Key", func(t *testing.T) {
+		// Temporarily unset API key to test error handling
+		os.Unsetenv("GEMINI_API_KEY")
 
-	// Add a test file
-	testutils.AddAndCommitFile(t, tempDir, "test.txt", "Test content", "Add test file")
+		// Generate embeddings for a text - should fail gracefully
+		_, err := embeddings.GenerateEmbedding("Test content")
+		if err == nil {
+			t.Error("Expected error for missing API key, but got nil")
+		}
 
-	// Create mock API client
-	mockClient := mocks.NewMockAPIClient()
+		// Verify error message contains API key reference
+		if !strings.Contains(err.Error(), "API key") && !strings.Contains(err.Error(), "GEMINI_API_KEY") {
+			t.Errorf("Expected error to mention API key, got: %v", err)
+		}
+	})
 
-	// Set up a mock response for embeddings
-	mockClient.DefaultResponse = "mock embedding response"
-
-	// Set up mock client (requires dependency injection)
-	// For now, test basic functionality
-
-	// Generate embeddings for a text
-	emb, err := embeddings.GenerateEmbedding("Test content")
-	if err != nil {
-		// May fail if API key is not set up in the test environment
-		t.Logf("GenerateEmbedding returned an error: %v (may be expected in test environment)", err)
-		return
-	}
-
-	// Verify we got non-empty embeddings
-	if len(emb) == 0 {
-		t.Error("Expected non-empty embeddings")
-	}
+	// Reset environment for cleanup
+	os.Setenv("GEMINI_API_KEY", "test-api-key-for-testing")
 }
 
 // TestGetFileDiff tests getting the diff for a file
