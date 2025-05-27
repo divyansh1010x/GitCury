@@ -12,6 +12,9 @@ import (
 
 // TestRunGitCmd tests the basic git command execution functionality
 func TestRunGitCmd(t *testing.T) {
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
 	// Create a temporary directory for testing
 	tempDir := testutils.CreateTempDir(t)
 
@@ -32,6 +35,9 @@ func TestRunGitCmd(t *testing.T) {
 
 // TestRunGitCmdWithTimeout tests the git command execution with timeout
 func TestRunGitCmdWithTimeout(t *testing.T) {
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
 	// Create a temporary directory for testing
 	tempDir := testutils.CreateTempDir(t)
 
@@ -53,6 +59,9 @@ func TestRunGitCmdWithTimeout(t *testing.T) {
 
 // TestGetAllChangedFiles tests retrieving changed files from git
 func TestGetAllChangedFiles(t *testing.T) {
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
 	// Create a temporary directory for testing
 	tempDir := testutils.CreateTempDir(t)
 
@@ -79,6 +88,9 @@ func TestGetAllChangedFiles(t *testing.T) {
 
 // TestIsGitRepository tests checking if a path is a git repository
 func TestIsGitRepository(t *testing.T) {
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
 	// Create a temporary directory for testing
 	tempDir := testutils.CreateTempDir(t)
 
@@ -101,6 +113,9 @@ func TestIsGitRepository(t *testing.T) {
 
 // TestGetGitConfigValue tests reading git config values
 func TestGetGitConfigValue(t *testing.T) {
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
 	// Create a temporary directory for testing
 	tempDir := testutils.CreateTempDir(t)
 
@@ -121,6 +136,9 @@ func TestGetGitConfigValue(t *testing.T) {
 
 // TestSetGitConfigValue tests setting git config values
 func TestSetGitConfigValue(t *testing.T) {
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
 	// Create a temporary directory for testing
 	tempDir := testutils.CreateTempDir(t)
 
@@ -151,6 +169,9 @@ func TestSetGitConfigValue(t *testing.T) {
 
 // Additional tests for recovery and progress functions
 func TestCheckRepositoryHealth(t *testing.T) {
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
 	// Create a temporary directory for testing
 	tempDir := testutils.CreateTempDir(t)
 
@@ -171,6 +192,9 @@ func TestCheckRepositoryHealth(t *testing.T) {
 }
 
 func TestRecoverFromGitError(t *testing.T) {
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
 	// Create a temporary directory for testing
 	tempDir := testutils.CreateTempDir(t)
 
