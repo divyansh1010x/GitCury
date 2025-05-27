@@ -20,10 +20,10 @@ const (
 
 // StructuredError represents an error with additional context
 type StructuredError struct {
-	Type       ErrorType
-	Message    string
-	Cause      error
-	Context    map[string]interface{}
+	Type          ErrorType
+	Message       string
+	Cause         error
+	Context       map[string]interface{}
 	ProcessedFile string
 }
 
@@ -41,7 +41,7 @@ func (e *StructuredError) Error() string {
 		}
 		msg += fmt.Sprintf(" [%s]", strings.Join(contextStrs, ", "))
 	}
-	
+
 	if e.ProcessedFile != "" {
 		msg += fmt.Sprintf(" [File: %s]", e.ProcessedFile)
 	}
@@ -63,10 +63,10 @@ func NewConfigError(message string, cause error, context map[string]interface{},
 		file = processedFile[0]
 	}
 	return &StructuredError{
-		Type:         ConfigError,
-		Message:      message,
-		Cause:        cause,
-		Context:      context,
+		Type:          ConfigError,
+		Message:       message,
+		Cause:         cause,
+		Context:       context,
 		ProcessedFile: file,
 	}
 }
@@ -78,10 +78,10 @@ func NewGitError(message string, cause error, context map[string]interface{}, pr
 		file = processedFile[0]
 	}
 	return &StructuredError{
-		Type:         GitError,
-		Message:      message,
-		Cause:        cause,
-		Context:      context,
+		Type:          GitError,
+		Message:       message,
+		Cause:         cause,
+		Context:       context,
 		ProcessedFile: file,
 	}
 }
@@ -93,10 +93,10 @@ func NewAPIError(message string, cause error, context map[string]interface{}, pr
 		file = processedFile[0]
 	}
 	return &StructuredError{
-		Type:         APIError,
-		Message:      message,
-		Cause:        cause,
-		Context:      context,
+		Type:          APIError,
+		Message:       message,
+		Cause:         cause,
+		Context:       context,
 		ProcessedFile: file,
 	}
 }
@@ -108,10 +108,10 @@ func NewValidationError(message string, cause error, context map[string]interfac
 		file = processedFile[0]
 	}
 	return &StructuredError{
-		Type:         ValidationError,
-		Message:      message,
-		Cause:        cause,
-		Context:      context,
+		Type:          ValidationError,
+		Message:       message,
+		Cause:         cause,
+		Context:       context,
 		ProcessedFile: file,
 	}
 }
@@ -123,10 +123,10 @@ func NewSystemError(message string, cause error, context map[string]interface{},
 		file = processedFile[0]
 	}
 	return &StructuredError{
-		Type:         SystemError,
-		Message:      message,
-		Cause:        cause,
-		Context:      context,
+		Type:          SystemError,
+		Message:       message,
+		Cause:         cause,
+		Context:       context,
 		ProcessedFile: file,
 	}
 }
@@ -167,7 +167,6 @@ func ToUserFriendlyMessage(err error) string {
 		}
 	}
 
-	
 	// Default error handling
 	return fmt.Sprintf("Error: %s", err.Error())
 }
