@@ -1,0 +1,13 @@
+{
+  "GEMINI_API_KEY": "AIzaSyCVN0g249VU1mcy1dMbdP-4_FIS95N21oI",
+  "app_name": "GitCury",
+  "numFilesToCommit": 5,
+  "root_folders": [
+    "/home/lakshya-jain/Intern/demo/pinnzo",
+    "/home/lakshya-jain/projects/libr",
+    "/home/lakshya-jain/projects/GitCury",
+    "/home/lakshya-jain/projects/warp_2025/newsletter",
+    "/home/lakshya-jain/projects/warp_2025/PhotoManagement"
+  ],
+  "version": "1.0.0"
+}
