@@ -60,13 +60,13 @@ func Error(message string, fileContext ...string) {
 		if parts := strings.Split(file, "/"); len(parts) > 2 {
 			shortFile = parts[len(parts)-2] + "/" + parts[len(parts)-1]
 		}
-		
+
 		// Add file context if provided
 		fileInfo := ""
 		if len(fileContext) > 0 && fileContext[0] != "" {
 			fileInfo = fmt.Sprintf(" [File: %s]", fileContext[0])
 		}
-		
+
 		log.Printf("\n%s%s[BREACH  ] ⚠️ %s %s%s (at %s:%d)\n", Red, BlackBg, Reset, message, fileInfo, shortFile, line)
 	} else {
 		fileInfo := ""
