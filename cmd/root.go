@@ -83,7 +83,7 @@ func Execute() {
 	}
 
 	// Add a version flag to the root command
-	rootCmd.PersistentFlags().BoolP("version", "v", false, "Print the version number of GitCury")
+	rootCmd.PersistentFlags().BoolP("version", "V", false, "Print the version number of GitCury")
 
 	// Add common flags
 	rootCmd.PersistentFlags().BoolP("quiet", "q", false, "Minimize output, only show errors")
