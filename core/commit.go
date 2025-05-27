@@ -47,8 +47,8 @@ func CommitAllRoots(env ...[]string) error {
 				if structErr, ok := err.(*utils.StructuredError); ok && structErr.ProcessedFile != "" {
 					fileInfo = structErr.ProcessedFile
 				}
-				
-				utils.Error("[" + config.Aliases.Commit + ".FAIL]: Failed to commit batch for folder '" + folder.Name + "' - " + err.Error(), fileInfo)
+
+				utils.Error("["+config.Aliases.Commit+".FAIL]: Failed to commit batch for folder '"+folder.Name+"' - "+err.Error(), fileInfo)
 				return utils.NewGitError(
 					"Failed to commit changes in folder",
 					err,
@@ -70,10 +70,10 @@ func CommitAllRoots(env ...[]string) error {
 	if len(errors) > 0 {
 		errorDetails := make([]string, 0, len(errors))
 		filesList := make([]string, 0, len(errors))
-		
+
 		for _, err := range errors {
 			errorDetails = append(errorDetails, err.Error())
-			
+
 			// Extract file information if available
 			if structErr, ok := err.(*utils.StructuredError); ok && structErr.ProcessedFile != "" {
 				filesList = append(filesList, structErr.ProcessedFile)
@@ -85,7 +85,7 @@ func CommitAllRoots(env ...[]string) error {
 			filesInfo = strings.Join(filesList, ", ")
 		}
 
-		utils.Error("[" + config.Aliases.Commit + ".FAIL]: Batch commit completed with " + fmt.Sprint(len(errors)) + " errors", filesInfo)
+		utils.Error("["+config.Aliases.Commit+".FAIL]: Batch commit completed with "+fmt.Sprint(len(errors))+" errors", filesInfo)
 		utils.Debug("[" + config.Aliases.Commit + ".FAIL]: Errors encountered: " + strings.Join(errorDetails, "; "))
 
 		return utils.NewGitError(
@@ -107,7 +107,7 @@ func CommitAllRoots(env ...[]string) error {
 func CommitOneRoot(rootFolderName string, env ...[]string) error {
 	rootFolder := output.GetFolder(rootFolderName)
 	if len(rootFolder.Files) == 0 {
-		utils.Error("[" + config.Aliases.Commit + ".FAIL]: Root folder '" + rootFolderName + "' not found or contains no files.", rootFolderName)
+		utils.Error("["+config.Aliases.Commit+".FAIL]: Root folder '"+rootFolderName+"' not found or contains no files.", rootFolderName)
 		return utils.NewValidationError(
 			"Root folder not found or has no files",
 			nil,
@@ -127,8 +127,8 @@ func CommitOneRoot(rootFolderName string, env ...[]string) error {
 		if structErr, ok := err.(*utils.StructuredError); ok && structErr.ProcessedFile != "" {
 			fileInfo = structErr.ProcessedFile
 		}
-		
-		utils.Error("[" + config.Aliases.Commit + ".FAIL]: Failed to commit batch for folder '" + rootFolderName + "' - " + err.Error(), fileInfo)
+
+		utils.Error("["+config.Aliases.Commit+".FAIL]: Failed to commit batch for folder '"+rootFolderName+"' - "+err.Error(), fileInfo)
 		return utils.NewGitError(
 			"Failed to commit batch for folder",
 			err,
