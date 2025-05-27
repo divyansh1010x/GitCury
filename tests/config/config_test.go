@@ -11,16 +11,24 @@ import (
 
 // TestLoadConfig tests loading the configuration
 func TestLoadConfig(t *testing.T) {
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
+
 	// Create a temporary directory for testing
 	tempDir := testutils.CreateTempDir(t)
 
-	// Create a sample config file
+	// Create a sample config file with all required fields
 	configPath := filepath.Join(tempDir, "config.json")
 	configContent := `{
 		"GEMINI_API_KEY": "test-api-key",
 		"output_file_path": "test-output.json",
 		"logLevel": "debug",
-		"maxConcurrent": 4
+		"maxConcurrent": 4,
+		"app_name": "GitCury",
+		"version": "1.0.0",
+		"root_folders": ["."],
+		"numFilesToCommit": 5
 	}`
 
 	if err := os.WriteFile(configPath, []byte(configContent), 0644); err != nil {
