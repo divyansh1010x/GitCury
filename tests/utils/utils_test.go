@@ -1,6 +1,7 @@
 package utils_test
 
 import (
+	"GitCury/tests/testutils"
 	"GitCury/utils"
 	"errors"
 	"testing"
@@ -9,6 +10,9 @@ import (
 
 // TestSafeExecute tests the panic recovery mechanism
 func TestSafeExecute(t *testing.T) {
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
 	// Test normal execution without panic
 	err := utils.SafeExecute("TestOperation", func() error {
 		return nil
@@ -37,6 +41,9 @@ func TestSafeExecute(t *testing.T) {
 
 // TestNewWorkerPool tests the worker pool functionality
 func TestNewWorkerPool(t *testing.T) {
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
 	// Test with valid number of workers
 	pool := utils.NewWorkerPool(3)
 	if pool == nil {
@@ -52,6 +59,9 @@ func TestNewWorkerPool(t *testing.T) {
 
 // TestWorkerPoolSubmit tests submitting tasks to the worker pool
 func TestWorkerPoolSubmit(t *testing.T) {
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
 	pool := utils.NewWorkerPool(2)
 
 	// Submit a successful task
@@ -76,6 +86,9 @@ func TestWorkerPoolSubmit(t *testing.T) {
 
 // TestErrorHelpers tests the structured error helpers
 func TestErrorHelpers(t *testing.T) {
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
 	// Test creating a Git error
 	err := utils.NewGitError("git error", nil, nil)
 	if err == nil {
@@ -111,6 +124,9 @@ func TestErrorHelpers(t *testing.T) {
 
 // TestToUserFriendlyMessage tests converting errors to user-friendly messages
 func TestToUserFriendlyMessage(t *testing.T) {
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
 	// Test with regular error
 	regularErr := errors.New("regular error")
 	msg := utils.ToUserFriendlyMessage(regularErr)
@@ -128,6 +144,9 @@ func TestToUserFriendlyMessage(t *testing.T) {
 
 // TestLogger tests logging functionality
 func TestLogger(t *testing.T) {
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
 	// Set debug log level
 	originalLevel := utils.LogLevel
 	utils.SetLogLevel("debug")
@@ -145,6 +164,9 @@ func TestLogger(t *testing.T) {
 
 // TestFileUtils tests file utility functions
 func TestFileUtils(t *testing.T) {
+	// Setup test environment with config and API key
+	cleanup := testutils.SetupTestEnvironment(t)
+	defer cleanup()
 	// Test JSON serialization
 	data := map[string]string{
 		"key": "value",
