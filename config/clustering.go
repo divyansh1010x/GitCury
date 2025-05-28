@@ -1,8 +1,9 @@
 package config
 
 import (
-	"GitCury/utils"
 	"fmt"
+	"log"
+	"strconv"
 	"strings"
 )
 
@@ -80,13 +81,13 @@ func GetClusteringConfig() *ClusteringConfig {
 
 	clusteringSettings, exists := settings["clustering"]
 	if !exists {
-		utils.Warning("[Config]: Clustering configuration not found, using defaults")
+		log.Println("[Config]: Clustering configuration not found, using defaults")
 		return getDefaultClusteringConfig()
 	}
 
 	clusteringMap, ok := clusteringSettings.(map[string]interface{})
 	if !ok {
-		utils.Warning("[Config]: Invalid clustering configuration format, using defaults")
+		log.Println("[Config]: Invalid clustering configuration f ormat, using defaults")
 		return getDefaultClusteringConfig()
 	}
 
@@ -190,7 +191,7 @@ func SetClusteringConfig(config *ClusteringConfig) error {
 	// Use the global config system to set and save
 	Set("clustering", clusteringMap)
 
-	utils.Info("[Config]: Clustering configuration updated successfully")
+	log.Println("[Config]: Clustering configuration updated successfully")
 	return nil
 }
 
@@ -320,7 +321,7 @@ func SetClusteringConfigByKey(key, value string) error {
 	case "cached_delay_ms":
 		if _, err := parseInt(value); err == nil {
 			// Note: This could be added to CachedConfig if needed
-			utils.Warning("cached_delay_ms setting not yet implemented in configuration structure")
+			log.Println("cached_delay_ms setting not yet implemented in configuration structure")
 		} else {
 			return fmt.Errorf("invalid integer value for cached_delay_ms: %s", value)
 		}
@@ -594,19 +595,11 @@ func GetBalancedConfig() *ClusteringConfig {
 // Helper functions for parsing string values
 func parseFloat(s string) (float64, error) {
 	// Try to parse as float
-	if val, err := utils.ParseFloat(s); err == nil {
-		return val, nil
-	}
-	// Fallback: try to parse manually
-	var result float64
-	if _, err := fmt.Sscanf(s, "%f", &result); err != nil {
-		return 0, fmt.Errorf("invalid float: %s", s)
-	}
-	return result, nil
+	return strconv.ParseFloat(s, 64)
 }
 
 func parseInt(s string) (int, error) {
-	return utils.ParseInt(s)
+	return strconv.Atoi(s)
 }
 
 func parseBool(s string) (bool, error) {
