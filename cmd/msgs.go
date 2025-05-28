@@ -206,6 +206,19 @@ Examples:
 [NOTICE]: Ensure proper configuration of root folders to optimize message generation.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		// Start stats tracking if enabled
+		if utils.IsStatsEnabled() {
+			if allFlag {
+				utils.StartOperation("GenerateAllMessages")
+				// Set initial progress
+				utils.UpdateOperationProgress("GenerateAllMessages", 10.0)
+			} else if rootFolderName != "" {
+				utils.StartOperation("GenerateRootMessages")
+				// Set initial progress
+				utils.UpdateOperationProgress("GenerateRootMessages", 10.0)
+			}
+		}
+
 		// Handle custom instructions temporarily (not saved to config)
 		var originalInstructions interface{}
 		var hadInstructions bool
@@ -242,10 +255,16 @@ Examples:
 			}
 
 			if err != nil {
+				if utils.IsStatsEnabled() {
+					utils.FailOperation("GenerateAllMessages", err.Error())
+				}
 				utils.Error("[" + config.Aliases.GetMsgs + "]: Error encountered - " + err.Error())
 				return
 			}
 
+			if utils.IsStatsEnabled() {
+				utils.MarkOperationComplete("GenerateAllMessages")
+			}
 			allOutput := output.GetAll()
 			utils.Success("[" + config.Aliases.GetMsgs + "]: Commit messages generated for all root folders successfully.")
 			utils.Print(utils.ToJSON(allOutput))
@@ -261,20 +280,37 @@ Examples:
 			}
 
 			if err != nil {
+				if utils.IsStatsEnabled() {
+					utils.FailOperation("GenerateRootMessages", err.Error())
+				}
 				utils.Error("[" + config.Aliases.GetMsgs + "]: Error encountered - " + err.Error())
 				return
 			}
 
 			rootFolder := output.GetFolder(rootFolderName)
 			if len(rootFolder.Files) == 0 {
+				if utils.IsStatsEnabled() {
+					utils.FailOperation("GenerateRootMessages", "No changed files detected")
+				}
 				utils.Error("[" + config.Aliases.GetMsgs + "]: No changed files detected in the specified root folder.")
 				return
 			}
 
+			if utils.IsStatsEnabled() {
+				utils.MarkOperationComplete("GenerateRootMessages")
+			}
 			utils.Success("[" + config.Aliases.GetMsgs + "]: Commit messages generated for root folder: " + rootFolderName + " successfully.")
 			utils.Print(utils.ToJSON(rootFolder))
 		} else {
+			if utils.IsStatsEnabled() {
+				utils.FailOperation("GenerateMessages", "No operation flag specified")
+			}
 			utils.Error("[" + config.Aliases.GetMsgs + "]: You must specify either --all or --root flag.")
+		}
+
+		// Display stats if enabled
+		if utils.IsStatsEnabled() {
+			utils.PrintStats()
 		}
 	},
 }

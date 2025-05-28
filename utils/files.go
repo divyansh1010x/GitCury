@@ -59,3 +59,14 @@ func ParseInt(s string) (int, error) {
 	Debug("[PARSE]: 🔢 Successfully parsed string to int: " + s)
 	return result, nil
 }
+
+func ParseFloat(s string) (float64, error) {
+	var result float64
+	if _, err := fmt.Sscanf(s, "%f", &result); err != nil {
+		Error("[PARSE]: 🚨 Error parsing string to float: " + s)
+		return 0, fmt.Errorf("invalid float: %s", s)
+	}
+
+	Debug("[PARSE]: 🔢 Successfully parsed string to float: " + s)
+	return result, nil
+}

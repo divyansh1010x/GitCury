@@ -322,6 +322,7 @@ import (
 	"GitCury/config"
 	"GitCury/utils"
 	"encoding/json"
+	"fmt"
 	"os"
 	"strings"
 
@@ -366,10 +367,19 @@ Examples:
 	gitcury config set --key root_folders --value /path/to/folder1,/path/to/folder2
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		// Track config operation
+		if utils.IsStatsEnabled() {
+			utils.StartOperation("ConfigView")
+		}
+		
 		if deleteConfig {
 			utils.Info("Resetting all configuration to defaults...")
 			config.Delete()
 			utils.Success("Configuration reset successfully.")
+			
+			if utils.IsStatsEnabled() {
+				utils.CompleteOperation("ConfigView")
+			}
 			return
 		}
 
@@ -417,6 +427,10 @@ Examples:
 			}
 			utils.Info("📋 Current Configuration (✅ API key configured)")
 			utils.Info("════════════════════════════════════════")
+		}
+		
+		if utils.IsStatsEnabled() {
+			utils.CompleteOperation("ConfigView")
 		}
 
 		// Display config in a user-friendly format
@@ -556,6 +570,218 @@ Examples:
 	},
 }
 
+var clusteringCmd = &cobra.Command{
+	Use:   "clustering",
+	Short: "Manage clustering configuration",
+	Long: `
+Manage clustering configuration for grouping files in commits.
+
+Clustering Methods:
+• directory: Group files by directory structure (fastest)
+• pattern: Group files by file patterns and extensions  
+• cached: Use cached embeddings for similarity clustering
+• semantic: Full semantic analysis clustering (slowest)
+
+Presets:
+• speed: Directory-only clustering for maximum speed
+• balanced: Smart multi-layered approach (default)
+• quality: Semantic-first clustering for best results
+
+Examples:
+• View clustering configuration:
+	gitcury config clustering
+
+• Set clustering method:
+	gitcury config clustering set --method directory
+
+• Apply a preset:
+	gitcury config clustering preset --name speed
+
+• Configure similarity threshold:
+	gitcury config clustering set --key similarity_threshold --value 0.7
+`,
+	Run: func(cmd *cobra.Command, args []string) {
+		clusteringConfig := config.GetClusteringConfig()
+
+		utils.Info("🔀 Current Clustering Configuration")
+		utils.Info("═══════════════════════════════════════")
+
+		b, _ := json.MarshalIndent(clusteringConfig, "", "  ")
+		utils.Print(string(b))
+		utils.Print("")
+
+		// Show active methods
+		utils.Info("✅ Active Methods:")
+		if clusteringConfig.Methods.Directory.Enabled {
+			utils.Info(fmt.Sprintf("   • Directory (weight: %.1f)", clusteringConfig.Methods.Directory.Weight))
+		}
+		if clusteringConfig.Methods.Pattern.Enabled {
+			utils.Info(fmt.Sprintf("   • Pattern (weight: %.1f)", clusteringConfig.Methods.Pattern.Weight))
+		}
+		if clusteringConfig.Methods.Cached.Enabled {
+			utils.Info(fmt.Sprintf("   • Cached (weight: %.1f)", clusteringConfig.Methods.Cached.Weight))
+		}
+		if clusteringConfig.Methods.Semantic.Enabled {
+			utils.Info(fmt.Sprintf("   • Semantic (weight: %.1f)", clusteringConfig.Methods.Semantic.Weight))
+		}
+		utils.Print("")
+
+		utils.Info("💡 Use 'gitcury config clustering set --help' for configuration options")
+		utils.Info("💡 Use 'gitcury config clustering preset --help' for quick presets")
+	},
+}
+
+var clusteringSetKey string
+var clusteringSetValue string
+var clusteringMethod string
+
+var clusteringSetCmd = &cobra.Command{
+	Use:   "set",
+	Short: "Set clustering configuration values",
+	Long: `
+Set specific clustering configuration values.
+
+Available Keys:
+• similarity_threshold: Global similarity threshold (0.0-1.0)
+• max_processing_time: Maximum time in seconds for clustering
+• adaptive_optimization: Enable/disable adaptive optimization (true/false)
+• performance_mode: Performance preference (speed/balanced/quality)
+
+Method-specific Keys:
+• directory_enabled: Enable directory clustering (true/false)
+• directory_weight: Weight for directory method (0.0-1.0)
+• directory_confidence_threshold: Confidence threshold for directory method
+• directory_similarity_threshold: Similarity threshold for directory method
+
+• pattern_enabled: Enable pattern clustering (true/false)
+• pattern_weight: Weight for pattern method (0.0-1.0)
+• pattern_confidence_threshold: Confidence threshold for pattern method
+• pattern_similarity_threshold: Similarity threshold for pattern method
+
+• cached_enabled: Enable cached clustering (true/false)
+• cached_weight: Weight for cached method (0.0-1.0)
+• cached_confidence_threshold: Confidence threshold for cached method
+• cached_similarity_threshold: Similarity threshold for cached method
+• cached_delay_ms: Delay between cached operations in milliseconds
+
+• semantic_enabled: Enable semantic clustering (true/false)
+• semantic_weight: Weight for semantic method (0.0-1.0)
+• semantic_confidence_threshold: Confidence threshold for semantic method
+• semantic_similarity_threshold: Similarity threshold for semantic method
+• semantic_rate_limit_delay: Rate limit delay for semantic operations
+
+Examples:
+• Set global similarity threshold:
+	gitcury config clustering set --key similarity_threshold --value 0.7
+
+• Enable only directory clustering:
+	gitcury config clustering set --key directory_enabled --value true
+	gitcury config clustering set --key pattern_enabled --value false
+	gitcury config clustering set --key cached_enabled --value false
+	gitcury config clustering set --key semantic_enabled --value false
+
+• Set performance mode:
+	gitcury config clustering set --key performance_mode --value speed
+`,
+	Run: func(cmd *cobra.Command, args []string) {
+		if clusteringSetKey == "" || clusteringSetValue == "" {
+			utils.Error("Both --key and --value are required.")
+			utils.Info("Example: gitcury config clustering set --key similarity_threshold --value 0.7")
+			return
+		}
+
+		err := config.SetClusteringConfigByKey(clusteringSetKey, clusteringSetValue)
+		if err != nil {
+			utils.Error("Failed to set clustering configuration: " + err.Error())
+			return
+		}
+
+		utils.Success("✅ Clustering configuration updated: " + clusteringSetKey + " = " + clusteringSetValue)
+
+		// Provide context-specific guidance
+		if strings.Contains(clusteringSetKey, "enabled") {
+			utils.Info("💡 Tip: Restart any running clustering operations to apply changes")
+		} else if strings.Contains(clusteringSetKey, "threshold") {
+			utils.Info("💡 Lower thresholds = more groups, higher thresholds = fewer groups")
+		}
+	},
+}
+
+var presetName string
+
+var clusteringPresetCmd = &cobra.Command{
+	Use:   "preset",
+	Short: "Apply clustering configuration presets",
+	Long: `
+Apply predefined clustering configuration presets.
+
+Available Presets:
+
+speed:
+  • Directory clustering only
+  • No fallback methods
+  • Maximum performance
+  • Best for large repositories
+
+balanced (default):
+  • Multi-layered approach
+  • Directory → Pattern → Cached → Semantic
+  • Good balance of speed and quality
+  • Recommended for most use cases
+
+quality:
+  • Semantic clustering first
+  • Higher similarity thresholds
+  • Better grouping quality
+  • Best for smaller repositories
+
+Examples:
+• Apply speed preset:
+	gitcury config clustering preset --name speed
+
+• Apply quality preset:
+	gitcury config clustering preset --name quality
+
+• Reset to balanced preset:
+	gitcury config clustering preset --name balanced
+`,
+	Run: func(cmd *cobra.Command, args []string) {
+		if presetName == "" {
+			utils.Error("Preset name is required.")
+			utils.Info("Available presets: speed, balanced, quality")
+			utils.Info("Example: gitcury config clustering preset --name speed")
+			return
+		}
+
+		err := config.ApplyClusteringPreset(presetName)
+		if err != nil {
+			utils.Error("Failed to apply preset: " + err.Error())
+			utils.Info("Available presets: speed, balanced, quality")
+			return
+		}
+
+		utils.Success("✅ Applied clustering preset: " + presetName)
+
+		switch presetName {
+		case "speed":
+			utils.Info("🚀 Speed preset applied - directory clustering only")
+			utils.Info("   • Fastest performance")
+			utils.Info("   • May create more commit groups")
+		case "quality":
+			utils.Info("🎯 Quality preset applied - semantic clustering prioritized")
+			utils.Info("   • Best grouping quality")
+			utils.Info("   • Slower but more intelligent clustering")
+		case "balanced":
+			utils.Info("⚖️  Balanced preset applied - multi-layered approach")
+			utils.Info("   • Good balance of speed and quality")
+			utils.Info("   • Recommended for most repositories")
+		}
+
+		utils.Info("")
+		utils.Info("💡 View updated configuration: gitcury config clustering")
+	},
+}
+
 func init() {
 	setCmd.Flags().StringVarP(&configSetKey, "key", "k", "", "Configuration key to set")
 	setCmd.Flags().StringVarP(&configSetValue, "value", "v", "", "Configuration value to set")
@@ -563,10 +789,22 @@ func init() {
 	removeCmd.Flags().StringVarP(&configRemoveKey, "key", "k", "", "Configuration key to remove")
 	removeCmd.Flags().StringVarP(&configRemoveRoot, "root", "r", "", "Specific root folder to remove")
 
+	// Clustering command flags
+	clusteringSetCmd.Flags().StringVarP(&clusteringSetKey, "key", "k", "", "Configuration key to set")
+	clusteringSetCmd.Flags().StringVarP(&clusteringSetValue, "value", "v", "", "Configuration value to set")
+	clusteringSetCmd.Flags().StringVarP(&clusteringMethod, "method", "m", "", "Clustering method to configure")
+
+	clusteringPresetCmd.Flags().StringVarP(&presetName, "name", "n", "", "Preset name to apply (speed, balanced, quality)")
+
+	// Add clustering subcommands
+	clusteringCmd.AddCommand(clusteringSetCmd)
+	clusteringCmd.AddCommand(clusteringPresetCmd)
+
 	// Avoid shorthand flag to prevent conflicts with other commands
 	configCmd.Flags().BoolVar(&deleteConfig, "reset", false, "Reset all configuration to defaults")
 	configCmd.AddCommand(removeCmd)
 	configCmd.AddCommand(setCmd)
+	configCmd.AddCommand(clusteringCmd)
 
 	rootCmd.AddCommand(configCmd)
 }

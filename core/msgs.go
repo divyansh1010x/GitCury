@@ -15,6 +15,11 @@ func GetAllMsgs(numFiles ...int) error {
 	if len(numFiles) == 0 || numFiles[0] <= 0 {
 		numFiles[0] = defaultNumFiles
 	}
+	
+	// Update progress in stats if enabled
+	if utils.IsStatsEnabled() {
+		utils.UpdateOperationProgress("GenerateAllMessages", 20.0)
+	}
 
 	utils.Debug("[" + config.Aliases.GetMsgs + "]: Preparing commit messages for " + strconv.Itoa(numFiles[0]) + " files per folder.")
 
@@ -80,6 +85,12 @@ func GetAllMsgs(numFiles ...int) error {
 	}
 
 	utils.Success("[" + config.Aliases.GetMsgs + "]: Commit message generation completed successfully for all folders.")
+	
+	// Update progress in stats if enabled
+	if utils.IsStatsEnabled() {
+		utils.UpdateOperationProgress("GenerateAllMessages", 90.0)
+	}
+	
 	output.SaveToFile()
 	return nil
 }
@@ -88,6 +99,11 @@ func GetMsgsForRootFolder(folder string, numFiles ...int) error {
 	if folder == "" {
 		utils.Error("[" + config.Aliases.GetMsgs + "]: Root folder is empty.")
 		return fmt.Errorf("root folder is empty")
+	}
+	
+	// Update progress in stats if enabled
+	if utils.IsStatsEnabled() {
+		utils.UpdateOperationProgress("GenerateRootMessages", 20.0)
 	}
 
 	numFilesToCommit := 10 // Default value
@@ -137,11 +153,21 @@ func GetMsgsForRootFolder(folder string, numFiles ...int) error {
 
 	utils.Success("[" + config.Aliases.GetMsgs + "]: Commit message generation completed successfully for folder: " + folder)
 	utils.Debug("[" + config.Aliases.GetMsgs + "]: All output: " + fmt.Sprint(output.GetAll()))
+	
+	// Update progress in stats if enabled
+	if utils.IsStatsEnabled() {
+		utils.UpdateOperationProgress("GenerateRootMessages", 90.0)
+	}
+	
 	output.SaveToFile()
 	return nil
 }
 
 func GroupAndGetAllMsgs(numFiles ...int) error {
+	// Update progress in stats if enabled
+	if utils.IsStatsEnabled() {
+		utils.UpdateOperationProgress("GenerateAllMessages", 20.0)
+	}
 
 	utils.Debug("[" + config.Aliases.GetMsgs + "]: Preparing grouped commit messages with embeddings for " + strconv.Itoa(numFiles[0]) + " files per folder.")
 
@@ -222,6 +248,11 @@ func GroupAndGetAllMsgs(numFiles ...int) error {
 		return fmt.Errorf("one or more errors occurred during grouped commit message generation with embeddings")
 	}
 
+	// Update progress in stats if enabled
+	if utils.IsStatsEnabled() {
+		utils.UpdateOperationProgress("GenerateAllMessages", 90.0)
+	}
+
 	utils.Success("[" + config.Aliases.GetMsgs + "]: Grouped commit message generation with embeddings completed successfully for all folders.")
 	output.SaveToFile()
 	return nil
@@ -231,6 +262,11 @@ func GroupAndGetMsgsForRootFolder(folder string, numFiles ...int) error {
 	if folder == "" {
 		utils.Error("[" + config.Aliases.GetMsgs + "]: Root folder is empty.")
 		return fmt.Errorf("root folder is empty")
+	}
+	
+	// Update progress in stats if enabled
+	if utils.IsStatsEnabled() {
+		utils.UpdateOperationProgress("GenerateRootMessages", 20.0)
 	}
 
 	clusters := 10 // Default value
@@ -260,6 +296,11 @@ func GroupAndGetMsgsForRootFolder(folder string, numFiles ...int) error {
 		utils.Error("[" + config.Aliases.GetMsgs + "]: Failed to retrieve changed files for folder '" + folder + "' - " + err.Error())
 		return fmt.Errorf("failed to get changed files: %s", err.Error())
 	}
+	
+	// Update progress in stats if enabled
+	if utils.IsStatsEnabled() {
+		utils.UpdateOperationProgress("GenerateRootMessages", 40.0)
+	}
 
 	if len(changedFiles) == 0 {
 		utils.Debug("[" + config.Aliases.GetMsgs + "]: No changed files found in folder: " + folder)
@@ -276,6 +317,12 @@ func GroupAndGetMsgsForRootFolder(folder string, numFiles ...int) error {
 
 	utils.Success("[" + config.Aliases.GetMsgs + "]: Commit message generation completed successfully for folder: " + folder)
 	utils.Debug("[" + config.Aliases.GetMsgs + "]: All output: " + fmt.Sprint(output.GetAll()))
+	
+	// Update progress in stats if enabled
+	if utils.IsStatsEnabled() {
+		utils.UpdateOperationProgress("GenerateRootMessages", 90.0)
+	}
+	
 	output.SaveToFile()
 	return nil
 }

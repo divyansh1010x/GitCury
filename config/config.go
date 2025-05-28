@@ -162,6 +162,52 @@ func LoadConfig() error {
 			"timeout":       30,
 			"maxConcurrent": 5,
 			"logLevel":      "info",
+			"clustering": map[string]interface{}{
+				"defaultMethod":                 "directory",
+				"enableFallbackMethods":         true,
+				"maxFilesForSemanticClustering": 10,
+				"confidenceThresholds": map[string]float64{
+					"directory": 0.8,
+					"pattern":   0.7,
+					"cached":    0.6,
+					"semantic":  0.5,
+				},
+				"similarityThresholds": map[string]float64{
+					"directory": 0.7,
+					"pattern":   0.6,
+					"cached":    0.5,
+					"semantic":  0.4,
+				},
+				"methods": map[string]interface{}{
+					"directory": map[string]interface{}{
+						"enabled": true,
+						"weight":  1.0,
+					},
+					"pattern": map[string]interface{}{
+						"enabled": true,
+						"weight":  0.8,
+					},
+					"cached": map[string]interface{}{
+						"enabled":          true,
+						"weight":           0.6,
+						"minCacheHitRatio": 0.4,
+						"maxCacheAge":      24, // hours
+					},
+					"semantic": map[string]interface{}{
+						"enabled":                 true,
+						"weight":                  0.4,
+						"rateLimitDelay":          2000, // milliseconds
+						"maxConcurrentEmbeddings": 1,
+						"embeddingTimeout":        30, // seconds
+					},
+				},
+				"performance": map[string]interface{}{
+					"preferSpeed":          true,
+					"maxProcessingTime":    60, // seconds
+					"enableBenchmarking":   false,
+					"adaptiveOptimization": true,
+				},
+			},
 		}
 
 		// Save the default settings to the file
@@ -342,6 +388,52 @@ func LoadConfigForConfigCommands() error {
 			"timeout":       30,
 			"maxConcurrent": 5,
 			"logLevel":      "info",
+			"clustering": map[string]interface{}{
+				"defaultMethod":                 "directory",
+				"enableFallbackMethods":         true,
+				"maxFilesForSemanticClustering": 10,
+				"confidenceThresholds": map[string]interface{}{
+					"directory": 0.8,
+					"pattern":   0.7,
+					"cached":    0.6,
+					"semantic":  0.5,
+				},
+				"similarityThresholds": map[string]interface{}{
+					"directory": 0.7,
+					"pattern":   0.6,
+					"cached":    0.5,
+					"semantic":  0.4,
+				},
+				"methods": map[string]interface{}{
+					"directory": map[string]interface{}{
+						"enabled": true,
+						"weight":  1.0,
+					},
+					"pattern": map[string]interface{}{
+						"enabled": true,
+						"weight":  0.8,
+					},
+					"cached": map[string]interface{}{
+						"enabled":          true,
+						"weight":           0.6,
+						"minCacheHitRatio": 0.4,
+						"maxCacheAge":      24, // hours
+					},
+					"semantic": map[string]interface{}{
+						"enabled":                 true,
+						"weight":                  0.4,
+						"rateLimitDelay":          2000, // milliseconds
+						"maxConcurrentEmbeddings": 1,
+						"embeddingTimeout":        30, // seconds
+					},
+				},
+				"performance": map[string]interface{}{
+					"preferSpeed":          true,
+					"maxProcessingTime":    60, // seconds
+					"enableBenchmarking":   false,
+					"adaptiveOptimization": true,
+				},
+			},
 		}
 
 		// Save the default settings silently
@@ -506,6 +598,58 @@ func checkCriticalConfig() []string {
 	if _, exists := settings["logLevel"]; !exists {
 		utils.Debug("[Config]: Setting default logLevel to info")
 		settings["logLevel"] = "info"
+		configChanged = true
+	}
+
+	// Auto-set clustering configuration defaults
+	if _, exists := settings["clustering"]; !exists {
+		utils.Debug("[Config]: Setting default clustering configuration")
+		settings["clustering"] = map[string]interface{}{
+			"defaultMethod":                 "directory",
+			"enableFallbackMethods":         true,
+			"maxFilesForSemanticClustering": 10,
+			"confidenceThresholds": map[string]interface{}{
+				"directory": 0.8,
+				"pattern":   0.7,
+				"cached":    0.6,
+				"semantic":  0.5,
+			},
+			"similarityThresholds": map[string]interface{}{
+				"directory": 0.7,
+				"pattern":   0.6,
+				"cached":    0.5,
+				"semantic":  0.4,
+			},
+			"methods": map[string]interface{}{
+				"directory": map[string]interface{}{
+					"enabled": true,
+					"weight":  1.0,
+				},
+				"pattern": map[string]interface{}{
+					"enabled": true,
+					"weight":  0.8,
+				},
+				"cached": map[string]interface{}{
+					"enabled":          true,
+					"weight":           0.6,
+					"minCacheHitRatio": 0.4,
+					"maxCacheAge":      24, // hours
+				},
+				"semantic": map[string]interface{}{
+					"enabled":                 true,
+					"weight":                  0.4,
+					"rateLimitDelay":          2000, // milliseconds
+					"maxConcurrentEmbeddings": 1,
+					"embeddingTimeout":        30, // seconds
+				},
+			},
+			"performance": map[string]interface{}{
+				"preferSpeed":          true,
+				"maxProcessingTime":    60, // seconds
+				"enableBenchmarking":   false,
+				"adaptiveOptimization": true,
+			},
+		}
 		configChanged = true
 	}
 

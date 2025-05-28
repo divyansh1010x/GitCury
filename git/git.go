@@ -464,14 +464,28 @@ func GenCommitMessageWithContext(files []string, dir string, contextPrompt strin
 }
 
 func BatchProcessGetMessages(allChangedFiles []string, rootFolder string) error {
+	// Start tracking operation in stats
+	if utils.IsStatsEnabled() {
+		utils.StartOperation("BatchProcessMessages")
+		utils.UpdateOperationProgress("BatchProcessMessages", 10.0)
+	}
+	
 	utils.Debug("[GIT.BATCH]: Starting batch processing of commit messages")
 	var fileWg sync.WaitGroup
 	var fileErrors []error
 	fileMu := sync.Mutex{}
+	
+	// Calculate progress increments
+	fileCount := float64(len(allChangedFiles))
+	if fileCount > 0 && utils.IsStatsEnabled() {
+		utils.UpdateOperationProgress("BatchProcessMessages", 20.0)
+	}
+	
+	progressPerFile := 70.0 / fileCount // 20% initial + 70% processing + 10% final = 100%
 
-	for _, file := range allChangedFiles {
+	for i, file := range allChangedFiles {
 		fileWg.Add(1)
-		go func(file string) {
+		go func(index int, file string) {
 			defer fileWg.Done()
 
 			utils.Debug("[GIT.BATCH]: Processing file: " + file)
@@ -501,7 +515,14 @@ func BatchProcessGetMessages(allChangedFiles []string, rootFolder string) error 
 
 			utils.Debug("[GIT.BATCH.SUCCESS]: Generated commit message for file: " + file + " - " + message)
 			output.Set(file, rootFolder, message)
-		}(file)
+			
+			// Update progress in stats if enabled
+			if utils.IsStatsEnabled() {
+				// Calculate progress based on completed files
+				progress := 20.0 + (float64(index+1) * progressPerFile)
+				utils.UpdateOperationProgress("BatchProcessMessages", progress)
+			}
+		}(i, file)
 	}
 
 	fileWg.Wait()
@@ -522,7 +543,18 @@ func BatchProcessGetMessages(allChangedFiles []string, rootFolder string) error 
 		}
 
 		utils.Error("[GIT.BATCH.FAIL]: Batch processing completed with errors", filesInfo)
+		
+		// Mark operation as failed in stats
+		if utils.IsStatsEnabled() {
+			utils.FailOperation("BatchProcessMessages", "One or more errors occurred while preparing commit messages")
+		}
+		
 		return fmt.Errorf("one or more errors occurred while preparing commit messages")
+	}
+	
+	// Mark operation as completed in stats
+	if utils.IsStatsEnabled() {
+		utils.MarkOperationComplete("BatchProcessMessages")
 	}
 
 	return nil
@@ -718,6 +750,12 @@ func GetFileDiff(filePath string, rootFolder string) (string, error) {
 }
 
 func BatchProcessWithEmbeddings(allChangedFiles []string, rootFolder string, numClusters int) error {
+	// Start tracking operation in stats
+	if utils.IsStatsEnabled() {
+		utils.StartOperation("BatchProcessWithEmbeddings")
+		utils.UpdateOperationProgress("BatchProcessWithEmbeddings", 10.0)
+	}
+
 	utils.Debug("[GIT.BATCH]: Starting intelligent batch processing with semantic grouping")
 
 	// First, filter out files that shouldn't be processed
@@ -729,9 +767,20 @@ func BatchProcessWithEmbeddings(allChangedFiles []string, rootFolder string, num
 		}
 		filteredFiles = append(filteredFiles, file)
 	}
+	
+	// Update progress in stats if enabled
+	if utils.IsStatsEnabled() {
+		utils.UpdateOperationProgress("BatchProcessWithEmbeddings", 20.0)
+	}
 
 	if len(filteredFiles) == 0 {
 		utils.Warning("[GIT.BATCH]: No suitable files found for processing after filtering")
+		
+		// Mark operation as completed in stats
+		if utils.IsStatsEnabled() {
+			utils.MarkOperationComplete("BatchProcessWithEmbeddings")
+		}
+		
 		return nil
 	}
 
@@ -741,7 +790,29 @@ func BatchProcessWithEmbeddings(allChangedFiles []string, rootFolder string, num
 	err := attemptSemanticGrouping(filteredFiles, rootFolder, numClusters)
 	if err != nil {
 		utils.Warning(fmt.Sprintf("[GIT.BATCH]: Semantic grouping failed (%s), falling back to simple processing", err.Error()))
-		return fallbackToSimpleProcessing(filteredFiles, rootFolder)
+		
+		// Update progress in stats
+		if utils.IsStatsEnabled() {
+			utils.UpdateOperationProgress("BatchProcessWithEmbeddings", 50.0)
+		}
+		
+		fallbackErr := fallbackToSimpleProcessing(filteredFiles, rootFolder)
+		
+		// Mark operation as completed or failed based on fallback success
+		if utils.IsStatsEnabled() {
+			if fallbackErr != nil {
+				utils.FailOperation("BatchProcessWithEmbeddings", fallbackErr.Error())
+			} else {
+				utils.MarkOperationComplete("BatchProcessWithEmbeddings")
+			}
+		}
+		
+		return fallbackErr
+	}
+	
+	// Mark operation as completed
+	if utils.IsStatsEnabled() {
+		utils.MarkOperationComplete("BatchProcessWithEmbeddings")
 	}
 
 	return nil
