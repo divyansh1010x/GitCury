@@ -47,7 +47,7 @@ func ProgressCommitBatch(rootFolder output.Folder, env ...[]string) error {
 		if message != "" {
 			progress.UpdateMessage(message)
 		}
-		
+
 		// Also update stats tracking
 		if utils.IsStatsEnabled() {
 			// Calculate percentage progress
@@ -73,22 +73,22 @@ func ProgressCommitBatch(rootFolder output.Folder, env ...[]string) error {
 
 	if err != nil {
 		progress.UpdateMessage("Commit failed: " + err.Error())
-		
+
 		// Mark operation as failed in stats
 		if utils.IsStatsEnabled() {
 			utils.FailOperation("CommitBatch", err.Error())
 		}
-		
+
 		return err
 	}
 
 	progress.UpdateMessage("Commit completed successfully")
-	
+
 	// Mark operation as completed in stats
 	if utils.IsStatsEnabled() {
 		utils.MarkOperationComplete("CommitBatch")
 	}
-	
+
 	return nil
 }
 
@@ -109,28 +109,28 @@ func ProgressPushBranch(rootFolderName string, branch string) error {
 	progress := utils.NewProgressReporter(100, "Pushing to remote repository")
 	progress.Start()
 	defer progress.Done()
-	
+
 	// Update initial progress
 	progress.Update(10)
 	progress.UpdateMessage("Preparing to push branch: " + branch)
-	
+
 	// Update stats progress to match terminal progress
 	if utils.IsStatsEnabled() {
 		utils.UpdateOperationProgress("PushBranch", 25.0)
 	}
-	
+
 	// Sleep briefly to make progress visible
 	time.Sleep(100 * time.Millisecond)
-	
+
 	// Update progress
 	progress.Update(50)
 	progress.UpdateMessage("Pushing branch '" + branch + "' to remote")
-	
+
 	// Update stats progress
 	if utils.IsStatsEnabled() {
 		utils.UpdateOperationProgress("PushBranch", 50.0)
 	}
-	
+
 	// Sleep briefly to make progress visible
 	time.Sleep(100 * time.Millisecond)
 
@@ -144,12 +144,12 @@ func ProgressPushBranch(rootFolderName string, branch string) error {
 
 	if err != nil {
 		progress.UpdateMessage("Failed to push branch: " + err.Error())
-		
+
 		// Mark operation as failed in stats
 		if utils.IsStatsEnabled() {
 			utils.FailOperation("PushBranch", err.Error())
 		}
-		
+
 		utils.Error("[GIT.PUSH.FAIL]: Failed to push branch: " + err.Error())
 		return fmt.Errorf("failed to push branch: %s", err.Error())
 	}
@@ -157,7 +157,7 @@ func ProgressPushBranch(rootFolderName string, branch string) error {
 	// Update final progress
 	progress.Update(100)
 	progress.UpdateMessage("Branch pushed successfully")
-	
+
 	// Mark operation as completed in stats
 	if utils.IsStatsEnabled() {
 		utils.MarkOperationComplete("PushBranch")
