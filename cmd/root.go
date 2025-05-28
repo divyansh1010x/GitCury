@@ -42,6 +42,7 @@ package cmd
 import (
 	"GitCury/config"
 	"GitCury/utils"
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -68,6 +69,16 @@ Simplify your Git workflow with AI:
 
 [SYSTEM]: Ready to assist. All systems operational.
 `,
+	Run: func(cmd *cobra.Command, args []string) {
+		// If no subcommand is specified, show help
+		cmd.Help()
+	},
+	PostRun: func(cmd *cobra.Command, args []string) {
+		// Print stats if enabled
+		if utils.IsStatsEnabled() {
+			utils.PrintStats()
+		}
+	},
 }
 
 func Execute() {
@@ -88,17 +99,14 @@ func Execute() {
 	// Add common flags
 	rootCmd.PersistentFlags().BoolP("quiet", "q", false, "Minimize output, only show errors")
 	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Enable debug output")
+	rootCmd.PersistentFlags().BoolP("stats", "s", false, "Show command execution statistics (completion time, progress, etc.)")
 
 	// Add a hook to handle flags before executing the command
 	cobra.OnInitialize(func() {
 		// Check if version flag is set
 		versionFlag, _ := rootCmd.Flags().GetBool("version")
 		if versionFlag {
-			version := config.Get("version").(string)
-			if version == "" {
-				version = "1.0.0"
-			}
-			utils.Info("GitCury version " + version)
+			fmt.Println("GitCury version 1.0.0")
 			os.Exit(0)
 		}
 
@@ -112,6 +120,18 @@ func Execute() {
 		debugFlag, _ := rootCmd.Flags().GetBool("debug")
 		if debugFlag {
 			utils.SetLogLevel("debug")
+		}
+
+		// Handle stats flag
+		statsFlag, _ := rootCmd.Flags().GetBool("stats")
+		if statsFlag {
+			utils.EnableStats()
+			// Record the start of the command in the stats
+			commandName := rootCmd.Name()
+			if len(os.Args) > 1 {
+				commandName = os.Args[1] // Use the subcommand name for better tracking
+			}
+			utils.StartOperation("Command:" + commandName)
 		}
 	})
 
@@ -151,10 +171,24 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.
 For complete documentation, visit: https://github.com/lakshyajain-0291/GitCury
 `)
 
+	// Add PostRun function to all commands to display stats
+	addStatsPostRunToAllCommands(rootCmd)
+
 	// Use custom error handling with user-friendly messages
 	if err := rootCmd.Execute(); err != nil {
 		// Convert error to user-friendly message
 		utils.Error(utils.ToUserFriendlyMessage(err))
 		os.Exit(1)
+	}
+}
+
+// addStatsPostRunToAllCommands recursively adds a stats PostRun function to all commands
+func addStatsPostRunToAllCommands(cmd *cobra.Command) {
+	// Add stats PostRun to this command
+	utils.AddStatsPostRunToCommand(cmd)
+	
+	// Recursively add to all subcommands
+	for _, subCmd := range cmd.Commands() {
+		addStatsPostRunToAllCommands(subCmd)
 	}
 }
