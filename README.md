@@ -211,6 +211,8 @@ GitCury provides a comprehensive CLI to streamline your Git workflow:
   gitcury getmsgs --all --instructions "Focus on security improvements"
   ```
 
+> **📝 Note:** GitCury automatically skips binary files (images, executables, compiled files, etc.) during message generation and commit operations to focus on readable source code changes.
+
 ### **Commit Operations**
 - Commit all changes:
   ```bash
@@ -224,6 +226,8 @@ GitCury provides a comprehensive CLI to streamline your Git workflow:
   ```bash
   gitcury commit with-date --all
   ```
+
+> **📝 Note:** GitCury automatically skips binary files when processing commits, ensuring only source code and text files are analyzed for commit message generation.
 
 ### **Push Operations**
 - Push all changes:
