@@ -269,7 +269,7 @@ Examples:
 			utils.Success("[" + config.Aliases.GetMsgs + "]: Commit messages generated for all root folders successfully.")
 			utils.Print(utils.ToJSON(allOutput))
 		} else if rootFolderName != "" {
-			utils.Info("[" + config.Aliases.GetMsgs + "]: Targeting root folder: " + rootFolderName)
+			utils.Info("[" + config.Aliases.GetMsgs + "]: Targeting root folder: " + rootFolderName + "\n")
 
 			var err error
 			if groupFlag {
@@ -310,6 +310,56 @@ Examples:
 
 		// Display stats if enabled
 		if utils.IsStatsEnabled() {
+			// Capture clustering configuration for getmsgs command
+			clusteringConfig := config.GetClusteringConfig()
+
+			// Determine enabled methods
+			enabledMethods := []string{}
+			if clusteringConfig.Methods.Directory.Enabled {
+				enabledMethods = append(enabledMethods, "directory")
+			}
+			if clusteringConfig.Methods.Pattern.Enabled {
+				enabledMethods = append(enabledMethods, "pattern")
+			}
+			if clusteringConfig.Methods.Cached.Enabled {
+				enabledMethods = append(enabledMethods, "cached")
+			}
+			if clusteringConfig.Methods.Semantic.Enabled {
+				enabledMethods = append(enabledMethods, "semantic")
+			}
+
+			// Determine performance mode
+			performanceMode := "balanced"
+			if clusteringConfig.Performance.PreferSpeed {
+				if clusteringConfig.Performance.MaxProcessingTime <= 30 {
+					performanceMode = "speed"
+				} else {
+					performanceMode = "balanced"
+				}
+			} else {
+				performanceMode = "quality"
+			}
+
+			// Add grouping status to the method information
+			methodUsed := clusteringConfig.DefaultMethod
+			if groupFlag {
+				methodUsed = clusteringConfig.DefaultMethod + " (grouping enabled)"
+			}
+
+			// Set clustering information for stats display
+			utils.SetClusteringInfo(
+				methodUsed,
+				enabledMethods,
+				clusteringConfig.ConfidenceThresholds,
+				clusteringConfig.SimilarityThresholds,
+				clusteringConfig.MaxFilesForSemanticClustering,
+				clusteringConfig.EnableFallbackMethods,
+				performanceMode,
+				clusteringConfig.Performance.MaxProcessingTime,
+				clusteringConfig.Performance.EnableBenchmarking,
+				clusteringConfig.Performance.AdaptiveOptimization,
+			)
+
 			utils.PrintStats()
 		}
 	},
