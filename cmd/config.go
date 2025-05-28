@@ -371,12 +371,12 @@ Examples:
 		if utils.IsStatsEnabled() {
 			utils.StartOperation("ConfigView")
 		}
-		
+
 		if deleteConfig {
 			utils.Info("Resetting all configuration to defaults...")
 			config.Delete()
 			utils.Success("Configuration reset successfully.")
-			
+
 			if utils.IsStatsEnabled() {
 				utils.CompleteOperation("ConfigView")
 			}
@@ -428,7 +428,7 @@ Examples:
 			utils.Info("📋 Current Configuration (✅ API key configured)")
 			utils.Info("════════════════════════════════════════")
 		}
-		
+
 		if utils.IsStatsEnabled() {
 			utils.CompleteOperation("ConfigView")
 		}
