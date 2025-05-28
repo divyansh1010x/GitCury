@@ -158,14 +158,14 @@ Examples:
 	Run: func(cmd *cobra.Command, args []string) {
 		if deployAll {
 			utils.Info("[" + config.Aliases.Push + "]: Pushing all changes to the remote repository.")
-			
+
 			// Start stats tracking if enabled
 			if utils.IsStatsEnabled() {
 				utils.StartOperation("PushAllRoots")
 				// Set initial progress
 				utils.UpdateOperationProgress("PushAllRoots", 10.0)
 			}
-			
+
 			err := core.PushAllRoots(targetBranch)
 			if err != nil {
 				if utils.IsStatsEnabled() {
@@ -174,21 +174,21 @@ Examples:
 				utils.Error("[" + config.Aliases.Push + "]: Error pushing all changes: " + err.Error())
 				return
 			}
-			
+
 			if utils.IsStatsEnabled() {
 				utils.MarkOperationComplete("PushAllRoots")
 			}
 			utils.Success("[" + config.Aliases.Push + "]: All changes pushed successfully.")
 		} else if targetFolder != "" {
 			utils.Info("[" + config.Aliases.Push + "]: Pushing changes from folder: " + targetFolder)
-			
+
 			// Start stats tracking if enabled
 			if utils.IsStatsEnabled() {
 				utils.StartOperation("PushOneRoot")
 				// Set initial progress
 				utils.UpdateOperationProgress("PushOneRoot", 10.0)
 			}
-			
+
 			err := core.PushOneRoot(targetFolder, targetBranch)
 			if err != nil {
 				if utils.IsStatsEnabled() {
@@ -197,7 +197,7 @@ Examples:
 				utils.Error("[" + config.Aliases.Push + "]: Error pushing changes from folder '" + targetFolder + "': " + err.Error())
 				return
 			}
-			
+
 			if utils.IsStatsEnabled() {
 				utils.MarkOperationComplete("PushOneRoot")
 			}
