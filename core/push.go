@@ -21,10 +21,20 @@ func PushAllRoots(branchName string) error {
 			"config",
 		)
 	}
+	
+	// Update progress in stats if enabled
+	if utils.IsStatsEnabled() {
+		utils.UpdateOperationProgress("PushAllRoots", 20.0)
+	}
 
 	var rootFolderWg sync.WaitGroup
 	var mu sync.Mutex
 	var errors []string
+	
+	// Update progress in stats if enabled
+	if utils.IsStatsEnabled() {
+		utils.UpdateOperationProgress("PushAllRoots", 40.0)
+	}
 
 	for _, rootFolder := range rootFolders {
 		rootFolderStr, ok := rootFolder.(string)
@@ -39,7 +49,7 @@ func PushAllRoots(branchName string) error {
 			defer rootFolderWg.Done()
 			utils.Debug("[" + config.Aliases.Push + "]: 📂 Root folder to push: " + folder)
 
-			err := git.PushBranch(folder, branchName)
+			err := git.ProgressPushBranch(folder, branchName)
 			if err != nil {
 				// Extract file information if available in the error
 				fileInfo := folder
@@ -58,6 +68,12 @@ func PushAllRoots(branchName string) error {
 	}
 
 	rootFolderWg.Wait()
+	
+	// Update progress in stats if enabled
+	if utils.IsStatsEnabled() {
+		utils.UpdateOperationProgress("PushAllRoots", 70.0)
+	}
+	
 	if len(errors) > 0 {
 		filesInfo := "multiple_folders"
 		utils.Error("["+config.Aliases.Push+"]: ❌ Errors occurred during push operation", filesInfo)
@@ -71,14 +87,24 @@ func PushAllRoots(branchName string) error {
 		)
 	}
 
+	// Update progress in stats if enabled
+	if utils.IsStatsEnabled() {
+		utils.UpdateOperationProgress("PushAllRoots", 90.0)
+	}
+
 	utils.Success("[" + config.Aliases.Push + "]: 🌐 Push operation for all roots completed successfully")
 	return nil
 }
 
 func PushOneRoot(rootFolderName, branchName string) error {
+	// Update progress in stats if enabled
+	if utils.IsStatsEnabled() {
+		utils.UpdateOperationProgress("PushOneRoot", 30.0)
+	}
+	
 	utils.Debug("[" + config.Aliases.Push + "]: 📂 Targeting root folder for push: " + rootFolderName)
 
-	err := git.PushBranch(rootFolderName, branchName)
+	err := git.ProgressPushBranch(rootFolderName, branchName)
 	if err != nil {
 		// Extract file information if available in the error
 		fileInfo := rootFolderName
@@ -96,6 +122,11 @@ func PushOneRoot(rootFolderName, branchName string) error {
 			},
 			fileInfo,
 		)
+	}
+
+	// Update progress in stats if enabled
+	if utils.IsStatsEnabled() {
+		utils.UpdateOperationProgress("PushOneRoot", 80.0)
 	}
 
 	utils.Success("[" + config.Aliases.Push + "]: ✅ Push operation for root folder '" + rootFolderName + "' completed successfully")
