@@ -186,7 +186,7 @@ For complete documentation, visit: https://github.com/lakshyajain-0291/GitCury
 func addStatsPostRunToAllCommands(cmd *cobra.Command) {
 	// Add stats PostRun to this command
 	utils.AddStatsPostRunToCommand(cmd)
-	
+
 	// Recursively add to all subcommands
 	for _, subCmd := range cmd.Commands() {
 		addStatsPostRunToAllCommands(subCmd)
