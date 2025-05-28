@@ -21,7 +21,7 @@ func PushAllRoots(branchName string) error {
 			"config",
 		)
 	}
-	
+
 	// Update progress in stats if enabled
 	if utils.IsStatsEnabled() {
 		utils.UpdateOperationProgress("PushAllRoots", 20.0)
@@ -30,7 +30,7 @@ func PushAllRoots(branchName string) error {
 	var rootFolderWg sync.WaitGroup
 	var mu sync.Mutex
 	var errors []string
-	
+
 	// Update progress in stats if enabled
 	if utils.IsStatsEnabled() {
 		utils.UpdateOperationProgress("PushAllRoots", 40.0)
@@ -68,12 +68,12 @@ func PushAllRoots(branchName string) error {
 	}
 
 	rootFolderWg.Wait()
-	
+
 	// Update progress in stats if enabled
 	if utils.IsStatsEnabled() {
 		utils.UpdateOperationProgress("PushAllRoots", 70.0)
 	}
-	
+
 	if len(errors) > 0 {
 		filesInfo := "multiple_folders"
 		utils.Error("["+config.Aliases.Push+"]: ❌ Errors occurred during push operation", filesInfo)
@@ -101,7 +101,7 @@ func PushOneRoot(rootFolderName, branchName string) error {
 	if utils.IsStatsEnabled() {
 		utils.UpdateOperationProgress("PushOneRoot", 30.0)
 	}
-	
+
 	utils.Debug("[" + config.Aliases.Push + "]: 📂 Targeting root folder for push: " + rootFolderName)
 
 	err := git.ProgressPushBranch(rootFolderName, branchName)
