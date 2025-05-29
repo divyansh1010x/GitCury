@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  gitcury:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VERSION: dev
+        COMMIT: local
+        BUILD_DATE: "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+    volumes:
+      - ${HOME}/.gitconfig:/home/gitcuryuser/.gitconfig:ro
+      - ./:/app/data
+      - gitcury_config:/home/gitcuryuser/.gitcury
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    working_dir: /app/data
+    entrypoint: ["/app/entrypoint.sh"]
+    command: ["--help"]
+
+volumes:
+  gitcury_config:
