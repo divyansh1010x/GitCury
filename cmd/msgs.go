@@ -206,19 +206,6 @@ Examples:
 [NOTICE]: Ensure proper configuration of root folders to optimize message generation.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		// Start stats tracking if enabled
-		if utils.IsStatsEnabled() {
-			if allFlag {
-				utils.StartOperation("GenerateAllMessages")
-				// Set initial progress
-				utils.UpdateOperationProgress("GenerateAllMessages", 10.0)
-			} else if rootFolderName != "" {
-				utils.StartOperation("GenerateRootMessages")
-				// Set initial progress
-				utils.UpdateOperationProgress("GenerateRootMessages", 10.0)
-			}
-		}
-
 		// Handle custom instructions temporarily (not saved to config)
 		var originalInstructions interface{}
 		var hadInstructions bool
@@ -229,138 +216,60 @@ Examples:
 
 			// Set custom instructions temporarily
 			config.Set("commit_instructions", customInstructions)
-			utils.Debug("[" + config.Aliases.GetMsgs + "]: Using custom instructions (temporary): " + customInstructions)
 
 			// Defer cleanup to ensure instructions are removed
 			defer func() {
 				if hadInstructions {
 					config.Set("commit_instructions", originalInstructions)
-					utils.Debug("[" + config.Aliases.GetMsgs + "]: Restored original commit instructions")
 				} else {
 					config.Remove("commit_instructions")
-					utils.Debug("[" + config.Aliases.GetMsgs + "]: Removed temporary custom instructions")
 				}
 			}()
 		}
 
 		if allFlag {
-			utils.Info("[" + config.Aliases.GetMsgs + "]: Generating messages for all root folders.")
+			utils.Info("Generating messages for all root folders...")
 			var err error
 
 			if groupFlag {
-				utils.Debug("[" + config.Aliases.GetMsgs + "]: Grouping logic enabled via --group flag for all folders.")
 				err = core.GroupAndGetAllMsgs(numFiles)
 			} else {
 				err = core.GetAllMsgs(numFiles)
 			}
 
 			if err != nil {
-				if utils.IsStatsEnabled() {
-					utils.FailOperation("GenerateAllMessages", err.Error())
-				}
-				utils.Error("[" + config.Aliases.GetMsgs + "]: Error encountered - " + err.Error())
+				utils.Error("Error generating messages: " + err.Error())
 				return
 			}
 
-			if utils.IsStatsEnabled() {
-				utils.MarkOperationComplete("GenerateAllMessages")
-			}
 			allOutput := output.GetAll()
-			utils.Success("[" + config.Aliases.GetMsgs + "]: Commit messages generated for all root folders successfully.")
+			utils.Success("✅ Commit messages generated for all root folders successfully.")
 			utils.Print(utils.ToJSON(allOutput))
 		} else if rootFolderName != "" {
-			utils.Info("[" + config.Aliases.GetMsgs + "]: Targeting root folder: " + rootFolderName + "\n")
+			utils.Info("Generating messages for folder: " + rootFolderName)
 
 			var err error
 			if groupFlag {
-				utils.Debug("[" + config.Aliases.GetMsgs + "]: Grouping logic enabled via --group flag.")
 				err = core.GroupAndGetMsgsForRootFolder(rootFolderName, numFiles)
 			} else {
 				err = core.GetMsgsForRootFolder(rootFolderName, numFiles)
 			}
 
 			if err != nil {
-				if utils.IsStatsEnabled() {
-					utils.FailOperation("GenerateRootMessages", err.Error())
-				}
-				utils.Error("[" + config.Aliases.GetMsgs + "]: Error encountered - " + err.Error())
+				utils.Error("Error generating messages: " + err.Error())
 				return
 			}
 
 			rootFolder := output.GetFolder(rootFolderName)
 			if len(rootFolder.Files) == 0 {
-				if utils.IsStatsEnabled() {
-					utils.FailOperation("GenerateRootMessages", "No changed files detected")
-				}
-				utils.Error("[" + config.Aliases.GetMsgs + "]: No changed files detected in the specified root folder.")
+				utils.Error("No changed files detected in the specified root folder.")
 				return
 			}
 
-			if utils.IsStatsEnabled() {
-				utils.MarkOperationComplete("GenerateRootMessages")
-			}
-			utils.Success("[" + config.Aliases.GetMsgs + "]: Commit messages generated for root folder: " + rootFolderName + " successfully.")
+			utils.Success("✅ Commit messages generated for root folder: " + rootFolderName + " successfully.")
 			utils.Print(utils.ToJSON(rootFolder))
 		} else {
-			if utils.IsStatsEnabled() {
-				utils.FailOperation("GenerateMessages", "No operation flag specified")
-			}
-			utils.Error("[" + config.Aliases.GetMsgs + "]: You must specify either --all or --root flag.")
-		}
-
-		// Display stats if enabled
-		if utils.IsStatsEnabled() {
-			// Capture clustering configuration for getmsgs command
-			clusteringConfig := config.GetClusteringConfig()
-
-			// Determine enabled methods
-			enabledMethods := []string{}
-			if clusteringConfig.Methods.Directory.Enabled {
-				enabledMethods = append(enabledMethods, "directory")
-			}
-			if clusteringConfig.Methods.Pattern.Enabled {
-				enabledMethods = append(enabledMethods, "pattern")
-			}
-			if clusteringConfig.Methods.Cached.Enabled {
-				enabledMethods = append(enabledMethods, "cached")
-			}
-			if clusteringConfig.Methods.Semantic.Enabled {
-				enabledMethods = append(enabledMethods, "semantic")
-			}
-
-			// Determine performance mode
-			performanceMode := "balanced"
-			if clusteringConfig.Performance.PreferSpeed {
-				if clusteringConfig.Performance.MaxProcessingTime <= 30 {
-					performanceMode = "speed"
-				} else {
-					performanceMode = "balanced"
-				}
-			} else {
-				performanceMode = "quality"
-			}
-
-			// Add grouping status to the method information
-			methodUsed := clusteringConfig.DefaultMethod
-			if groupFlag {
-				methodUsed = clusteringConfig.DefaultMethod + " (grouping enabled)"
-			}
-
-			// Set clustering information for stats display
-			utils.SetClusteringInfo(
-				methodUsed,
-				enabledMethods,
-				clusteringConfig.ConfidenceThresholds,
-				clusteringConfig.SimilarityThresholds,
-				clusteringConfig.MaxFilesForSemanticClustering,
-				clusteringConfig.EnableFallbackMethods,
-				performanceMode,
-				clusteringConfig.Performance.MaxProcessingTime,
-				clusteringConfig.Performance.EnableBenchmarking,
-				clusteringConfig.Performance.AdaptiveOptimization,
-			)
-
-			utils.PrintStats()
+			utils.Error("You must specify either --all or --root flag.")
 		}
 	},
 }
