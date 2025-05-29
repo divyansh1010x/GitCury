@@ -67,32 +67,32 @@ Examples:
 		loadAliases() // Ensure aliases are loaded
 		if cmd.Flag("add").Changed {
 			if len(args) != 2 {
-				utils.Error("[ALIAS]: Invalid arguments. Usage: --add <command> <alias>")
+				utils.Error("Invalid arguments. Usage: --add <command> <alias>")
 				cmd.Help()
 				return
 			}
-			utils.Info("[ALIAS]: Adding alias '" + args[1] + "' for command '" + args[0] + "'.")
+			utils.Info("Adding alias '" + args[1] + "' for command '" + args[0] + "'.")
 			Aliases[args[0]] = args[1]
 			config.Set("aliases", Aliases)
-			utils.Success("[ALIAS]: Alias added successfully.")
+			utils.Success("Alias added successfully.")
 		} else if cmd.Flag("remove").Changed {
 			if len(args) != 1 {
-				utils.Error("[ALIAS]: Invalid arguments. Usage: --remove <alias>")
+				utils.Error("Invalid arguments. Usage: --remove <alias>")
 				cmd.Help()
 				return
 			}
-			utils.Info("[ALIAS]: Removing alias '" + args[0] + "'.")
+			utils.Info("Removing alias '" + args[0] + "'.")
 			delete(Aliases, args[0])
 			config.Set("aliases", Aliases)
-			utils.Success("[ALIAS]: Alias removed successfully.")
+			utils.Success("Alias removed successfully.")
 		} else if cmd.Flag("list").Changed {
-			utils.Info("[ALIAS]: Listing all aliases.")
+			utils.Info("Listing all aliases.")
 			for cmdName, alias := range Aliases {
 				cmd.Printf("%s -> %s\n", cmdName, alias)
 			}
-			utils.Success("[ALIAS]: Alias listing completed.")
+			utils.Success("Alias listing completed.")
 		} else {
-			utils.Error("[ALIAS]: No valid flag provided. Use --add, --remove, or --list.")
+			utils.Error("No valid flag provided. Use --add, --remove, or --list.")
 			cmd.Help()
 		}
 	},
@@ -100,19 +100,19 @@ Examples:
 
 func ReampAlias(root *cobra.Command) {
 	loadAliases() // Ensure aliases are loaded before remapping
-	utils.Debug("[ALIAS]: Re-mapping aliases to commands.")
+	utils.Debug("Re-mapping aliases to commands.")
 	for cmdName, alias := range Aliases {
 		cmd, _, err := root.Find([]string{cmdName})
 		if err != nil {
-			utils.Error("[ALIAS]: Error finding command '" + cmdName + "' - " + err.Error())
+			utils.Error("Error finding command '" + cmdName + "' - " + err.Error())
 			continue
 		}
 		if cmd == nil {
-			utils.Error("[ALIAS]: Command '" + cmdName + "' not found.")
+			utils.Error("Command '" + cmdName + "' not found.")
 			continue
 		}
 		cmd.Aliases = append(cmd.Aliases, alias)
-		utils.Debug("[ALIAS]: Alias '" + alias + "' mapped to command '" + cmdName + "'.")
+		utils.Debug("Alias '" + alias + "' mapped to command '" + cmdName + "'.")
 	}
 }
 
