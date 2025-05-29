@@ -205,21 +205,7 @@ Examples:
 			return
 		}
 
-		// Start overall boom operation tracking
-		if utils.IsStatsEnabled() {
-			utils.StartOperation("BoomWorkflow")
-			// Set initial progress
-			utils.UpdateOperationProgress("BoomWorkflow", 10.0)
-		}
-
 		utils.Info("Starting analysis...")
-
-		// Track message generation
-		if utils.IsStatsEnabled() {
-			utils.StartOperation("BoomGenerateMessages")
-			// Set initial progress
-			utils.UpdateOperationProgress("BoomGenerateMessages", 10.0)
-		}
 
 		var err error
 		if cascadeAll {
@@ -229,26 +215,14 @@ Examples:
 		}
 
 		if err != nil {
-			if utils.IsStatsEnabled() {
-				utils.FailOperation("BoomGenerateMessages", err.Error())
-				utils.FailOperation("BoomWorkflow", "Message generation failed")
-			}
 			utils.Error("Analysis failed: " + err.Error())
 			return
-		}
-
-		if utils.IsStatsEnabled() {
-			utils.MarkOperationComplete("BoomGenerateMessages")
-			utils.UpdateOperationProgress("BoomWorkflow", 30.0)
 		}
 
 		allOutput := output.GetAll()
 		utils.Print(utils.ToJSON(allOutput))
 
 		if len(allOutput.Folders) == 0 {
-			if utils.IsStatsEnabled() {
-				utils.FailOperation("BoomWorkflow", "No changes detected")
-			}
 			utils.Error("No changes detected.")
 			return
 		}
@@ -259,21 +233,11 @@ Examples:
 		response = strings.TrimSpace(strings.ToLower(response))
 
 		if response != "y" && response != "yes" {
-			if utils.IsStatsEnabled() {
-				utils.FailOperation("BoomWorkflow", "User aborted operation")
-			}
 			utils.Warning("Operation aborted by user.")
 			return
 		}
 
 		utils.Info("Committing changes...")
-
-		// Track commit operation
-		if utils.IsStatsEnabled() {
-			utils.StartOperation("BoomCommit")
-			// Set initial progress
-			utils.UpdateOperationProgress("BoomCommit", 10.0)
-		}
 
 		if cascadeAll {
 			err = core.CommitAllRoots()
@@ -282,17 +246,8 @@ Examples:
 		}
 
 		if err != nil {
-			if utils.IsStatsEnabled() {
-				utils.FailOperation("BoomCommit", err.Error())
-				utils.FailOperation("BoomWorkflow", "Commit failed")
-			}
 			utils.Error("Commit failed: " + err.Error())
 			return
-		}
-
-		if utils.IsStatsEnabled() {
-			utils.MarkOperationComplete("BoomCommit")
-			utils.UpdateOperationProgress("BoomWorkflow", 60.0)
 		}
 
 		fmt.Print("Push changes to remote? (y/n): ")
@@ -300,9 +255,6 @@ Examples:
 		response = strings.TrimSpace(strings.ToLower(response))
 
 		if response != "y" && response != "yes" {
-			if utils.IsStatsEnabled() {
-				utils.MarkOperationComplete("BoomWorkflow")
-			}
 			utils.Success("Operation completed. Push skipped.")
 			return
 		}
@@ -316,13 +268,6 @@ Examples:
 
 		utils.Info("Pushing to branch: " + branchName)
 
-		// Track push operation
-		if utils.IsStatsEnabled() {
-			utils.StartOperation("BoomPush")
-			// Set initial progress
-			utils.UpdateOperationProgress("BoomPush", 10.0)
-		}
-
 		if cascadeAll {
 			err = core.PushAllRoots(branchName)
 		} else {
@@ -330,17 +275,8 @@ Examples:
 		}
 
 		if err != nil {
-			if utils.IsStatsEnabled() {
-				utils.FailOperation("BoomPush", err.Error())
-				utils.FailOperation("BoomWorkflow", "Push failed")
-			}
 			utils.Error("Push failed: " + err.Error())
 			return
-		}
-
-		if utils.IsStatsEnabled() {
-			utils.MarkOperationComplete("BoomPush")
-			utils.MarkOperationComplete("BoomWorkflow")
 		}
 
 		utils.Success("Operation completed successfully.")

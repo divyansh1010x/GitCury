@@ -1,7 +1,6 @@
 package core
 
 import (
-	"GitCury/config"
 	"GitCury/git"
 	"GitCury/output"
 	"GitCury/utils"
@@ -13,13 +12,8 @@ import (
 func CommitAllRoots(env ...[]string) error {
 	rootFolders := output.GetAll().Folders
 	if len(rootFolders) == 0 {
-		utils.Warning("[" + config.Aliases.Commit + "]: No root folders with changes to commit")
+		utils.Warning("No root folders with changes to commit")
 		return nil
-	}
-
-	// Update progress in stats if enabled
-	if utils.IsStatsEnabled() {
-		utils.UpdateOperationProgress("CommitAllRoots", 20.0)
 	}
 
 	// Determine optimal worker count based on available folders
@@ -30,12 +24,6 @@ func CommitAllRoots(env ...[]string) error {
 
 	// Create worker pool for parallel execution with limited concurrency
 	pool := utils.NewWorkerPool(workerCount)
-	utils.Debug("[" + config.Aliases.Commit + "]: Created worker pool with " + fmt.Sprint(workerCount) + " workers for " + fmt.Sprint(len(rootFolders)) + " folders")
-
-	// Update progress in stats if enabled
-	if utils.IsStatsEnabled() {
-		utils.UpdateOperationProgress("CommitAllRoots", 30.0)
-	}
 
 	// Submit commit tasks for each root folder
 	for _, rootFolder := range rootFolders {
@@ -43,10 +31,7 @@ func CommitAllRoots(env ...[]string) error {
 		taskName := "CommitRoot:" + folder.Name
 
 		pool.Submit(taskName, 2*time.Minute, func() error {
-			utils.Debug("[" + config.Aliases.Commit + "]: Processing root folder: " + folder.Name)
-
 			if len(folder.Files) == 0 {
-				utils.Debug("[" + config.Aliases.Commit + "]: No files to commit in folder: " + folder.Name)
 				return nil
 			}
 
@@ -58,7 +43,7 @@ func CommitAllRoots(env ...[]string) error {
 					fileInfo = structErr.ProcessedFile
 				}
 
-				utils.Error("["+config.Aliases.Commit+".FAIL]: Failed to commit batch for folder '"+folder.Name+"' - "+err.Error(), fileInfo)
+				utils.Error("Failed to commit batch for folder '"+folder.Name+"' - "+err.Error(), fileInfo)
 				return utils.NewGitError(
 					"Failed to commit changes in folder",
 					err,
@@ -70,18 +55,12 @@ func CommitAllRoots(env ...[]string) error {
 				)
 			}
 
-			utils.Debug("[" + config.Aliases.Commit + "]: Successfully committed changes in folder: " + folder.Name)
 			return nil
 		})
 	}
 
 	// Wait for all commit tasks to complete
 	errors := pool.Wait()
-
-	// Update progress in stats if enabled
-	if utils.IsStatsEnabled() {
-		utils.UpdateOperationProgress("CommitAllRoots", 80.0)
-	}
 
 	if len(errors) > 0 {
 		errorDetails := make([]string, 0, len(errors))
@@ -101,8 +80,7 @@ func CommitAllRoots(env ...[]string) error {
 			filesInfo = strings.Join(filesList, ", ")
 		}
 
-		utils.Error("["+config.Aliases.Commit+".FAIL]: Batch commit completed with "+fmt.Sprint(len(errors))+" errors", filesInfo)
-		utils.Debug("[" + config.Aliases.Commit + ".FAIL]: Errors encountered: " + strings.Join(errorDetails, "; "))
+		utils.Error("Batch commit completed with "+fmt.Sprint(len(errors))+" errors", filesInfo)
 
 		return utils.NewGitError(
 			fmt.Sprintf("%d errors occurred during batch commit", len(errors)),
@@ -116,20 +94,14 @@ func CommitAllRoots(env ...[]string) error {
 	}
 
 	output.Clear()
-
-	// Update progress in stats if enabled
-	if utils.IsStatsEnabled() {
-		utils.UpdateOperationProgress("CommitAllRoots", 95.0)
-	}
-
-	utils.Success("[" + config.Aliases.Commit + ".SUCCESS]: Batch commit completed successfully. Output cleared.")
+	utils.Success("✅ Batch commit completed successfully. Output cleared.")
 	return nil
 }
 
 func CommitOneRoot(rootFolderName string, env ...[]string) error {
 	rootFolder := output.GetFolder(rootFolderName)
 	if len(rootFolder.Files) == 0 {
-		utils.Error("["+config.Aliases.Commit+".FAIL]: Root folder '"+rootFolderName+"' not found or contains no files.", rootFolderName)
+		utils.Error("Root folder '"+rootFolderName+"' not found or contains no files.", rootFolderName)
 		return utils.NewValidationError(
 			"Root folder not found or has no files",
 			nil,
@@ -140,13 +112,6 @@ func CommitOneRoot(rootFolderName string, env ...[]string) error {
 		)
 	}
 
-	// Update progress in stats if enabled
-	if utils.IsStatsEnabled() {
-		utils.UpdateOperationProgress("CommitOneRoot", 30.0)
-	}
-
-	utils.Debug("[" + config.Aliases.Commit + "]: Targeting root folder for commit: " + rootFolderName)
-
 	err := git.ProgressCommitBatch(rootFolder, env...)
 	if err != nil {
 		// Extract file information if available in the error
@@ -155,7 +120,7 @@ func CommitOneRoot(rootFolderName string, env ...[]string) error {
 			fileInfo = structErr.ProcessedFile
 		}
 
-		utils.Error("["+config.Aliases.Commit+".FAIL]: Failed to commit batch for folder '"+rootFolderName+"' - "+err.Error(), fileInfo)
+		utils.Error("Failed to commit batch for folder '"+rootFolderName+"' - "+err.Error(), fileInfo)
 		return utils.NewGitError(
 			"Failed to commit batch for folder",
 			err,
@@ -166,11 +131,6 @@ func CommitOneRoot(rootFolderName string, env ...[]string) error {
 		)
 	}
 
-	// Update progress in stats if enabled
-	if utils.IsStatsEnabled() {
-		utils.UpdateOperationProgress("CommitOneRoot", 90.0)
-	}
-
-	utils.Success("[" + config.Aliases.Commit + ".SUCCESS]: Batch commit completed successfully for root folder: " + rootFolderName)
+	utils.Success("✅ Batch commit completed successfully for root folder: " + rootFolderName)
 	return nil
 }

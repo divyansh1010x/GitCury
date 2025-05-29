@@ -131,18 +131,17 @@ Examples:
 	Run: func(cmd *cobra.Command, args []string) {
 		if deleteFlag {
 			output.Clear()
-			utils.Info("[" + config.Aliases.Output + "]: All messages deleted.")
+			utils.Success("✅ All messages deleted.")
 			return
 		}
 		if logFlag {
 			utils.Print(utils.ToJSON(output.GetAll()))
-			utils.Info("[" + config.Aliases.Output + "]: Messages displayed.")
 		} else if editFlag {
 			editor := resolveEditor()
 			outputFile := resolveOutputFile()
 
 			if _, err := os.Stat(outputFile); os.IsNotExist(err) {
-				utils.Error("[" + config.Aliases.Output + "]: Output file not found.")
+				utils.Error("Output file not found. Generate messages first.")
 				return
 			}
 
@@ -152,11 +151,11 @@ Examples:
 			cmd.Stderr = os.Stderr
 
 			if err := cmd.Run(); err != nil {
-				utils.Error("[" + config.Aliases.Output + "]: Failed to open editor: " + err.Error())
+				utils.Error("Failed to open editor: " + err.Error())
 				return
 			}
 
-			utils.Info("[" + config.Aliases.Output + "]: File edited successfully.")
+			utils.Success("✅ File edited successfully.")
 		} else {
 			cmd.Help()
 		}

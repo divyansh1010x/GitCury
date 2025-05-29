@@ -272,28 +272,12 @@ Examples:
 [NOTICE]: Ensure the commit messages are generated before committing.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		// Start stats tracking if enabled
-		if utils.IsStatsEnabled() {
-			if sealAllFlag {
-				utils.StartOperation("CommitAllRoots")
-				// Set initial progress
-				utils.UpdateOperationProgress("CommitAllRoots", 10.0)
-			} else if folderName != "" {
-				utils.StartOperation("CommitOneRoot")
-				// Set initial progress
-				utils.UpdateOperationProgress("CommitOneRoot", 10.0)
-			}
-		}
-
 		// Use our SafeExecute function to add panic recovery
 		err := utils.SafeExecute("CommitChanges", func() error {
 			if sealAllFlag {
-				utils.Info("[" + config.Aliases.Commit + "]: Committing all changes across root folders.")
+				utils.Info("Committing all changes across root folders...")
 				err := core.CommitAllRoots()
 				if err != nil {
-					if utils.IsStatsEnabled() {
-						utils.FailOperation("CommitAllRoots", err.Error())
-					}
 					return utils.NewGitError(
 						"Failed to commit all changes",
 						err,
@@ -302,16 +286,10 @@ Examples:
 						},
 					)
 				}
-				if utils.IsStatsEnabled() {
-					utils.MarkOperationComplete("CommitAllRoots")
-				}
-				utils.Success("[" + config.Aliases.Commit + "]: All changes committed successfully.")
+				utils.Success("✅ All changes committed successfully.")
 			} else if folderName != "" {
 				// Validate the folder exists
 				if _, err := os.Stat(folderName); os.IsNotExist(err) {
-					if utils.IsStatsEnabled() {
-						utils.FailOperation("CommitOneRoot", "Root folder does not exist: "+folderName)
-					}
 					return utils.NewValidationError(
 						"Root folder does not exist",
 						err,
@@ -321,12 +299,9 @@ Examples:
 					)
 				}
 
-				utils.Info("[" + config.Aliases.Commit + "]: Targeting root folder: " + folderName)
+				utils.Info("Committing changes in folder: " + folderName)
 				err := core.CommitOneRoot(folderName)
 				if err != nil {
-					if utils.IsStatsEnabled() {
-						utils.FailOperation("CommitOneRoot", err.Error())
-					}
 					return utils.NewGitError(
 						"Failed to commit changes in folder",
 						err,
@@ -336,14 +311,8 @@ Examples:
 						},
 					)
 				}
-				if utils.IsStatsEnabled() {
-					utils.MarkOperationComplete("CommitOneRoot")
-				}
-				utils.Success("[" + config.Aliases.Commit + "]: Changes in the specified folder committed successfully.")
+				utils.Success("✅ Changes in folder committed successfully.")
 			} else {
-				if utils.IsStatsEnabled() {
-					utils.FailOperation("CommitChanges", "No operation flag specified")
-				}
 				return utils.NewValidationError(
 					"You must specify either --all or --root flag",
 					nil,
@@ -357,8 +326,6 @@ Examples:
 
 		if err != nil {
 			utils.Error(utils.ToUserFriendlyMessage(err))
-		} else if utils.IsStatsEnabled() {
-			utils.PrintStats()
 		}
 	},
 }
@@ -414,7 +381,7 @@ Examples:
 			// Check if the date is in the future
 			now := time.Now()
 			if parsedTime.After(now) {
-				utils.Warning("[" + config.Aliases.Commit + "]: The specified datetime is in the future. This may cause issues with Git history.")
+				utils.Warning("The specified datetime is in the future. This may cause issues with Git history.")
 
 				// Ask for confirmation before proceeding with future date
 				details := []string{
@@ -443,11 +410,10 @@ Examples:
 				"GIT_AUTHOR_DATE="+formattedDateTime,
 				"GIT_COMMITTER_DATE="+formattedDateTime,
 			)
-			utils.Info("[" + config.Aliases.Commit + "]: Setting commit date and time to: " + formattedDateTime)
 
 			// Execute commit logic
 			if sealAllFlag {
-				utils.Info("[" + config.Aliases.Commit + "]: Committing all changes with custom timestamp.")
+				utils.Info("Committing all changes with custom timestamp...")
 				err := core.CommitAllRoots(env)
 				if err != nil {
 					return utils.NewGitError(
@@ -472,7 +438,7 @@ Examples:
 					)
 				}
 
-				utils.Info("[" + config.Aliases.Commit + "]: Committing changes in folder with custom timestamp: " + folderName)
+				utils.Info("Committing changes in folder with custom timestamp: " + folderName)
 
 				// Use git recovery mechanism for safer operations with progress reporting
 				err := git.SafeGitOperation(folderName, "CommitWithDate", func() error {
@@ -509,13 +475,12 @@ Examples:
 				)
 			}
 
-			utils.Success("[" + config.Aliases.Commit + "]: Changes committed with the specified timestamp successfully.")
+			utils.Success("✅ Changes committed with the specified timestamp successfully.")
 			return nil
 		})
 
 		if err != nil {
 			utils.Error(utils.ToUserFriendlyMessage(err))
-			cmd.PrintErrln("Error: " + utils.ToUserFriendlyMessage(err))
 		}
 	},
 }
