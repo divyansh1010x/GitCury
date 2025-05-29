@@ -157,53 +157,27 @@ Examples:
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if deployAll {
-			utils.Info("[" + config.Aliases.Push + "]: Pushing all changes to the remote repository.")
-
-			// Start stats tracking if enabled
-			if utils.IsStatsEnabled() {
-				utils.StartOperation("PushAllRoots")
-				// Set initial progress
-				utils.UpdateOperationProgress("PushAllRoots", 10.0)
-			}
+			utils.Info("Pushing all changes to the remote repository...")
 
 			err := core.PushAllRoots(targetBranch)
 			if err != nil {
-				if utils.IsStatsEnabled() {
-					utils.FailOperation("PushAllRoots", err.Error())
-				}
-				utils.Error("[" + config.Aliases.Push + "]: Error pushing all changes: " + err.Error())
+				utils.Error("Error pushing all changes: " + err.Error())
 				return
 			}
 
-			if utils.IsStatsEnabled() {
-				utils.MarkOperationComplete("PushAllRoots")
-			}
-			utils.Success("[" + config.Aliases.Push + "]: All changes pushed successfully.")
+			utils.Success("✅ All changes pushed successfully.")
 		} else if targetFolder != "" {
-			utils.Info("[" + config.Aliases.Push + "]: Pushing changes from folder: " + targetFolder)
-
-			// Start stats tracking if enabled
-			if utils.IsStatsEnabled() {
-				utils.StartOperation("PushOneRoot")
-				// Set initial progress
-				utils.UpdateOperationProgress("PushOneRoot", 10.0)
-			}
+			utils.Info("Pushing changes from folder: " + targetFolder)
 
 			err := core.PushOneRoot(targetFolder, targetBranch)
 			if err != nil {
-				if utils.IsStatsEnabled() {
-					utils.FailOperation("PushOneRoot", err.Error())
-				}
-				utils.Error("[" + config.Aliases.Push + "]: Error pushing changes from folder '" + targetFolder + "': " + err.Error())
+				utils.Error("Error pushing changes from folder '" + targetFolder + "': " + err.Error())
 				return
 			}
 
-			if utils.IsStatsEnabled() {
-				utils.MarkOperationComplete("PushOneRoot")
-			}
-			utils.Success("[" + config.Aliases.Push + "]: Changes from folder '" + targetFolder + "' pushed successfully.")
+			utils.Success("✅ Changes from folder '" + targetFolder + "' pushed successfully.")
 		} else {
-			utils.Error("[" + config.Aliases.Push + "]: You must specify either --all or --root flag.")
+			utils.Error("You must specify either --all or --root flag.")
 		}
 	},
 }
