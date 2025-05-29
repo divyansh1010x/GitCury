@@ -27,6 +27,52 @@ GitCury is an **AI-powered Git automation CLI tool** that streamlines your devel
 
 GitCury leverages **Google Gemini AI** to understand your code changes and generate meaningful commit messages automatically. It supports multi-repository workflows and provides a comprehensive CLI for managing Git operations across multiple project roots.
 
+## 📥 Installation
+
+Choose your preferred installation method:
+
+### Homebrew (macOS and Linux)
+
+```bash
+brew tap lakshyajain-0291/gitcury
+brew install gitcury
+```
+
+### Scoop (Windows)
+
+```bash
+scoop bucket add gitcury https://github.com/lakshyajain-0291/GitCury-Scoop-Bucket.git
+scoop install gitcury
+```
+
+### Go Install
+
+If you have Go installed:
+
+```bash
+go install github.com/lakshyajain-0291/gitcury@latest
+```
+
+### Docker
+
+```bash
+docker pull lakshyajain0291/gitcury:latest
+```
+
+Run with Docker:
+
+```bash
+docker run -it --rm \
+  -v "$(pwd):/app/data" -w "/app/data" \
+  -v "$HOME/.gitconfig:/home/gitcuryuser/.gitconfig:ro" \
+  -v "$HOME/.gitcury:/home/gitcuryuser/.gitcury" \
+  lakshyajain0291/gitcury [command]
+```
+
+### Direct Download
+
+Download the appropriate binary for your operating system from the [Releases page](https://github.com/lakshyajain-0291/GitCury/releases).
+
 ## ✨ Key Features
 
 ### 🤖 **AI-Powered Commit Messages**  
