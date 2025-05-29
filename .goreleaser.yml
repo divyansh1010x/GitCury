@@ -1,15 +1,9 @@
-# GoReleaser configuration for GitCury
-# Documentation: https://goreleaser.com
-
-version: 2
-
+# GoReleaser configuration file
 project_name: gitcury
-
 before:
   hooks:
     - go mod tidy
     - go generate ./...
-
 builds:
   - id: gitcury
     main: ./main.go
@@ -25,235 +19,97 @@ builds:
       - arm64
     ldflags:
       - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
+    # Add mod timestamp for reproducible builds
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    # Ensure the binary is not marked as development version
     flags:
       - -trimpath
 
 archives:
-  - id: gitcury-archive
-    format: tar.gz
+  - format: tar.gz
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-    format_overrides:
-      - goos: windows
-        format: zip
     files:
-      - README.md
       - LICENSE
-      - config.json
+      - README.md
+      - config.json.example
+    # Use zlib compression for better compatibility
+    compression: zlib
+    # Allow files with different permissions
+    rlcp: true
+  - id: windows-zip
+    format: zip
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - LICENSE
+      - README.md
+      - config.json.example
 
 checksum:
-  name_template: "checksums.txt"
+  name_template: 'checksums.txt'
+  algorithm: sha256
 
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
 
 changelog:
   sort: asc
-  use: github
   filters:
     exclude:
-      - "^docs:"
-      - "^test:"
-      - "^chore:"
-  groups:
-    - title: "New Features"
-      regexp: "^.*feat[(\\w)]*:+.*$"
-      order: 0
-    - title: "Bug Fixes"
-      regexp: "^.*fix[(\\w)]*:+.*$"
-      order: 1
-    - title: "Performance Improvements"
-      regexp: "^.*perf[(\\w)]*:+.*$"
-      order: 2
-    - title: "Others"
-      order: 999
+      - '^docs:'
+      - '^test:'
+      - 'merge conflict'
+      - Merge pull request
+      - Merge branch
 
-# GitHub Release
 release:
   github:
     owner: lakshyajain-0291
     name: GitCury
-  draft: false
   prerelease: auto
-  name_template: "GitCury {{ .Tag }}"
-  header: |
-    ## 🚀 GitCury {{ .Tag }} - AI-Powered Git Automation
 
-    Welcome to GitCury {{ .Tag }}! This release brings enhanced AI-powered Git automation to streamline your development workflow.
-
-    ### 📦 Installation Options
-
-    **Homebrew (macOS/Linux):**
-    ```bash
-    brew install lakshyajain-0291/tap/gitcury
-    ```
-
-    **Chocolatey (Windows):**
-    ```bash
-    choco install gitcury
-    ```
-
-    **Snap (Linux):**
-    ```bash
-    sudo snap install gitcury
-    ```
-
-    **Direct Download:**
-    Download the appropriate binary for your platform from the assets below.
-
-  footer: |
-    ### 🙏 Thanks to all contributors!
-
-    **Full Changelog**: https://github.com/lakshyajain-0291/GitCury/compare/{{ .PreviousTag }}...{{ .Tag }}
-
-    ---
-    
-    🌟 **Star us on GitHub** | 📖 **Read the docs** | 🐛 **Report issues**
-
-# Package Managers
+# Homebrew Tap configuration
 brews:
   - name: gitcury
-    repository:
+    tap:
       owner: lakshyajain-0291
-      name: homebrew-tap
-      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
-    directory: Formula
+      name: homebrew-gitcury
+      token: "{{ .Env.HOMEBREW_TAP_PAT }}"
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
     homepage: "https://github.com/lakshyajain-0291/GitCury"
-    description: "AI-powered Git automation CLI tool with intelligent commit message generation"
+    description: "AI-Powered Git Automation CLI tool"
     license: "MIT"
-    dependencies:
-      - name: git
-        type: required
-    install: |
-      bin.install "gitcury"
-      (bash_completion/"gitcury").write Utils.safe_popen_read("#{bin}/gitcury", "completion", "bash")
-      (zsh_completion/"_gitcury").write Utils.safe_popen_read("#{bin}/gitcury", "completion", "zsh")
-      (fish_completion/"gitcury.fish").write Utils.safe_popen_read("#{bin}/gitcury", "completion", "fish")
     test: |
-      system "#{bin}/gitcury", "version"
+      system "#{bin}/gitcury --version"
 
-chocolateys:
+# Scoop Bucket configuration
+scoops:
   - name: gitcury
-    title: GitCury
-    authors: Lakshya Jain
-    project_url: https://github.com/lakshyajain-0291/GitCury
-    url_template: "https://github.com/lakshyajain-0291/GitCury/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-    copyright: 2025 Lakshya Jain
-    license_url: https://github.com/lakshyajain-0291/GitCury/blob/main/LICENSE
-    require_license_acceptance: false
-    project_source_url: https://github.com/lakshyajain-0291/GitCury
-    docs_url: https://github.com/lakshyajain-0291/GitCury/blob/main/README.md
-    bug_tracker_url: https://github.com/lakshyajain-0291/GitCury/issues
-    tags: "git automation ai cli developer-tools"
-    summary: AI-powered Git automation CLI tool
-    description: |
-      GitCury is an AI-powered Git automation CLI tool that streamlines your development workflow.
-      Built with Go and powered by Google's Gemini AI, GitCury automates commit message generation,
-      manages multi-repository operations, and provides intelligent Git workflow automation.
-    release_notes: "https://github.com/lakshyajain-0291/GitCury/releases/tag/v{{ .Version }}"
-    dependencies:
-      - id: git
-        version: "[2.0.0,)"
-
-scoop:
-  repository:
-    owner: lakshyajain-0291
-    name: scoop-bucket
-    token: "{{ .Env.SCOOP_BUCKET_TOKEN }}"
-  directory: bucket
-  homepage: "https://github.com/lakshyajain-0291/GitCury"
-  description: "AI-powered Git automation CLI tool with intelligent commit message generation"
-  license: "MIT"
-
-snapcrafts:
-  - name: gitcury
-    publish: true
-    summary: AI-powered Git automation CLI tool
-    description: |
-      GitCury is an AI-powered Git automation CLI tool that streamlines your 
-      development workflow. Built with Go and powered by Google's Gemini AI, 
-      GitCury automates commit message generation, manages multi-repository 
-      operations, and provides intelligent Git workflow automation.
-    grade: stable
-    confinement: strict
-    license: MIT
-    base: core22
-    apps:
-      gitcury:
-        command: gitcury
-        plugs: [home, network, removable-media]
-
-winget:
-  - name: gitcury
-    publisher: lakshyajain-0291
-    short_description: "AI-powered Git automation CLI tool"
-    license: "MIT"
-    homepage: "https://github.com/lakshyajain-0291/GitCury"
-    repository:
+    bucket:
       owner: lakshyajain-0291
-      name: winget-pkgs
-      token: "{{ .Env.WINGET_TOKEN }}"
+      name: GitCury-Scoop-Bucket
+      token: "{{ .Env.SCOOP_BUCKET_PAT }}"
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    homepage: "https://github.com/lakshyajain-0291/GitCury"
+    description: "AI-Powered Git Automation CLI tool"
+    license: "MIT"
 
 # Docker images
 dockers:
   - image_templates:
-      - "lakshyajain0291/gitcury:{{ .Tag }}"
       - "lakshyajain0291/gitcury:latest"
-      - "ghcr.io/lakshyajain-0291/gitcury:{{ .Tag }}"
-      - "ghcr.io/lakshyajain-0291/gitcury:latest"
+      - "lakshyajain0291/gitcury:{{ .Tag }}"
+      - "lakshyajain0291/gitcury:v{{ .Major }}"
+      - "lakshyajain0291/gitcury:v{{ .Major }}.{{ .Minor }}"
     dockerfile: Dockerfile
     use: buildx
     build_flag_templates:
       - "--pull"
       - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.name={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.source=https://github.com/lakshyajain-0291/GitCury"
-      - "--platform=linux/amd64"
-
-docker_manifests:
-  - name_template: "lakshyajain0291/gitcury:{{ .Tag }}"
-    image_templates:
-      - "lakshyajain0291/gitcury:{{ .Tag }}"
-  - name_template: "lakshyajain0291/gitcury:latest"
-    image_templates:
-      - "lakshyajain0291/gitcury:latest"
-  - name_template: "ghcr.io/lakshyajain-0291/gitcury:{{ .Tag }}"
-    image_templates:
-      - "ghcr.io/lakshyajain-0291/gitcury:{{ .Tag }}"
-  - name_template: "ghcr.io/lakshyajain-0291/gitcury:latest"
-    image_templates:
-      - "ghcr.io/lakshyajain-0291/gitcury:latest"
-
-nfpms:
-  - id: gitcury
-    package_name: gitcury
-    vendor: Lakshya Jain
-    homepage: https://github.com/lakshyajain-0291/GitCury
-    maintainer: Lakshya Jain <lakshyajain0291@gmail.com>
-    description: AI-powered Git automation CLI tool with intelligent commit message generation
-    license: MIT
-    formats:
-      - deb
-      - rpm
-      - apk
-    dependencies:
-      - git
-    recommends:
-      - ca-certificates
-    contents:
-      - src: ./config.json
-        dst: /etc/gitcury/config.json
-        type: config
-      - src: ./README.md
-        dst: /usr/share/doc/gitcury/README.md
-      - src: ./LICENSE
-        dst: /usr/share/doc/gitcury/LICENSE
-
-announce:
-  twitter:
-    enabled: false # Enable if you have Twitter API access
-  mastodon:
-    enabled: false # Enable if you have Mastodon account
-  discord:
-    enabled: false # Enable if you have Discord webhook
+      - "--label=org.opencontainers.image.source={{.GitURL}}"

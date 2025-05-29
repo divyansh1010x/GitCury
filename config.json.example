@@ -1,0 +1,30 @@
+{
+  "app_name": "GitCury",
+  "numFilesToCommit": 5,
+  "root_folders": [
+    "/path/to/your/git/repository"
+  ],
+  "version": "1.0.0",
+  "api_key": "YOUR_GEMINI_API_KEY",
+  "clustering": {
+    "enabled": true,
+    "default_method": "semantic",
+    "enabled_methods": ["semantic", "directory", "extension"],
+    "confidence_thresholds": {
+      "semantic": 0.7,
+      "directory": 0.6,
+      "extension": 0.5
+    },
+    "similarity_thresholds": {
+      "semantic": 0.6,
+      "directory": 0.8,
+      "extension": 0.7
+    },
+    "max_files_for_semantic": 100,
+    "enable_fallback_methods": true,
+    "performance_mode": "balanced",
+    "max_processing_time": 60,
+    "enable_benchmarking": false,
+    "adaptive_optimization": true
+  }
+}

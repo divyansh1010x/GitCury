@@ -67,7 +67,6 @@
 // 	rootCmd.AddCommand(bootstrapCmd)
 // }
 
-
 package cmd
 
 import (
@@ -99,40 +98,40 @@ Examples:
 [NOTICE]: Ensure your shell environment is properly configured for integration.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		utils.Info("[" + config.Aliases.Setup + "]: Setting up GitCury...")
+		utils.Info("Setting up GitCury...")
 
 		// Generate configuration
 		config.LoadConfig()
-		utils.Success("[" + config.Aliases.Setup + "]: Configuration generated.")
+		utils.Success("Configuration generated.")
 
 		configDir := config.Get("config_dir").(string)
 
 		// Install shell completion scripts
-		utils.Info("[" + config.Aliases.Setup + "]: Installing shell completion scripts...")
+		utils.Info("Installing shell completion scripts...")
 		shell := os.Getenv("SHELL")
 		switch {
 		case strings.Contains(shell, "bash"):
 			err := rootCmd.GenBashCompletionFile(configDir + "/gitcury-completion.bash")
 			if err == nil {
-				utils.Success("[" + config.Aliases.Setup + "]: Bash completion script installed.")
-				utils.Info("[" + config.Aliases.Setup + "]: Add 'source ~/.gitcury/gitcury-completion.bash' to your ~/.bashrc.")
+				utils.Success("Bash completion script installed.")
+				utils.Info("Add 'source ~/.gitcury/gitcury-completion.bash' to your ~/.bashrc.")
 			}
 		case strings.Contains(shell, "zsh"):
 			err := rootCmd.GenZshCompletionFile(configDir + "/gitcury-completion.zsh")
 			if err == nil {
-				utils.Success("[" + config.Aliases.Setup + "]: Zsh completion script installed.")
-				utils.Info("[" + config.Aliases.Setup + "]: Add 'source ~/.gitcury/gitcury-completion.zsh' to your ~/.zshrc.")
+				utils.Success("Zsh completion script installed.")
+				utils.Info("Add 'source ~/.gitcury/gitcury-completion.zsh' to your ~/.zshrc.")
 			}
 		case strings.Contains(shell, "fish"):
 			err := rootCmd.GenFishCompletionFile(configDir+"/completions/gitcury.fish", true)
 			if err == nil {
-				utils.Success("[" + config.Aliases.Setup + "]: Fish completion script installed.")
+				utils.Success("Fish completion script installed.")
 			}
 		default:
-			utils.Error("[" + config.Aliases.Setup + "]: Shell not recognized. Use 'gitcury completion' for manual setup.")
+			utils.Error("Shell not recognized. Use 'gitcury completion' for manual setup.")
 		}
 
-		utils.Success("[" + config.Aliases.Setup + "]: Setup completed!")
+		utils.Success("Setup completed!")
 	},
 }
 

@@ -2,8 +2,19 @@ package main
 
 import (
 	"GitCury/cmd"
+	"GitCury/utils"
+	"fmt"
+	"os"
 )
 
+// Version information - these will be set during build by GoReleaser
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
+// Old server code left for reference
 // func main() {
 // 	router := mux.NewRouter()
 
@@ -30,5 +41,15 @@ import (
 // }
 
 func main() {
+	// Set version information for use in commands
+	cmd.SetVersionInfo(version, commit, date)
+	
+	// Direct version flag check for simple usage
+	if len(os.Args) > 1 && (os.Args[1] == "--version" || os.Args[1] == "-v") {
+		fmt.Printf("GitCury %s (commit %s, built on %s)\n", version, commit, date)
+		os.Exit(0)
+	}
+	
+	utils.Debug(fmt.Sprintf("Starting GitCury %s", version))
 	cmd.Execute()
 }
