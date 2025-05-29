@@ -1,0 +1,88 @@
+name: Deploy Merged PR
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths-ignore:
+      - '**.md'
+      - '.github/**'
+      - 'docs/**'
+
+jobs:
+  test-and-tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed to create tags
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+      
+      - name: Run tests
+        run: go test -v ./...
+        
+      - name: Check if we need to create a new version
+        id: check-version
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          COMMIT_COUNT=$(git rev-list $LAST_TAG..HEAD --count)
+          
+          if [ $COMMIT_COUNT -gt 0 ]; then
+            echo "Need to create a new version (commits since last tag: $COMMIT_COUNT)"
+            
+            # Determine version increment type based on commit messages
+            BREAKING_CHANGE=$(git log $LAST_TAG..HEAD --pretty=format:"%s" | grep -ci "breaking\|BREAKING CHANGE")
+            FEAT=$(git log $LAST_TAG..HEAD --pretty=format:"%s" | grep -ci "^feat\|feature:")
+            
+            # Extract version components
+            MAJOR=$(echo $LAST_TAG | sed 's/v\([0-9]*\)\..*/\1/')
+            MINOR=$(echo $LAST_TAG | sed 's/v[0-9]*\.\([0-9]*\)\..*/\1/')
+            PATCH=$(echo $LAST_TAG | sed 's/v[0-9]*\.[0-9]*\.\([0-9]*\).*/\1/')
+            
+            # Determine which part to increment
+            if [ $BREAKING_CHANGE -gt 0 ]; then
+              # Breaking change - increment major version
+              NEW_MAJOR=$((MAJOR + 1))
+              NEW_MINOR=0
+              NEW_PATCH=0
+              NEW_TAG="v$NEW_MAJOR.$NEW_MINOR.$NEW_PATCH"
+              echo "Incrementing MAJOR version due to breaking changes"
+            elif [ $FEAT -gt 0 ]; then
+              # New feature - increment minor version
+              NEW_MINOR=$((MINOR + 1))
+              NEW_PATCH=0
+              NEW_TAG="v$MAJOR.$NEW_MINOR.$NEW_PATCH"
+              echo "Incrementing MINOR version due to new features"
+            else
+              # Regular change - increment patch version
+              NEW_PATCH=$((PATCH + 1))
+              NEW_TAG="v$MAJOR.$MINOR.$NEW_PATCH"
+              echo "Incrementing PATCH version for regular changes"
+            fi
+            
+            echo "new_tag=$NEW_TAG" >> $GITHUB_OUTPUT
+            echo "needs_release=true" >> $GITHUB_OUTPUT
+          else
+            echo "No new commits since last tag, skipping release"
+            echo "needs_release=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Create and push tag
+        if: steps.check-version.outputs.needs_release == 'true'
+        run: |
+          NEW_TAG=${{ steps.check-version.outputs.new_tag }}
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git tag -a $NEW_TAG -m "Automatic release $NEW_TAG"
+          git push origin $NEW_TAG
+          echo "Created and pushed tag $NEW_TAG"
+
+  # The actual release will be handled by the release.yml workflow when it detects the new tag
