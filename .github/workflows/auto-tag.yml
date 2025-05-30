@@ -42,10 +42,18 @@ jobs:
             BREAKING_CHANGE=$(git log $LAST_TAG..HEAD --pretty=format:"%s" | grep -ci "breaking\|BREAKING CHANGE")
             FEAT=$(git log $LAST_TAG..HEAD --pretty=format:"%s" | grep -ci "^feat\|feature:")
             
-            # Extract version components
-            MAJOR=$(echo $LAST_TAG | sed 's/v\([0-9]*\)\..*/\1/')
-            MINOR=$(echo $LAST_TAG | sed 's/v[0-9]*\.\([0-9]*\)\..*/\1/')
-            PATCH=$(echo $LAST_TAG | sed 's/v[0-9]*\.[0-9]*\.\([0-9]*\).*/\1/')
+            # Extract version components - handle case where tag might be v0.0.0 or incomplete
+            VERSION_WITHOUT_V=$(echo $LAST_TAG | sed 's/^v//')
+            MAJOR=$(echo $VERSION_WITHOUT_V | cut -d. -f1)
+            MINOR=$(echo $VERSION_WITHOUT_V | cut -d. -f2)
+            PATCH=$(echo $VERSION_WITHOUT_V | cut -d. -f3)
+            
+            # Set defaults if components are empty
+            MAJOR=${MAJOR:-0}
+            MINOR=${MINOR:-0}
+            PATCH=${PATCH:-0}
+            
+            echo "Parsed version components - MAJOR: $MAJOR, MINOR: $MINOR, PATCH: $PATCH"
             
             # Determine which part to increment
             if [ $BREAKING_CHANGE -gt 0 ]; then
