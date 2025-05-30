@@ -15,11 +15,13 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.24'
+          cache: true
+          cache-dependency-path: go.sum
 
       - name: Build
         run: go build -v ./...
 
-      - name: Test
+      - name: Test with race detection
         run: go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
       
       - name: Upload coverage to Codecov
@@ -40,6 +42,8 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.24'
+          cache: true
+          cache-dependency-path: go.sum
 
       - name: Run GoReleaser Check
         uses: goreleaser/goreleaser-action@v5
@@ -49,23 +53,31 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   
-  # Test on multiple OS and Go versions
+  # Simplified matrix test - only test current and previous Go version on Linux
   test-matrix:
     name: Test Go ${{ matrix.go-version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        go-version: ['1.20', '1.21', '1.22', '1.24']
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        go-version: ['1.23', '1.24']  # Only test current and previous
+        os: [ubuntu-latest]  # Only Linux for speed
+        include:
+          # Test latest Go on Windows and macOS for broader compatibility
+          - go-version: '1.24'
+            os: windows-latest
+          - go-version: '1.24'
+            os: macos-latest
     steps:
       - uses: actions/checkout@v4
       - name: Setup Go ${{ matrix.go-version }}
         uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
+          cache: true
+          cache-dependency-path: go.sum
       
       - name: Build
         run: go build -v ./...
         
-      - name: Test
+      - name: Test (no race detection for speed)
         run: go test -v ./...

@@ -58,7 +58,7 @@ template: |
 
   ### Scoop (Windows)
   ```bash
-  scoop bucket add gitcury https://github.com/lakshyajain-0291/GitCury-Scoop-Bucket.git
+  scoop bucket add gitcury https://github.com/lakshyajain-0291/gitcury-Scoop-Bucket.git
   scoop install gitcury
   ```
 

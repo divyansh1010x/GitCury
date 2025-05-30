@@ -1,0 +1,58 @@
+name: Comprehensive Tests
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Run nightly at 2 AM UTC
+  workflow_dispatch:  # Allow manual trigger
+  release:
+    types: [published]
+
+jobs:
+  test-full-matrix:
+    name: Test Go ${{ matrix.go-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        go-version: ['1.20', '1.21', '1.22', '1.23', '1.24']
+        os: [ubuntu-latest, windows-latest, macos-latest]
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+          cache: true
+          cache-dependency-path: go.sum
+      
+      - name: Build
+        run: go build -v ./...
+        
+      - name: Test with race detection
+        run: go test -v -race ./...
+        
+      - name: Test with coverage
+        run: go test -v -coverprofile=coverage.txt -covermode=atomic ./...
+        if: matrix.os == 'ubuntu-latest' && matrix.go-version == '1.24'
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        if: matrix.os == 'ubuntu-latest' && matrix.go-version == '1.24'
+        with:
+          file: ./coverage.txt
+          fail_ci_if_error: false
+
+  performance-test:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+          cache: true
+          cache-dependency-path: go.sum
+      
+      - name: Run performance test script
+        run: ./performance-test.sh
