@@ -234,8 +234,6 @@ package cmd
 import (
 	"GitCury/config"
 	"GitCury/core"
-	"GitCury/git"
-	"GitCury/output"
 	"GitCury/utils"
 	"os"
 	"time"
@@ -440,23 +438,8 @@ Examples:
 
 				utils.Info("Committing changes in folder with custom timestamp: " + folderName)
 
-				// Use git recovery mechanism for safer operations with progress reporting
-				err := git.SafeGitOperation(folderName, "CommitWithDate", func() error {
-					// Get all files that need to be committed
-					folder := output.GetFolder(folderName)
-					if len(folder.Files) == 0 {
-						return utils.NewValidationError(
-							"No files to commit in folder",
-							nil,
-							map[string]interface{}{
-								"folder": folderName,
-							},
-						)
-					}
-
-					// Use enhanced commit with progress reporting
-					return git.ProgressCommitBatch(folder, env)
-				})
+				// Use core.CommitOneRoot with custom environment variables for timestamp
+				err := core.CommitOneRoot(folderName, env)
 
 				if err != nil {
 					return err
