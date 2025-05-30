@@ -1,9 +1,8 @@
 #!/bin/bash
 
-# Quick CI Status Check Script
-# This script checks the status of GitHub Actions workflows
-
-echo "🔍 Checking GitCury CI Status..."
+# Ultra-Fast CI Status Check Script
+echo "⚡ GitCury Ultra-Fast CI Status"
+echo "==============================="
 
 # Check if we're in a git repository
 if ! git rev-parse --git-dir > /dev/null 2>&1; then
@@ -19,30 +18,36 @@ echo "📍 Current branch: $BRANCH"
 COMMIT=$(git rev-parse --short HEAD)
 echo "📝 Latest commit: $COMMIT"
 
-# Check if we have any workflows that would run
 echo ""
-echo "🚀 Workflows that would trigger on push to $BRANCH:"
+echo "🚀 Active Workflows:"
 
 if [[ "$BRANCH" == "main" || "$BRANCH" == "master" ]]; then
-    echo "  ✅ Fast Check"
-    echo "  ✅ Code Quality"  
-    echo "  ✅ PR Workflow (if PR exists)"
+    echo "  ⚡ Essential Checks (30-60s) - Build + Vet"
+    echo "  🔧 PR Validation - GoReleaser check (if PR exists)"
 else
-    echo "  ✅ Fast Check (on PR to main/master)"
-    echo "  ✅ Code Quality (on PR to main/master)"
-    echo "  ✅ PR Workflow (on PR to main/master)"
+    echo "  ⚡ Essential Checks (30-60s) - Build + Vet (on PR)"
+    echo "  🔧 PR Validation - GoReleaser check (on PR)"
 fi
 
 echo ""
-echo "⏰ Comprehensive Tests run:"
-echo "  🌙 Nightly at 2 AM UTC"
-echo "  🔧 Manually via workflow_dispatch"
-echo "  🚀 On releases"
+echo "📅 Scheduled/Manual Workflows:"
+echo "  🧪 Comprehensive Tests - Weekly on Sunday 2 AM UTC"
+echo "  🔧 Manual trigger available via workflow_dispatch"
+echo "  🚀 Full validation on releases"
 
 echo ""
-echo "💡 To run performance test locally:"
-echo "   ./performance-test.sh"
+echo "🎯 Performance Targets:"
+echo "  • Essential checks: 30-60 seconds"
+echo "  • PR validation: 1-2 minutes"
+echo "  • Total feedback: Under 2 minutes"
 
 echo ""
-echo "🔗 Workflow URLs:"
-echo "   https://github.com/lakshyajain-0291/gitcury/actions"
+echo "💡 Quick commands:"
+echo "   ./performance-test.sh  - Test locally"
+echo "   Local build: go build ."
+echo "   Local vet: go vet ./..."
+
+echo ""
+echo "🔗 Monitor at: https://github.com/lakshyajain-0291/gitcury/actions"
+echo ""
+echo "✅ Ultra-fast CI setup active!"

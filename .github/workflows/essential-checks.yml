@@ -1,0 +1,27 @@
+name: Essential Checks
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  push:
+    branches: [ main, master ]
+
+jobs:
+  essential:
+    name: Build & Vet
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+          cache: true
+          cache-dependency-path: go.sum
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Go Vet
+        run: go vet ./...
