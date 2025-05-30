@@ -21,7 +21,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22' # Use your project's Go version
+          go-version: '1.24' # Use your project's Go version
 
       # Login to Docker Hub
       - name: Log in to Docker Hub
@@ -42,7 +42,7 @@ jobs:
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v5 # Use the latest version
         with:
-          version: latest
+          version: ~> v2
           args: release --clean # '--clean' removes the dist folder before building
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Automatically provided by GitHub
