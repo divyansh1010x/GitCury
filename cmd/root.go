@@ -109,6 +109,7 @@ func Execute() {
 	// Add common flags
 	rootCmd.PersistentFlags().BoolP("quiet", "q", false, "Minimize output, only show errors")
 	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Enable debug output")
+	rootCmd.PersistentFlags().BoolP("stats", "s", false, "Enable statistics tracking and display performance metrics")
 
 	// Add a hook to handle flags before executing the command
 	cobra.OnInitialize(func() {
@@ -129,6 +130,12 @@ func Execute() {
 		debugFlag, _ := rootCmd.Flags().GetBool("debug")
 		if debugFlag {
 			utils.SetLogLevel("debug")
+		}
+
+		// Handle stats flag
+		statsFlag, _ := rootCmd.Flags().GetBool("stats")
+		if statsFlag {
+			utils.EnableStats()
 		}
 	})
 
