@@ -1065,7 +1065,7 @@ func loadEmbeddingCache(rootFolder string) *EmbeddingCache {
 		}
 	}
 
-	data, err := os.ReadFile(cacheFile)
+	data, err := os.ReadFile(cacheFile) //nolint:gosec // Cache file path controlled by application
 	if err != nil {
 		utils.Warning(fmt.Sprintf("[GIT.CLUSTER]: Failed to read cache file: %v", err))
 		return &EmbeddingCache{

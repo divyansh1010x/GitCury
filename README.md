@@ -636,7 +636,6 @@ graph TD
 
 #### **🔍 Quality Gates**
 - **Linting**: `golangci-lint` with strict rules
-- **Security**: `gosec` vulnerability scanning
 - **Performance**: Benchmark regression testing
 - **Dependency**: `govulncheck` for known vulnerabilities
 

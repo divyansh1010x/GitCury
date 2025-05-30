@@ -37,7 +37,7 @@ func LoadOutput() {
 		outputFilePath = os.Getenv("HOME") + "/.gitcury/output.json"
 	}
 
-	file, err := os.Open(outputFilePath) //nolint:gosec // File path controlled by application
+	file, err := os.Open(outputFilePath)
 	if os.IsNotExist(err) {
 		utils.Debug("[" + config.Aliases.Output + "]: No existing output file found. Initializing fresh output.")
 		return
