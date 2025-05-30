@@ -1,9 +1,9 @@
 package end_to_end
 
 import (
-	"GitCury/config"
-	"GitCury/core"
-	"GitCury/tests/testutils"
+	"github.com/lakshyajain-0291/GitCury/config"
+	"github.com/lakshyajain-0291/GitCury/core"
+	"github.com/lakshyajain-0291/GitCury/tests/testutils"
 	"testing"
 )
 

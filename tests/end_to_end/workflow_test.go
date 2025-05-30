@@ -1,10 +1,10 @@
 package end_to_end
 
 import (
-	"GitCury/config"
-	"GitCury/core"
-	"GitCury/output"
-	"GitCury/tests/testutils"
+	"github.com/lakshyajain-0291/GitCury/config"
+	"github.com/lakshyajain-0291/GitCury/core"
+	"github.com/lakshyajain-0291/GitCury/output"
+	"github.com/lakshyajain-0291/GitCury/tests/testutils"
 	"os"
 	"path/filepath"
 	"testing"
