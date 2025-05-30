@@ -117,6 +117,7 @@ func ReampAlias(root *cobra.Command) {
 }
 
 func init() {
+	utils.AddStatsPostRunToCommand(aliasCmd)
 	rootCmd.AddCommand(aliasCmd)
 	aliasCmd.Flags().StringSliceP("add", "a", []string{}, "Add a new alias for a command")
 	aliasCmd.Flags().StringP("remove", "r", "", "Remove an existing alias")

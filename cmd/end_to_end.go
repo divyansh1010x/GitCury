@@ -200,6 +200,11 @@ Examples:
 	gitcury boom --root /path/to/folder
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		// Start tracking this command if stats are enabled
+		if utils.IsStatsEnabled() {
+			utils.StartOperation("Command:" + cmd.Name())
+		}
+
 		if !cascadeAll && cascadeRoot == "" {
 			utils.Error("Specify either --all or --root flag.")
 			return
@@ -287,6 +292,9 @@ func init() {
 	boomCmd.Flags().BoolVarP(&cascadeAll, "all", "a", false, "Execute boom across all root folders")
 	boomCmd.Flags().StringVarP(&cascadeRoot, "root", "r", "", "Target a specific root folder for boom execution")
 	boomCmd.Flags().IntVarP(&cascadeNumFiles, "num", "n", 0, "Maximum number of files to process per folder")
+
+	// Add stats tracking to the boom command
+	utils.AddStatsPostRunToCommand(boomCmd)
 
 	rootCmd.AddCommand(boomCmd)
 }

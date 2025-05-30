@@ -179,5 +179,8 @@ func init() {
 	outputCmd.Flags().BoolVarP(&deleteFlag, "delete", "x", false, "Delete all messages")
 	outputCmd.Flags().BoolVarP(&logFlag, "log", "l", false, "View all messages")
 	outputCmd.Flags().BoolVarP(&editFlag, "edit", "e", false, "Edit the output file")
+
+	utils.AddStatsPostRunToCommand(outputCmd)
+
 	rootCmd.AddCommand(outputCmd)
 }
