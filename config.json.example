@@ -1,0 +1,71 @@
+{
+  "GEMINI_API_KEY": "test-api-key",
+  "aliases": {
+    "boom": "cascade",
+    "commit": "seal",
+    "config": "nexus",
+    "getmsgs": "genesis",
+    "output": "trace",
+    "push": "deploy",
+    "setup": "bootstrap"
+  },
+  "app_name": "GitCury",
+  "clustering": {
+    "confidenceThresholds": {
+      "cached": 0.6,
+      "directory": 0.8,
+      "pattern": 0.7,
+      "semantic": 0.5
+    },
+    "defaultMethod": "directory",
+    "enableFallbackMethods": true,
+    "maxFilesForSemanticClustering": 10,
+    "methods": {
+      "cached": {
+        "enabled": true,
+        "maxCacheAge": 24,
+        "minCacheHitRatio": 0.4,
+        "weight": 0.6
+      },
+      "directory": {
+        "enabled": true,
+        "weight": 1
+      },
+      "pattern": {
+        "enabled": true,
+        "weight": 0.8
+      },
+      "semantic": {
+        "embeddingTimeout": 30,
+        "enabled": true,
+        "maxConcurrentEmbeddings": 1,
+        "rateLimitDelay": 2000,
+        "weight": 0.4
+      }
+    },
+    "performance": {
+      "adaptiveOptimization": true,
+      "enableBenchmarking": false,
+      "maxProcessingTime": 60,
+      "preferSpeed": true
+    },
+    "similarityThresholds": {
+      "cached": 0.5,
+      "directory": 0.7,
+      "pattern": 0.6,
+      "semantic": 0.4
+    }
+  },
+  "config_dir": "/home/lakshya-jain/.gitcury",
+  "editor": "nano",
+  "logLevel": "info",
+  "maxConcurrent": 5,
+  "numFilesToCommit": 5,
+  "output_file_path": "/home/lakshya-jain/.gitcury/output.json",
+  "retries": 3,
+  "root_folders": [
+    "."
+  ],
+  "timeout": 30,
+  "version": "1.0.0"
+}
