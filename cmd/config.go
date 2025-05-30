@@ -367,19 +367,9 @@ Examples:
 	gitcury config set --key root_folders --value /path/to/folder1,/path/to/folder2
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		// Track config operation
-		if utils.IsStatsEnabled() {
-			utils.StartOperation("ConfigView")
-		}
-
 		if deleteConfig {
-			utils.Info("Resetting all configuration to defaults...")
 			config.Delete()
 			utils.Success("Configuration reset successfully.")
-
-			if utils.IsStatsEnabled() {
-				utils.CompleteOperation("ConfigView")
-			}
 			return
 		}
 
@@ -404,7 +394,7 @@ Examples:
 				config.Set(key, value)
 			}
 
-			utils.Info("📝 Created basic configuration with default values")
+			utils.Success("📝 Created basic configuration with default values")
 		}
 
 		// Check if API key is missing and provide helpful guidance
@@ -429,10 +419,6 @@ Examples:
 			utils.Info("════════════════════════════════════════")
 		}
 
-		if utils.IsStatsEnabled() {
-			utils.CompleteOperation("ConfigView")
-		}
-
 		// Display config in a user-friendly format
 		b, _ := json.MarshalIndent(conf, "", "  ")
 		utils.Print(string(b))
@@ -452,7 +438,7 @@ Examples:
 			utils.Info("   export GEMINI_API_KEY=your_key_here")
 			utils.Info("")
 		} else {
-			utils.Info("✅ Configuration looks good! You're ready to use GitCury.")
+			utils.Success("✅ Configuration looks good! You're ready to use GitCury.")
 			utils.Info("")
 			utils.Info("💡 Try these commands:")
 			utils.Info("   gitcury getmsgs    # Generate AI commit messages")
@@ -512,9 +498,7 @@ Examples:
 
 		// Provide extra guidance for API key
 		if configSetKey == "GEMINI_API_KEY" {
-			utils.Info("")
-			utils.Info("🎉 API key configured! You can now use GitCury's AI features.")
-			utils.Info("💡 Try: gitcury commit --help")
+			utils.Success("🎉 API key configured! You can now use GitCury's AI features.")
 		}
 	},
 }
@@ -534,7 +518,6 @@ Examples:
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if configRemoveKey != "" {
-			utils.Info("Removing configuration key: " + configRemoveKey)
 			config.Remove(configRemoveKey)
 			utils.Success("✅ Configuration key removed: " + configRemoveKey)
 		} else if configRemoveRoot != "" {
@@ -563,9 +546,6 @@ Examples:
 			utils.Success("✅ Root folder removed: " + configRemoveRoot)
 		} else {
 			utils.Error("Specify either --key or --root for remove operation.")
-			utils.Info("Examples:")
-			utils.Info("  gitcury config remove --key SOME_KEY")
-			utils.Info("  gitcury config remove --root /path/to/folder")
 		}
 	},
 }
@@ -700,9 +680,7 @@ Examples:
 
 		// Provide context-specific guidance
 		if strings.Contains(clusteringSetKey, "enabled") {
-			utils.Info("💡 Tip: Restart any running clustering operations to apply changes")
-		} else if strings.Contains(clusteringSetKey, "threshold") {
-			utils.Info("💡 Lower thresholds = more groups, higher thresholds = fewer groups")
+			utils.Info("💡 Restart any running clustering operations to apply changes")
 		}
 	},
 }
