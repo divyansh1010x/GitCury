@@ -589,10 +589,27 @@ GitCury intelligently identifies relationships between test files and their corr
 ```
 
 ### 🎨 **Architecture Highlights**
+```mermaid
+graph TD
+    A[GitCury CLI]
+    A --> B[Clustering Engine]
+    B --> E[Semantic AI]
+    B --> F[Pattern Analysis]
+    B --> G[Directory Grouping]
+    B --> H[Smart Sampling]
+    B --> I[Cached Results]
+    
+    A --> C[AI Integration]
+    C --> J[Gemini API]
+    C --> K[Embeddings]
+    C --> L[Context Analysis]
+    
+    A --> D[Git Operations]
+    D --> M[Commit Management]
+    D --> N[Progress Tracking]
+    D --> O[Error Recovery]
 
-<div align="center">
-  <img src="assets/uml.png" alt="GitCury Architecture Diagram" width="700">
-</div>
+```
 
 ## 🏗️ CI/CD & Deployment Architecture
 
