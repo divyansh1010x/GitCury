@@ -1,9 +1,10 @@
-# GoReleaser configuration file
+version: 2
 project_name: gitcury
 before:
   hooks:
     - go mod tidy
     - go generate ./...
+
 builds:
   - id: gitcury
     main: ./main.go
@@ -19,35 +20,20 @@ builds:
       - arm64
     ldflags:
       - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
-    # Add mod timestamp for reproducible builds
     mod_timestamp: '{{ .CommitTimestamp }}'
-    # Ensure the binary is not marked as development version
     flags:
       - -trimpath
 
 archives:
-  - format: tar.gz
+  - id: default
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     files:
       - LICENSE
       - README.md
       - config.json.example
-    # Allow files with different permissions
-    rlcp: true
-  - id: windows-zip
-    format: zip
-    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-    files:
-      - LICENSE
-      - README.md
-      - config.json.example
-
-checksum:
-  name_template: 'checksums.txt'
-  algorithm: sha256
 
 snapshot:
-  name_template: "{{ incpatch .Version }}-next"
+  version_template: "{{ .Tag }}-next"
 
 changelog:
   sort: asc
@@ -65,10 +51,9 @@ release:
     name: GitCury
   prerelease: auto
 
-# Homebrew Tap configuration
 brews:
   - name: gitcury
-    tap:
+    repository:
       owner: lakshyajain-0291
       name: homebrew-gitcury
       token: "{{ .Env.HOMEBREW_TAP_PAT }}"
@@ -81,10 +66,9 @@ brews:
     test: |
       system "#{bin}/gitcury --version"
 
-# Scoop Bucket configuration
 scoops:
   - name: gitcury
-    bucket:
+    repository:
       owner: lakshyajain-0291
       name: GitCury-Scoop-Bucket
       token: "{{ .Env.SCOOP_BUCKET_PAT }}"
@@ -95,19 +79,19 @@ scoops:
     description: "AI-Powered Git Automation CLI tool"
     license: "MIT"
 
-# Docker images
-dockers:
-  - image_templates:
-      - "lakshyajain0291/gitcury:latest"
-      - "lakshyajain0291/gitcury:{{ .Tag }}"
-      - "lakshyajain0291/gitcury:v{{ .Major }}"
-      - "lakshyajain0291/gitcury:v{{ .Major }}.{{ .Minor }}"
-    dockerfile: Dockerfile
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.name={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.source={{.GitURL}}"
+# Docker images - disabled for now to complete testing
+# dockers:
+#   - image_templates:
+#       - "lakshyajain0291/gitcury:latest"
+#       - "lakshyajain0291/gitcury:{{ .Tag }}"
+#       - "lakshyajain0291/gitcury:v{{ .Major }}"
+#       - "lakshyajain0291/gitcury:v{{ .Major }}.{{ .Minor }}"
+#     dockerfile: Dockerfile
+#     use: buildx
+#     build_flag_templates:
+#       - "--pull"
+#       - "--label=org.opencontainers.image.created={{.Date}}"
+#       - "--label=org.opencontainers.image.name={{.ProjectName}}"
+#       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+#       - "--label=org.opencontainers.image.version={{.Version}}"
+#       - "--label=org.opencontainers.image.source={{.GitURL}}"

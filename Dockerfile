@@ -1,5 +1,5 @@
 # Stage 1: Build the Go application
-FROM golang:1.22-alpine AS builder
+FROM golang:1.24-alpine AS builder
 WORKDIR /app
 
 # Copy go.mod and go.sum first to leverage Docker cache
@@ -34,22 +34,22 @@ WORKDIR /app/
 COPY --from=builder /app/gitcury .
 COPY --from=builder /app/config.json.example /app/config.json.example
 
+# Make the binary executable before switching users
+RUN chmod +x ./gitcury
+
 # Create a non-root user for security
 RUN addgroup -S gitcurygroup && adduser -S gitcuryuser -G gitcurygroup
-USER gitcuryuser
 
 # Set home directory for the user (GitCury might store config in $HOME/.gitcury)
 ENV HOME=/home/gitcuryuser
-RUN mkdir -p $HOME/.gitcury && chown -R gitcuryuser:gitcurygroup $HOME
+RUN mkdir -p $HOME/.gitcury
 
-# Copy default config to the user's config directory
+# Copy default config to the user's config directory and set proper ownership
 COPY --from=builder /app/config.json.example $HOME/.gitcury/config.json.example
-
-# Make the binary executable
-RUN chmod +x ./gitcury
+RUN chown -R gitcuryuser:gitcurygroup $HOME && chown gitcuryuser:gitcurygroup /app/gitcury
 
 # Create a wrapper script to handle API key from environment
-RUN echo '#!/bin/bash\n\
+RUN printf '#!/bin/bash\n\
 # Copy example config if no config exists\n\
 if [ ! -f $HOME/.gitcury/config.json ]; then\n\
   cp $HOME/.gitcury/config.json.example $HOME/.gitcury/config.json\n\
@@ -59,7 +59,10 @@ if [ ! -f $HOME/.gitcury/config.json ]; then\n\
   fi\n\
 fi\n\
 # Run the application\n\
-/app/gitcury "$@"' > /app/entrypoint.sh && chmod +x /app/entrypoint.sh
+/app/gitcury "$@"\n' > /app/entrypoint.sh && chmod +x /app/entrypoint.sh
+
+# Switch to non-root user
+USER gitcuryuser
 
 ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["--help"]
