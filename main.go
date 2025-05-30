@@ -43,13 +43,13 @@ var (
 func main() {
 	// Set version information for use in commands
 	cmd.SetVersionInfo(version, commit, date)
-	
+
 	// Direct version flag check for simple usage
 	if len(os.Args) > 1 && (os.Args[1] == "--version" || os.Args[1] == "-v") {
 		fmt.Printf("GitCury %s (commit %s, built on %s)\n", version, commit, date)
 		os.Exit(0)
 	}
-	
+
 	utils.Debug(fmt.Sprintf("Starting GitCury %s", version))
 	cmd.Execute()
 }
