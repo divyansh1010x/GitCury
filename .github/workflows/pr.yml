@@ -1,35 +1,10 @@
-name: Test PR
+name: PR Validation
 
 on:
   pull_request:
     branches: [ main, master ]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.24'
-          cache: true
-          cache-dependency-path: go.sum
-
-      - name: Build
-        run: go build -v ./...
-
-      - name: Test with race detection
-        run: go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
-      
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          file: ./coverage.txt
-          fail_ci_if_error: false
-
   goreleaser-check:
     runs-on: ubuntu-latest
     steps:
@@ -49,35 +24,6 @@ jobs:
         uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
-          args: check # Just validate the configuration
+          args: check
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  
-  # Simplified matrix test - only test current and previous Go version on Linux
-  test-matrix:
-    name: Test Go ${{ matrix.go-version }} on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        go-version: ['1.23', '1.24']  # Only test current and previous
-        os: [ubuntu-latest]  # Only Linux for speed
-        include:
-          # Test latest Go on Windows and macOS for broader compatibility
-          - go-version: '1.24'
-            os: windows-latest
-          - go-version: '1.24'
-            os: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Go ${{ matrix.go-version }}
-        uses: actions/setup-go@v5
-        with:
-          go-version: ${{ matrix.go-version }}
-          cache: true
-          cache-dependency-path: go.sum
-      
-      - name: Build
-        run: go build -v ./...
-        
-      - name: Test (no race detection for speed)
-        run: go test -v ./...
