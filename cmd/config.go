@@ -784,5 +784,6 @@ func init() {
 	configCmd.AddCommand(setCmd)
 	configCmd.AddCommand(clusteringCmd)
 
+	utils.AddStatsPostRunToCommand(configCmd)
 	rootCmd.AddCommand(configCmd)
 }

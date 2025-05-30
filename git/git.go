@@ -17,21 +17,8 @@ import (
 )
 
 type FileEmbedding struct {
-	Pa	// Handle binary files first
-	if len(binaryFiles) > 0 {
-		// Stop the loader to prevent interference with user prompt
-		utils.StopCreativeLoader()
-		
-		utils.Info(fmt.Sprintf("🔍 Detected %d binary file(s):", len(binaryFiles)))
-		for _, file := range binaryFiles {
-			fileType := utils.GetBinaryFileType(file)
-			utils.Info(fmt.Sprintf("  • %s (%s)", filepath.Base(file), fileType))
-		}
-		fmt.Println()
-		
-		// Create detailed prompt showing binary files
-		promptMessage := fmt.Sprintf("Generate automated commit messages for these %d binary file(s)?", len(binaryFiles))
-		generateBinaryMessages := utils.ConfirmAction(promptMessage, true)Diff      string
+	Path      string
+	Diff      string
 	Embedding []float32
 }
 
@@ -440,9 +427,10 @@ func BatchProcessWithEmbeddings(allChangedFiles []string, rootFolder string, num
 		}
 		fmt.Println()
 		
-		// Create detailed prompt showing binary files
-		promptMessage := fmt.Sprintf("Generate automated commit messages for these %d binary file(s)?", len(binaryFiles))
-		generateBinaryMessages := utils.ConfirmAction(promptMessage, true)
+		generateBinaryMessages := utils.ConfirmAction(
+			"Would you like to generate automated commit messages for the binary files?", 
+			true,
+		)
 		
 		// Restart the creative loader after user input
 		utils.StartCreativeLoader("Processing files with clustering", utils.BrailleAnimation)

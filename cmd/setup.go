@@ -136,5 +136,6 @@ Examples:
 }
 
 func init() {
+	utils.AddStatsPostRunToCommand(setupCmd)
 	rootCmd.AddCommand(setupCmd)
 }

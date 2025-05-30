@@ -270,6 +270,12 @@ func AddStatsPostRunToCommand(cmd *cobra.Command) {
 				MarkOperationComplete(commandName)
 			}
 
+			// If this is the getmsgs command, ensure clustering info is set
+			if cmd.Name() == "getmsgs" && clusteringInfo == nil {
+				// Set default clustering info
+				CaptureClusteringConfig()
+			}
+
 			// Print stats
 			PrintStats()
 		}
