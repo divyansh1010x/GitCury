@@ -36,6 +36,8 @@ GitCury leverages **Google Gemini AI** to understand your code changes and gener
 
 GitCury is distributed through multiple channels for maximum accessibility:
 
+> **📊 Deployment Status**: All distribution channels are automatically updated when new releases are tagged. Check the [latest release](https://github.com/lakshyajain-0291/GitCury/releases/latest) for the most current version.
+
 ### 🍺 Homebrew (macOS and Linux) - **Recommended**
 
 ```bash
@@ -49,7 +51,7 @@ gitcury --version
 
 ### 🪣 Scoop (Windows) - **Recommended**
 
-```bash
+```powershell
 # Add the GitCury bucket
 scoop bucket add gitcury https://github.com/lakshyajain-0291/GitCury-Scoop-Bucket.git
 scoop install gitcury
@@ -728,15 +730,135 @@ git push origin v1.2.3
 # GitHub Actions will handle the rest!
 ```
 
+## 🚀 **First-Time Deployment Guide**
+
+Since you've already run `setup-distribution.sh` and pushed everything to GitHub, here's your step-by-step deployment process:
+
+### **Step 1: ⚙️ GitHub Secrets Setup (CRITICAL)**
+
+**Required GitHub Repository Secrets:**
+```bash
+# Go to: https://github.com/lakshyajain-0291/GitCury/settings/secrets/actions
+# Add these secrets:
+
+HOMEBREW_TAP_PAT=<your-github-personal-access-token>
+SCOOP_BUCKET_PAT=<your-github-personal-access-token>  
+DOCKERHUB_USERNAME=<your-dockerhub-username>
+DOCKERHUB_TOKEN=<your-dockerhub-access-token>
+```
+
+**Create Personal Access Token:**
+- GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
+- Generate token with scopes: `repo`, `write:packages`
+- Use same token for both `HOMEBREW_TAP_PAT` and `SCOOP_BUCKET_PAT`
+
+### **Step 2: 🚀 Create Your First Release**
+
+```bash
+# 1. Ensure you're on main branch with latest changes
+git checkout main && git pull
+
+# 2. Create your first release tag
+git tag v1.0.0 -m "Initial release v1.0.0"
+
+# 3. Push the tag to trigger automated deployment
+git push origin v1.0.0
+
+# 4. Monitor the deployment
+# Check: https://github.com/lakshyajain-0291/GitCury/actions
+```
+
+### **Step 3: ✅ Verify Deployment Success**
+
+After the GitHub Actions workflows complete (5-10 minutes):
+
+```bash
+# Check GitHub Release was created
+# Visit: https://github.com/lakshyajain-0291/GitCury/releases
+
+# Verify Docker image
+docker pull lakshyajain0291/gitcury:v1.0.0
+
+# Verify Homebrew (after ~30 minutes)
+brew tap lakshyajain-0291/gitcury && brew install gitcury
+
+# Verify Scoop (Windows)
+scoop bucket add gitcury https://github.com/lakshyajain-0291/GitCury-Scoop-Bucket.git
+scoop install gitcury
+```
+
+### **Step 4: 📊 Deployment Status Dashboard**
+
+Monitor your deployment across all channels:
+
+| Channel | Status Check | Expected Time | Verification Command |
+|---------|-------------|---------------|---------------------|
+| **🚀 GitHub Release** | ✅ Immediate | ~2-3 min | Visit [releases page](https://github.com/lakshyajain-0291/GitCury/releases) |
+| **🐳 Docker Hub** | ✅ Fast | ~3-5 min | `docker pull lakshyajain0291/gitcury:latest` |
+| **🍺 Homebrew** | ⏳ Automatic | ~15-30 min | `brew install lakshyajain-0291/gitcury/gitcury` |
+| **📦 Scoop** | ⏳ Automatic | ~10-20 min | `scoop install gitcury` |
+| **📋 Go Modules** | ✅ Immediate | ~1-2 min | `go install github.com/lakshyajain-0291/gitcury@latest` |
+
+**Monitoring Commands:**
+```bash
+# Check GitHub Actions status
+# Visit: https://github.com/lakshyajain-0291/GitCury/actions
+
+# Monitor Docker Hub
+curl -s "https://hub.docker.com/v2/repositories/lakshyajain0291/gitcury/tags/" | jq '.results[0].name'
+
+# Check Homebrew formula
+curl -s "https://raw.githubusercontent.com/lakshyajain-0291/homebrew-gitcury/main/Formula/gitcury.rb" | grep version
+
+# Verify Go module availability  
+go list -m -versions github.com/lakshyajain-0291/gitcury
+```
+
+## 🔄 **Subsequent Deployment Strategy**
+
+For all future releases, GitCury uses **automated semantic versioning**:
+
+### **🤖 Automatic Releases (Recommended)**
+
+Simply merge PRs to main with conventional commit messages:
+
+```bash
+# These commit types trigger version bumps:
+feat: new feature          → Minor version bump (v1.1.0)
+fix: bug fix               → Patch version bump (v1.0.1)  
+feat!: breaking change    → Major version bump (v2.0.0)
+docs: documentation       → No version bump
+```
+
+**Workflow:**
+1. Create feature branch: `git checkout -b feature/my-feature`
+2. Make changes and commit: `git commit -m "feat: add amazing feature"`
+3. Push and create PR: `git push origin feature/my-feature`
+4. Merge PR → Automatic tag creation → Automatic release
+
+### **🎯 Manual Release (When Needed)**
+
+For immediate releases or specific versioning:
+
+```bash
+# 1. Ensure main is ready
+git checkout main && git pull
+
+# 2. Create specific version tag  
+git tag v1.2.3 -m "Release v1.2.3: Brief description"
+
+# 3. Trigger deployment
+git push origin v1.2.3
+
 
 ## 🌟 Future Roadmap
 
 ### 🚧 **Coming Soon**
-- **🐳 Docker Support**: Containerized deployment options
-- **📊 Web Dashboard**: Real-time analytics and monitoring
-- **🔗 CI/CD Integration**: Native pipeline integrations
+- **📊 Web Dashboard**: Real-time analytics and monitoring  
+- **🔗 CI/CD Integration**: Native pipeline integrations for popular CI/CD platforms
 - **🎯 Multi-Language Support**: Beyond Go repositories
 - **🧠 Advanced ML Models**: Even smarter clustering algorithms
+- **🌐 Plugin System**: Extensible architecture for custom integrations
 
 ### 🎯 **Long-term Vision**
 - **🤖 Full AI Automation**: Complete workflow automation
@@ -827,7 +949,7 @@ git push origin v1.2.3
 # Verify Homebrew
 brew update && brew install lakshyajain-0291/gitcury/gitcury
 
-# Verify Scoop
+# Verify Scoop (Windows PowerShell)
 scoop update && scoop install gitcury
 
 # Verify Docker
@@ -875,7 +997,7 @@ GitCury was born from the frustration of managing complex multi-repository workf
 # Homebrew (macOS/Linux)
 brew tap lakshyajain-0291/gitcury && brew install gitcury
 
-# Scoop (Windows)  
+# Scoop (Windows PowerShell)  
 scoop bucket add gitcury https://github.com/lakshyajain-0291/GitCury-Scoop-Bucket.git && scoop install gitcury
 
 # Docker
