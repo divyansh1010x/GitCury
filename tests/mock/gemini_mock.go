@@ -1,7 +1,7 @@
 package mock
 
 import (
-	"github.com/lakshyajain-0291/GitCury/interfaces"
+	"github.com/lakshyajain-0291/gitcury/interfaces"
 	"fmt"
 	"path/filepath"
 	"strings"

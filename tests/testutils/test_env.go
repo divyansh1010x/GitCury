@@ -2,11 +2,11 @@
 package testutils
 
 import (
-	"github.com/lakshyajain-0291/GitCury/config"
-	"github.com/lakshyajain-0291/GitCury/core"
-	"github.com/lakshyajain-0291/GitCury/di"
-	"github.com/lakshyajain-0291/GitCury/output"
-	"github.com/lakshyajain-0291/GitCury/tests/mock"
+	"github.com/lakshyajain-0291/gitcury/config"
+	"github.com/lakshyajain-0291/gitcury/core"
+	"github.com/lakshyajain-0291/gitcury/di"
+	"github.com/lakshyajain-0291/gitcury/output"
+	"github.com/lakshyajain-0291/gitcury/tests/mock"
 	"os"
 	"path/filepath"
 )

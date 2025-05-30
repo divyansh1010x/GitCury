@@ -1,10 +1,10 @@
 package mock
 
 import (
-	"github.com/lakshyajain-0291/GitCury/di"
-	"github.com/lakshyajain-0291/GitCury/interfaces"
-	"github.com/lakshyajain-0291/GitCury/output"
-	"github.com/lakshyajain-0291/GitCury/utils"
+	"github.com/lakshyajain-0291/gitcury/di"
+	"github.com/lakshyajain-0291/gitcury/interfaces"
+	"github.com/lakshyajain-0291/gitcury/output"
+	"github.com/lakshyajain-0291/gitcury/utils"
 	"errors"
 	"fmt"
 	"path/filepath"

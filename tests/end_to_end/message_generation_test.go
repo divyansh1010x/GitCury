@@ -1,8 +1,8 @@
 package end_to_end
 
 import (
-	"github.com/lakshyajain-0291/GitCury/output"
-	"github.com/lakshyajain-0291/GitCury/tests/testutils"
+	"github.com/lakshyajain-0291/gitcury/output"
+	"github.com/lakshyajain-0291/gitcury/tests/testutils"
 	"testing"
 )
 
