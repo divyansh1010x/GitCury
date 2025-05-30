@@ -114,26 +114,26 @@ func Execute() {
 	// Add a hook to handle flags before executing the command
 	cobra.OnInitialize(func() {
 		// Check if version flag is set
-		versionFlag, _ := rootCmd.Flags().GetBool("version")
+		versionFlag, _ := rootCmd.PersistentFlags().GetBool("version")
 		if versionFlag {
 			fmt.Println("GitCury version 1.0.0")
 			os.Exit(0)
 		}
 
 		// Handle quiet flag
-		quietFlag, _ := rootCmd.Flags().GetBool("quiet")
+		quietFlag, _ := rootCmd.PersistentFlags().GetBool("quiet")
 		if quietFlag {
 			utils.SetLogLevel("error")
 		}
 
 		// Handle debug flag
-		debugFlag, _ := rootCmd.Flags().GetBool("debug")
+		debugFlag, _ := rootCmd.PersistentFlags().GetBool("debug")
 		if debugFlag {
 			utils.SetLogLevel("debug")
 		}
 
 		// Handle stats flag
-		statsFlag, _ := rootCmd.Flags().GetBool("stats")
+		statsFlag, _ := rootCmd.PersistentFlags().GetBool("stats")
 		if statsFlag {
 			utils.EnableStats()
 		}
