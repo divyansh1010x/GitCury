@@ -85,7 +85,7 @@ dockers:
       - "lakshyajain1503/gitcury:{{ .Tag }}"
       - "lakshyajain1503/gitcury:v{{ .Major }}"
       - "lakshyajain1503/gitcury:v{{ .Major }}.{{ .Minor }}"
-    dockerfile: Dockerfile
+    dockerfile: Dockerfile.goreleaser
     use: buildx
     build_flag_templates:
       - "--pull"
