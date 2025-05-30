@@ -2,12 +2,28 @@ package core
 
 import (
 	"GitCury/git"
+	"GitCury/interfaces"
 	"GitCury/output"
 	"GitCury/utils"
 	"fmt"
 	"strings"
 	"time"
 )
+
+// GitRunnerInstance allows dependency injection for testing
+var GitRunnerInstance interfaces.GitRunner
+
+// init initializes the default Git runner
+func init() {
+	if GitRunnerInstance == nil {
+		GitRunnerInstance = &git.DefaultGitRunner{}
+	}
+}
+
+// SetGitRunner allows injecting a custom GitRunner (used in tests)
+func SetGitRunner(runner interfaces.GitRunner) {
+	GitRunnerInstance = runner
+}
 
 func CommitAllRoots(env ...[]string) error {
 	rootFolders := output.GetAll().Folders
@@ -35,7 +51,7 @@ func CommitAllRoots(env ...[]string) error {
 				return nil
 			}
 
-			err := git.ProgressCommitBatch(folder, env...)
+			err := GitRunnerInstance.ProgressCommitBatch(outputToInterface(folder), env...)
 			if err != nil {
 				// Extract file information if available in the error
 				fileInfo := folder.Name
@@ -112,7 +128,7 @@ func CommitOneRoot(rootFolderName string, env ...[]string) error {
 		)
 	}
 
-	err := git.ProgressCommitBatch(rootFolder, env...)
+	err := GitRunnerInstance.ProgressCommitBatch(outputToInterface(rootFolder), env...)
 	if err != nil {
 		// Extract file information if available in the error
 		fileInfo := rootFolderName
@@ -133,4 +149,19 @@ func CommitOneRoot(rootFolderName string, env ...[]string) error {
 
 	utils.Success("✅ Batch commit completed successfully for root folder: " + rootFolderName)
 	return nil
+}
+
+// Conversion functions between output and interface types
+func outputToInterface(folder output.Folder) interfaces.Folder {
+	var files []interfaces.FileEntry
+	for _, file := range folder.Files {
+		files = append(files, interfaces.FileEntry{
+			Name:    file.Name,
+			Message: file.Message,
+		})
+	}
+	return interfaces.Folder{
+		Name:  folder.Name,
+		Files: files,
+	}
 }
