@@ -156,6 +156,11 @@ Examples:
 	gitcury push --root my-folder --branch dev
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		// Start tracking this command if stats are enabled
+		if utils.IsStatsEnabled() {
+			utils.StartOperation("Command:" + cmd.Name())
+		}
+
 		if deployAll {
 			utils.Info("Pushing all changes to the remote repository...")
 
@@ -186,5 +191,9 @@ func init() {
 	pushCmd.Flags().BoolVarP(&deployAll, "all", "a", false, "Push all changes to the remote repository")
 	pushCmd.Flags().StringVarP(&targetFolder, "root", "r", "", "Push changes from the specified folder to the remote repository")
 	pushCmd.Flags().StringVarP(&targetBranch, "branch", "b", "", "Specify the branch to push to (default: current branch)")
+
+	// Add stats tracking to the push command
+	utils.AddStatsPostRunToCommand(pushCmd)
+
 	rootCmd.AddCommand(pushCmd)
 }
