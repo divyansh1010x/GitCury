@@ -1088,7 +1088,7 @@ func loadEmbeddingCache(rootFolder string) *EmbeddingCache {
 	return &cache
 }
 
-func getCachedEmbedding(filePath string, cache *EmbeddingCache) (*FileCacheEntry, bool) {
+func getCachedEmbedding(filePath string, cache *EmbeddingCache) (*FileCacheEntry, bool) { //nolint:unused // Future caching optimization
 	entry, exists := cache.Embeddings[filePath]
 	if !exists {
 		return nil, false
@@ -1103,7 +1103,7 @@ func getCachedEmbedding(filePath string, cache *EmbeddingCache) (*FileCacheEntry
 	return &entry, true
 }
 
-func saveEmbeddingToCache(filePath string, embedding []float32, content string, cache *EmbeddingCache) {
+func saveEmbeddingToCache(filePath string, embedding []float32, content string, cache *EmbeddingCache) { //nolint:unused // Future caching optimization
 	entry := FileCacheEntry{
 		FilePath:    filePath,
 		Embedding:   embedding,
@@ -1152,7 +1152,7 @@ func getOptimalDiffSize(filePath string) int {
 	}
 }
 
-func calculateAdaptiveDelay(recentMisses int) time.Duration {
+func calculateAdaptiveDelay(recentMisses int) time.Duration { //nolint:unused // Future rate limiting optimization
 	baseDelay := 1000 * time.Millisecond
 
 	// Increase delay based on cache miss rate
@@ -1412,7 +1412,7 @@ func calculateSimilarityConfidence(similarity float64) float64 {
 	return 1.0 - 4.0*similarity*(1.0-similarity)
 }
 
-func cosineSimilarity(vec1, vec2 []float32) float64 {
+func cosineSimilarity(vec1, vec2 []float32) float64 { //nolint:unused // Future similarity calculations
 	return advancedCosineSimilarity(vec1, vec2, false)
 }
 
@@ -1775,7 +1775,7 @@ func ResetBenchmarks() {
 }
 
 // saveBenchmarkResults saves benchmark results to disk
-func saveBenchmarkResults(results BenchmarkResult, filepath string) error {
+func saveBenchmarkResults(results BenchmarkResult, filepath string) error { //nolint:unused // Future benchmarking features
 	data, err := json.MarshalIndent(results, "", "  ")
 	if err != nil {
 		return err

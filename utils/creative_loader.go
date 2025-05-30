@@ -224,7 +224,7 @@ func (cl *CreativeLoader) animate() {
 			if messages, exists := creativeMessages[cl.currentPhase]; exists && len(messages) > 0 {
 				// Change message every 8 animation cycles for smoother experience
 				if messageChangeCounter%8 == 0 {
-					messageIndex = rand.Intn(len(messages))
+					messageIndex = rand.Intn(len(messages)) //nolint:gosec // Non-cryptographic use, display only
 				}
 				currentMessage = messages[messageIndex]
 			}

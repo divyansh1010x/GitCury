@@ -377,7 +377,7 @@ Examples:
 		conf := config.GetAll()
 
 		// Ensure we have at least basic config structure
-		if conf == nil || len(conf) == 0 {
+		if len(conf) == 0 {
 			conf = map[string]interface{}{
 				"app_name":         "GitCury",
 				"version":          "1.0.0",

@@ -101,7 +101,10 @@ Examples:
 		utils.Info("Setting up GitCury...")
 
 		// Generate configuration
-		config.LoadConfig()
+		if err := config.LoadConfig(); err != nil {
+			utils.Error("Failed to load configuration: " + err.Error())
+			return
+		}
 		utils.Success("Configuration generated.")
 
 		configDir := config.Get("config_dir").(string)

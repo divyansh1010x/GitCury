@@ -37,7 +37,7 @@ func LoadOutput() {
 		outputFilePath = os.Getenv("HOME") + "/.gitcury/output.json"
 	}
 
-	file, err := os.Open(outputFilePath)
+	file, err := os.Open(outputFilePath) //nolint:gosec // File path controlled by application
 	if os.IsNotExist(err) {
 		utils.Debug("[" + config.Aliases.Output + "]: No existing output file found. Initializing fresh output.")
 		return
@@ -173,7 +173,7 @@ func SaveToFile() {
 		config.Set("output_file_path", outputFilePath)
 	}
 
-	outputFile, err := os.OpenFile(outputFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	outputFile, err := os.OpenFile(outputFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		utils.Error("[" + config.Aliases.Output + "]: 🚨 Error saving output file: " + err.Error())
 		return

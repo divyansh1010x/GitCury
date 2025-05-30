@@ -81,7 +81,10 @@ func PrepareCommitMessagesOne(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(output.GetFolder(folder))
+	if err := json.NewEncoder(w).Encode(output.GetFolder(folder)); err != nil {
+		utils.Error("Error encoding folder response: " + err.Error())
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+	}
 }
 
 func CommitAllFiles(w http.ResponseWriter, r *http.Request) {
@@ -159,5 +162,7 @@ func PushOne(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Files pushed successfully"))
+	if _, err := w.Write([]byte("Files pushed successfully")); err != nil {
+		utils.Error("Error writing response: " + err.Error())
+	}
 }

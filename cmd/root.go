@@ -87,7 +87,9 @@ Simplify your Git workflow with AI:
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		// If no subcommand is specified, show help
-		cmd.Help()
+		if err := cmd.Help(); err != nil {
+			utils.Error("Failed to show help: " + err.Error())
+		}
 	},
 }
 

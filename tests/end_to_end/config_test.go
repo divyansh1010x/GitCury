@@ -78,7 +78,9 @@ func TestConfigOperations(t *testing.T) {
 
 	// Test config file operations
 	configDir := filepath.Join(env.TempDir, ".gitcury")
-	os.MkdirAll(configDir, 0755)
+	if err := os.MkdirAll(configDir, 0755); err != nil {
+		t.Fatalf("Failed to create config directory: %v", err)
+	}
 	configFile := filepath.Join(configDir, "config.json")
 
 	// Set environment variable to use our custom config path

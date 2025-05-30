@@ -77,10 +77,12 @@ Examples:
 			Aliases[args[0]] = args[1]
 			config.Set("aliases", Aliases)
 			utils.Success("Alias added successfully.")
-		} else if cmd.Flag("remove").Changed {
+		} else		if cmd.Flag("remove").Changed {
 			if len(args) != 1 {
 				utils.Error("Invalid arguments. Usage: --remove <alias>")
-				cmd.Help()
+				if err := cmd.Help(); err != nil {
+					utils.Error("Failed to show help: " + err.Error())
+				}
 				return
 			}
 			utils.Info("Removing alias '" + args[0] + "'.")
@@ -95,7 +97,9 @@ Examples:
 			utils.Success("Alias listing completed.")
 		} else {
 			utils.Error("No valid flag provided. Use --add, --remove, or --list.")
-			cmd.Help()
+			if err := cmd.Help(); err != nil {
+				utils.Error("Failed to show help: " + err.Error())
+			}
 		}
 	},
 }

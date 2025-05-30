@@ -44,28 +44,6 @@ func SetTimeoutVar(retries, delay int) {
 	Debug(fmt.Sprintf("[GEMINI]: Updated retry settings: maxRetries=%d, retryDelay=%d", maxRetries, retryDelay))
 }
 
-func printResponse(resp *genai.GenerateContentResponse) {
-	if resp == nil {
-		Debug("[GEMINI]: Response is nil")
-		return
-	}
-	for i, candidate := range resp.Candidates {
-		if candidate == nil {
-			Debug(fmt.Sprintf("[GEMINI]: Candidate %d is nil", i+1))
-			continue
-		}
-		if candidate.Content == nil {
-			Debug(fmt.Sprintf("[GEMINI]: Candidate %d content is nil", i+1))
-			continue
-		}
-		if len(candidate.Content.Parts) == 0 {
-			Debug(fmt.Sprintf("[GEMINI]: Candidate %d has no content parts", i+1))
-			continue
-		}
-		Debug(fmt.Sprintf("[GEMINI]: Candidate %d: %s", i+1, candidate.Content.Parts[0]))
-	}
-}
-
 func SendToGemini(contextData map[string]map[string]string, apiKey string, customInstructions ...string) (string, error) {
 	// Validate API key with helpful guidance
 	if apiKey == "" {

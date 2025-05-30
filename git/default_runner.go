@@ -14,7 +14,7 @@ var _ interfaces.GitRunner = (*DefaultGitRunner)(nil)
 
 // RunGitCmd executes a Git command in the specified directory
 func (d *DefaultGitRunner) RunGitCmd(dir string, envVars map[string]string, args ...string) (string, error) {
-	return d.RunGitCmd(dir, envVars, args...)
+	return RunGitCmd(dir, envVars, args...)
 }
 
 // RunGitCmdWithTimeout executes a Git command with a timeout

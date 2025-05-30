@@ -189,7 +189,7 @@ func KMeans(data [][]float32, k int, maxIter int) ([]int, error) {
 	labels := make([]int, n)
 	centroids := make([][]float32, k)
 
-	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+	rng := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec // Non-cryptographic use, data shuffling
 	perm := rng.Perm(n)
 	for i := 0; i < k; i++ {
 		centroids[i] = make([]float32, dim)
@@ -291,7 +291,7 @@ func kMeansPlusPlus(data [][]float32, k int) [][]float32 {
 	n := len(data)
 	dim := len(data[0])
 	centroids := make([][]float32, k)
-	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+	rng := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec // Non-cryptographic use, clustering initialization
 
 	// Choose first centroid randomly
 	centroids[0] = make([]float32, dim)
@@ -412,7 +412,7 @@ func KMeansOptimized(data [][]float32, k int, maxIter int) ([]int, error) {
 		}
 
 		// Handle empty clusters and normalize
-		rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+		rng := rand.New(rand.NewSource(time.Now().UnixNano())) //nolint:gosec // Non-cryptographic use, clustering initialization
 		for i := 0; i < k; i++ {
 			if counts[i] == 0 {
 				newCentroids[i] = make([]float32, dim)

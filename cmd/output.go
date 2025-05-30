@@ -145,7 +145,7 @@ Examples:
 				return
 			}
 
-			cmd := exec.Command(editor, outputFile)
+			cmd := exec.Command(editor, outputFile) //nolint:gosec // User-controlled editor path is intentional
 			cmd.Stdin = os.Stdin
 			cmd.Stdout = os.Stdout
 			cmd.Stderr = os.Stderr
@@ -157,7 +157,9 @@ Examples:
 
 			utils.Success("✅ File edited successfully.")
 		} else {
-			cmd.Help()
+			if err := cmd.Help(); err != nil {
+				utils.Error("Failed to show help: " + err.Error())
+			}
 		}
 	},
 }

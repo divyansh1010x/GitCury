@@ -21,7 +21,7 @@ type ResourceManager struct {
 	// Metrics
 	memStats         runtime.MemStats
 	lastMemoryUsage  uint64
-	lastCPUUsage     float64
+	lastCPUUsage     float64 //nolint:unused // Will be used in future CPU monitoring
 	lastChecked      time.Time
 	resourceWarnings int
 }

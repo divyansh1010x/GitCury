@@ -15,7 +15,7 @@ var (
 	commandStartTime  time.Time
 	operationProgress = make(map[string]ProgressInfo)
 	totalOperations   int
-	completedOps      int
+	completedOps      int //nolint:unused // Will be used in future stats improvements
 	clusteringInfo    *ClusteringMethodInfo // New field for clustering info
 )
 

@@ -359,7 +359,7 @@ func LoadConfigForConfigCommands() error {
 
 	// Ensure config directory exists
 	configDir := filepath.Dir(configFilePath)
-	if err := os.MkdirAll(configDir, 0755); err != nil {
+	if err := os.MkdirAll(configDir, 0750); err != nil {
 		utils.Debug("[Config]: Error creating config directory: " + err.Error())
 		// Continue with in-memory config
 	}
@@ -747,11 +747,11 @@ func validateConfig() error {
 func saveConfigToFile(configFilePath string) error {
 	// Ensure the directory exists
 	dir := filepath.Dir(configFilePath)
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0750); err != nil {
 		return err
 	}
 
-	file, err := os.OpenFile(configFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	file, err := os.OpenFile(configFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return err
 	}
@@ -771,12 +771,12 @@ func Set(key string, value any) {
 	configFilePath := os.Getenv("HOME") + "/.gitcury/config.json"
 
 	dir := os.Getenv("HOME") + "/.gitcury"
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0750); err != nil {
 		utils.Error("[" + Aliases.Config + "]: ⚠️ Error creating config directory: " + err.Error())
 		return
 	}
 
-	file, err := os.OpenFile(configFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	file, err := os.OpenFile(configFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		utils.Error("[" + Aliases.Config + "]: ⚠️ Error saving configuration: " + err.Error())
 		return
@@ -814,7 +814,7 @@ func Remove(key string) {
 	// Save synchronously to ensure the change is persisted immediately
 	configFilePath := os.Getenv("HOME") + "/.gitcury/config.json"
 
-	file, err := os.OpenFile(configFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	file, err := os.OpenFile(configFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		utils.Error("[" + Aliases.Config + "]: ⚠️ Error saving configuration after removal: " + err.Error())
 		return
