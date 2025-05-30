@@ -1,4 +1,4 @@
-module github.com/lakshyajain-0291/GitCury
+module github.com/lakshyajain-0291/gitcury
 
 go 1.24.1
 

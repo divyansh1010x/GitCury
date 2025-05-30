@@ -1,8 +1,8 @@
 package git
 
 import (
-	"github.com/lakshyajain-0291/GitCury/interfaces"
-	"github.com/lakshyajain-0291/GitCury/output"
+	"github.com/lakshyajain-0291/gitcury/interfaces"
+	"github.com/lakshyajain-0291/gitcury/output"
 	"time"
 )
 

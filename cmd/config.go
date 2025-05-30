@@ -1,8 +1,8 @@
 // package cmd
 
 // import (
-// 	"github.com/lakshyajain-0291/GitCury/config"
-// 	"github.com/lakshyajain-0291/GitCury/utils"
+// 	"github.com/lakshyajain-0291/gitcury/config"
+// 	"github.com/lakshyajain-0291/gitcury/utils"
 // 	"encoding/json"
 // 	"strings"
 
@@ -163,8 +163,8 @@
 // package cmd
 
 // import (
-// 	"github.com/lakshyajain-0291/GitCury/config"
-// 	"github.com/lakshyajain-0291/GitCury/utils"
+// 	"github.com/lakshyajain-0291/gitcury/config"
+// 	"github.com/lakshyajain-0291/gitcury/utils"
 // 	"encoding/json"
 // 	"strings"
 
@@ -319,8 +319,8 @@
 package cmd
 
 import (
-	"github.com/lakshyajain-0291/GitCury/config"
-	"github.com/lakshyajain-0291/GitCury/utils"
+	"github.com/lakshyajain-0291/gitcury/config"
+	"github.com/lakshyajain-0291/gitcury/utils"
 	"encoding/json"
 	"fmt"
 	"os"

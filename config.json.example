@@ -1,5 +1,4 @@
 {
-  "GEMINI_API_KEY": "test-api-key",
   "aliases": {
     "boom": "cascade",
     "commit": "seal",

@@ -48,7 +48,7 @@ changelog:
 release:
   github:
     owner: lakshyajain-0291
-    name: GitCury
+    name: gitcury
   prerelease: auto
 
 brews:
@@ -60,7 +60,7 @@ brews:
     commit_author:
       name: goreleaserbot
       email: bot@goreleaser.com
-    homepage: "https://github.com/lakshyajain-0291/GitCury"
+    homepage: "https://github.com/lakshyajain-0291/gitcury"
     description: "AI-Powered Git Automation CLI tool"
     license: "MIT"
     test: |
@@ -70,12 +70,12 @@ scoops:
   - name: gitcury
     repository:
       owner: lakshyajain-0291
-      name: GitCury-Scoop-Bucket
+      name: gitcury-scoop-bucket
       token: "{{ .Env.SCOOP_BUCKET_PAT }}"
     commit_author:
       name: goreleaserbot
       email: bot@goreleaser.com
-    homepage: "https://github.com/lakshyajain-0291/GitCury"
+    homepage: "https://github.com/lakshyajain-0291/gitcury"
     description: "AI-Powered Git Automation CLI tool"
     license: "MIT"
 

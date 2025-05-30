@@ -1,7 +1,7 @@
 // package cmd
 
 // import (
-// 	"github.com/lakshyajain-0291/GitCury/utils"
+// 	"github.com/lakshyajain-0291/gitcury/utils"
 // 	"os"
 
 // 	"github.com/spf13/cobra"
@@ -40,8 +40,8 @@
 package cmd
 
 import (
-	"github.com/lakshyajain-0291/GitCury/config"
-	"github.com/lakshyajain-0291/GitCury/utils"
+	"github.com/lakshyajain-0291/gitcury/config"
+	"github.com/lakshyajain-0291/gitcury/utils"
 	"fmt"
 	"os"
 
@@ -174,7 +174,7 @@ func Execute() {
 {{.InheritedFlags.FlagUsages | trimTrailingWhitespaces}}{{end}}
 
 Use "{{.CommandPath}} [command] --help" for more information about a command.
-For complete documentation, visit: https://github.com/lakshyajain-0291/GitCury
+For complete documentation, visit: https://github.com/lakshyajain-0291/gitcury
 `)
 
 	// Use custom error handling with user-friendly messages

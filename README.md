@@ -9,16 +9,16 @@
 [<img src="https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg" width="60">](https://gemini.google.com/)
 
 [![Open in Visual Studio Code](https://img.shields.io/badge/Open%20in%20VS%20Code-007ACC?logo=visual-studio-code&logoColor=white)](https://vscode.dev/)
-[![Contributors](https://img.shields.io/github/contributors/lakshyajain-0291/GitCury)](https://github.com/lakshyajain-0291/GitCury/graphs/contributors)
-[![Forks](https://img.shields.io/github/forks/lakshyajain-0291/GitCury?style=social)](https://github.com/lakshyajain-0291/GitCury/network/members)
-[![Stars](https://img.shields.io/github/stars/lakshyajain-0291/GitCury?style=social)](https://github.com/lakshyajain-0291/GitCury/stargazers)
-[![Go Report Card](https://goreportcard.com/badge/github.com/lakshyajain-0291/GitCury)](https://goreportcard.com/report/github.com/lakshyajain-0291/GitCury)
+[![Contributors](https://img.shields.io/github/contributors/lakshyajain-0291/GitCury)](https://github.com/lakshyajain-0291/gitcury/graphs/contributors)
+[![Forks](https://img.shields.io/github/forks/lakshyajain-0291/GitCury?style=social)](https://github.com/lakshyajain-0291/gitcury/network/members)
+[![Stars](https://img.shields.io/github/stars/lakshyajain-0291/GitCury?style=social)](https://github.com/lakshyajain-0291/gitcury/stargazers)
+[![Go Report Card](https://goreportcard.com/badge/github.com/lakshyajain-0291/gitcury)](https://goreportcard.com/report/github.com/lakshyajain-0291/gitcury)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[![Release](https://img.shields.io/github/v/release/lakshyajain-0291/GitCury)](https://github.com/lakshyajain-0291/GitCury/releases/latest)
+[![Release](https://img.shields.io/github/v/release/lakshyajain-0291/GitCury)](https://github.com/lakshyajain-0291/gitcury/releases/latest)
 [![Docker Pulls](https://img.shields.io/docker/pulls/lakshyajain1503/gitcury)](https://hub.docker.com/r/lakshyajain1503/gitcury)
-[![CI/CD Pipeline](https://img.shields.io/github/actions/workflow/status/lakshyajain-0291/GitCury/release.yml?label=CI%2FCD)](https://github.com/lakshyajain-0291/GitCury/actions)
-[![Coverage](https://img.shields.io/badge/coverage-15.5%25-green)](https://github.com/lakshyajain-0291/GitCury/blob/main/COVERAGE_REPORT.md)
+[![CI/CD Pipeline](https://img.shields.io/github/actions/workflow/status/lakshyajain-0291/GitCury/release.yml?label=CI%2FCD)](https://github.com/lakshyajain-0291/gitcury/actions)
+[![Coverage](https://img.shields.io/badge/coverage-15.5%25-green)](https://github.com/lakshyajain-0291/gitcury/blob/main/COVERAGE_REPORT.md)
 
 </div>
 
@@ -36,7 +36,7 @@ GitCury leverages **Google Gemini AI** to understand your code changes and gener
 
 GitCury is distributed through multiple channels for maximum accessibility:
  
-> **📊 Deployment Status**: All distribution channels are automatically updated when new releases are tagged. Check the [latest release](https://github.com/lakshyajain-0291/GitCury/releases/latest) for the most current version.
+> **📊 Deployment Status**: All distribution channels are automatically updated when new releases are tagged. Check the [latest release](https://github.com/lakshyajain-0291/gitcury/releases/latest) for the most current version.
 
 ### 🍺 Homebrew (macOS and Linux) - **Recommended**
 
@@ -53,7 +53,7 @@ gitcury --version
 
 ```powershell
 # Add the GitCury bucket
-scoop bucket add gitcury https://github.com/lakshyajain-0291/GitCury-Scoop-Bucket.git
+scoop bucket add gitcury https://github.com/lakshyajain-0291/gitcury-Scoop-Bucket.git
 scoop install gitcury
 
 # Verify installation
@@ -65,7 +65,7 @@ gitcury --version
 If you have Go 1.20+ installed:
 
 ```bash
-go install github.com/lakshyajain-0291/GitCury@latest
+go install github.com/lakshyajain-0291/gitcury@latest
 
 # Ensure $GOPATH/bin is in your PATH
 export PATH=$PATH:$(go env GOPATH)/bin
@@ -95,7 +95,7 @@ docker-compose run --rm gitcury --help
 
 ### 📦 Direct Binary Download
 
-Download platform-specific binaries from [GitHub Releases](https://github.com/lakshyajain-0291/GitCury/releases):
+Download platform-specific binaries from [GitHub Releases](https://github.com/lakshyajain-0291/gitcury/releases):
 
 #### Available Platforms:
 - **Linux**: `amd64`, `arm64`
@@ -104,7 +104,7 @@ Download platform-specific binaries from [GitHub Releases](https://github.com/la
 
 ```bash
 # Example: Download and install on Linux
-wget https://github.com/lakshyajain-0291/GitCury/releases/latest/download/gitcury_linux_amd64.tar.gz
+wget https://github.com/lakshyajain-0291/gitcury/releases/latest/download/gitcury_linux_amd64.tar.gz
 tar -xzf gitcury_linux_amd64.tar.gz
 sudo mv gitcury /usr/local/bin/
 chmod +x /usr/local/bin/gitcury
@@ -116,7 +116,7 @@ For developers and contributors:
 
 ```bash
 # Clone the repository
-git clone https://github.com/lakshyajain-0291/GitCury.git
+git clone https://github.com/lakshyajain-0291/gitcury.git
 cd GitCury
 
 # Install dependencies
@@ -647,7 +647,7 @@ Deployment Channels:
 **For Contributors**:
 ```bash
 # 1. Setup development environment
-git clone https://github.com/lakshyajain-0291/GitCury.git
+git clone https://github.com/lakshyajain-0291/gitcury.git
 cd GitCury
 make setup-dev
 
@@ -689,7 +689,7 @@ Since you've already run `setup-distribution.sh` and pushed everything to GitHub
 
 **Required GitHub Repository Secrets:**
 ```bash
-# Go to: https://github.com/lakshyajain-0291/GitCury/settings/secrets/actions
+# Go to: https://github.com/lakshyajain-0291/gitcury/settings/secrets/actions
 # Add these secrets:
 
 HOMEBREW_TAP_PAT=<your-github-personal-access-token>
@@ -716,7 +716,7 @@ git tag v1.0.0 -m "Initial release v1.0.0"
 git push origin v1.0.0
 
 # 4. Monitor the deployment
-# Check: https://github.com/lakshyajain-0291/GitCury/actions
+# Check: https://github.com/lakshyajain-0291/gitcury/actions
 ```
 
 ### **Step 3: ✅ Verify Deployment Success**
@@ -725,7 +725,7 @@ After the GitHub Actions workflows complete (5-10 minutes):
 
 ```bash
 # Check GitHub Release was created
-# Visit: https://github.com/lakshyajain-0291/GitCury/releases
+# Visit: https://github.com/lakshyajain-0291/gitcury/releases
 
 # Verify Docker image (will be available after first release)
 # docker pull lakshyajain1503/gitcury:v1.0.0
@@ -734,7 +734,7 @@ After the GitHub Actions workflows complete (5-10 minutes):
 brew tap lakshyajain-0291/gitcury && brew install gitcury
 
 # Verify Scoop (Windows)
-scoop bucket add gitcury https://github.com/lakshyajain-0291/GitCury-Scoop-Bucket.git
+scoop bucket add gitcury https://github.com/lakshyajain-0291/gitcury-Scoop-Bucket.git
 scoop install gitcury
 ```
 
@@ -744,7 +744,7 @@ Monitor your deployment across all channels:
 
 | Channel | Status Check | Expected Time | Verification Command |
 |---------|-------------|---------------|---------------------|
-| **🚀 GitHub Release** | ✅ Immediate | ~2-3 min | Visit [releases page](https://github.com/lakshyajain-0291/GitCury/releases) |
+| **🚀 GitHub Release** | ✅ Immediate | ~2-3 min | Visit [releases page](https://github.com/lakshyajain-0291/gitcury/releases) |
 | **🐳 Docker Hub** | ⏳ Planned | ~3-5 min | *Will be available after first release* |
 | **🍺 Homebrew** | ⏳ Automatic | ~15-30 min | `brew install lakshyajain-0291/gitcury/gitcury` |
 | **📦 Scoop** | ⏳ Automatic | ~10-20 min | `scoop install gitcury` |
@@ -753,7 +753,7 @@ Monitor your deployment across all channels:
 **Monitoring Commands:**
 ```bash
 # Check GitHub Actions status
-# Visit: https://github.com/lakshyajain-0291/GitCury/actions
+# Visit: https://github.com/lakshyajain-0291/gitcury/actions
 
 # Monitor Docker Hub
 curl -s "https://hub.docker.com/v2/repositories/lakshyajain1503/gitcury/tags/" | jq '.results[0].name'
@@ -941,7 +941,7 @@ GitCury was born from the frustration of managing complex multi-repository workf
 
 ### 🎉 **Ready to Revolutionize Your Git Workflow?**
 
-**[⭐ Star GitCury](https://github.com/lakshyajain-0291/GitCury)** | **[🚀 Quick Start](#-quick-start)** | **[📖 Documentation](https://github.com/lakshyajain-0291/GitCury/wiki)** | **[🐳 Docker Hub](https://hub.docker.com/r/lakshyajain1503/gitcury)** | **[📦 Releases](https://github.com/lakshyajain-0291/GitCury/releases)**
+**[⭐ Star GitCury](https://github.com/lakshyajain-0291/gitcury)** | **[🚀 Quick Start](#-quick-start)** | **[📖 Documentation](https://github.com/lakshyajain-0291/gitcury/wiki)** | **[🐳 Docker Hub](https://hub.docker.com/r/lakshyajain1503/gitcury)** | **[📦 Releases](https://github.com/lakshyajain-0291/gitcury/releases)**
 
 #### 📥 **Install Now**:
 ```bash
@@ -949,7 +949,7 @@ GitCury was born from the frustration of managing complex multi-repository workf
 brew tap lakshyajain-0291/gitcury && brew install gitcury
 
 # Scoop (Windows PowerShell)  
-scoop bucket add gitcury https://github.com/lakshyajain-0291/GitCury-Scoop-Bucket.git && scoop install gitcury
+scoop bucket add gitcury https://github.com/lakshyajain-0291/gitcury-Scoop-Bucket.git && scoop install gitcury
 
 # Docker
 docker pull lakshyajain1503/gitcury:latest
