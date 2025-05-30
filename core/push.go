@@ -2,7 +2,6 @@ package core
 
 import (
 	"GitCury/config"
-	"GitCury/git"
 	"GitCury/utils"
 	"fmt"
 	"sync"
@@ -39,7 +38,7 @@ func PushAllRoots(branchName string) error {
 			defer rootFolderWg.Done()
 			utils.Debug("📂 Root folder to push: " + folder)
 
-			err := git.ProgressPushBranch(folder, branchName)
+			err := GitRunnerInstance.ProgressPushBranch(folder, branchName)
 			if err != nil {
 				// Extract file information if available in the error
 				fileInfo := folder
@@ -79,7 +78,7 @@ func PushAllRoots(branchName string) error {
 func PushOneRoot(rootFolderName, branchName string) error {
 	utils.Debug("📂 Targeting root folder for push: " + rootFolderName)
 
-	err := git.ProgressPushBranch(rootFolderName, branchName)
+	err := GitRunnerInstance.ProgressPushBranch(rootFolderName, branchName)
 	if err != nil {
 		// Extract file information if available in the error
 		fileInfo := rootFolderName
