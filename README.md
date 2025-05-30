@@ -35,7 +35,7 @@ GitCury leverages **Google Gemini AI** to understand your code changes and gener
 ## 📥 Installation & Deployment
 
 GitCury is distributed through multiple channels for maximum accessibility:
-
+ 
 > **📊 Deployment Status**: All distribution channels are automatically updated when new releases are tagged. Check the [latest release](https://github.com/lakshyajain-0291/GitCury/releases/latest) for the most current version.
 
 ### 🍺 Homebrew (macOS and Linux) - **Recommended**

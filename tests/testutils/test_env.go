@@ -65,12 +65,16 @@ func (env *TestEnv) CreateTestFiles(files []string) []string {
 
 		// Create directory if it doesn't exist
 		if _, err := os.Stat(dir); os.IsNotExist(err) {
-			os.MkdirAll(dir, 0755)
+			if err := os.MkdirAll(dir, 0755); err != nil {
+				panic("Failed to create directory: " + err.Error())
+			}
 		}
 
 		// Create file with simple content
 		content := []byte("Test content for " + file)
-		os.WriteFile(path, content, 0644)
+		if err := os.WriteFile(path, content, 0644); err != nil {
+			panic("Failed to write file: " + err.Error())
+		}
 
 		paths = append(paths, path)
 	}

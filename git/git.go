@@ -611,7 +611,9 @@ func RunGitCmdWithTimeout(dir string, envVars map[string]string, timeout time.Du
 		return stdout.String(), nil
 	case <-time.After(timeout):
 		if cmd.Process != nil {
-			cmd.Process.Kill()
+			if killErr := cmd.Process.Kill(); killErr != nil {
+				utils.Error("[GIT.EXEC.KILL]: Failed to kill process: " + killErr.Error())
+			}
 		}
 		err := fmt.Errorf("command timeout after %v", timeout)
 		utils.Error("[GIT.EXEC.TIMEOUT]: Command timed out: git " + strings.Join(args, " "))

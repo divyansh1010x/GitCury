@@ -68,7 +68,9 @@ Examples:
 		if cmd.Flag("add").Changed {
 			if len(args) != 2 {
 				utils.Error("Invalid arguments. Usage: --add <command> <alias>")
-				cmd.Help()
+				if err := cmd.Help(); err != nil {
+					utils.Error("Failed to show help: " + err.Error())
+				}
 				return
 			}
 			utils.Info("Adding alias '" + args[1] + "' for command '" + args[0] + "'.")

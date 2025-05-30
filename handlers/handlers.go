@@ -14,7 +14,10 @@ func ConfigHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		// Handle GET request to return the current configuration
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(config.GetAll())
+		if err := json.NewEncoder(w).Encode(config.GetAll()); err != nil {
+			utils.Error("Error encoding config response: " + err.Error())
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+		}
 		return
 	}
 
@@ -34,7 +37,10 @@ func ConfigHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(config.GetAll())
+		if err := json.NewEncoder(w).Encode(config.GetAll()); err != nil {
+			utils.Error("Error encoding config response: " + err.Error())
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+		}
 		return
 	}
 
@@ -52,7 +58,10 @@ func PrepareCommitMessagesHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(output.GetAll())
+	if err := json.NewEncoder(w).Encode(output.GetAll()); err != nil {
+		utils.Error("Error encoding commit messages response: " + err.Error())
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+	}
 }
 
 func PrepareCommitMessagesOne(w http.ResponseWriter, r *http.Request) {
@@ -85,7 +94,9 @@ func CommitAllFiles(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Files committed successfully and output.json deleted"))
+	if _, err := w.Write([]byte("Files committed successfully and output.json deleted")); err != nil {
+		utils.Error("Error writing response: " + err.Error())
+	}
 }
 
 func CommitFolder(w http.ResponseWriter, r *http.Request) {
@@ -104,7 +115,9 @@ func CommitFolder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Files committed successfully"))
+	if _, err := w.Write([]byte("Files committed successfully")); err != nil {
+		utils.Error("Error writing response: " + err.Error())
+	}
 }
 
 func PushAll(w http.ResponseWriter, r *http.Request) {
@@ -123,7 +136,9 @@ func PushAll(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("All folders pushed successfully"))
+	if _, err := w.Write([]byte("All folders pushed successfully")); err != nil {
+		utils.Error("Error writing response: " + err.Error())
+	}
 }
 
 func PushOne(w http.ResponseWriter, r *http.Request) {
