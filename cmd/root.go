@@ -1,7 +1,7 @@
 // package cmd
 
 // import (
-// 	"GitCury/utils"
+// 	"github.com/lakshyajain-0291/GitCury/utils"
 // 	"os"
 
 // 	"github.com/spf13/cobra"
@@ -40,8 +40,8 @@
 package cmd
 
 import (
-	"GitCury/config"
-	"GitCury/utils"
+	"github.com/lakshyajain-0291/GitCury/config"
+	"github.com/lakshyajain-0291/GitCury/utils"
 	"fmt"
 	"os"
 
