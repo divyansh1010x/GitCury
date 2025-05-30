@@ -1,10 +1,10 @@
 // package cmd
 
 // import (
-// 	"GitCury/config"
-// 	"GitCury/core"
-// 	"GitCury/git"
-// 	"GitCury/utils"
+// 	"github.com/lakshyajain-0291/GitCury/config"
+// 	"github.com/lakshyajain-0291/GitCury/core"
+// 	"github.com/lakshyajain-0291/GitCury/git"
+// 	"github.com/lakshyajain-0291/GitCury/utils"
 // 	"os"
 // 	"time"
 
@@ -232,9 +232,9 @@
 package cmd
 
 import (
-	"GitCury/config"
-	"GitCury/core"
-	"GitCury/utils"
+	"github.com/lakshyajain-0291/GitCury/config"
+	"github.com/lakshyajain-0291/GitCury/core"
+	"github.com/lakshyajain-0291/GitCury/utils"
 	"os"
 	"time"
 

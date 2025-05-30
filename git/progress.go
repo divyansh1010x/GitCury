@@ -1,8 +1,8 @@
 package git
 
 import (
-	"GitCury/output"
-	"GitCury/utils"
+	"github.com/lakshyajain-0291/GitCury/output"
+	"github.com/lakshyajain-0291/GitCury/utils"
 	"fmt"
 	"path/filepath"
 	"sync"

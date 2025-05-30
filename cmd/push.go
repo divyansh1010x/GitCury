@@ -1,8 +1,8 @@
 // package cmd
 
 // import (
-// 	"GitCury/core"
-// 	"GitCury/utils"
+// 	"github.com/lakshyajain-0291/GitCury/core"
+// 	"github.com/lakshyajain-0291/GitCury/utils"
 
 // 	"github.com/spf13/cobra"
 // )
@@ -54,8 +54,8 @@
 // package cmd
 
 // import (
-// 	"GitCury/core"
-// 	"GitCury/utils"
+// 	"github.com/lakshyajain-0291/GitCury/core"
+// 	"github.com/lakshyajain-0291/GitCury/utils"
 
 // 	"github.com/spf13/cobra"
 // )
@@ -122,9 +122,9 @@
 package cmd
 
 import (
-	"GitCury/config"
-	"GitCury/core"
-	"GitCury/utils"
+	"github.com/lakshyajain-0291/GitCury/config"
+	"github.com/lakshyajain-0291/GitCury/core"
+	"github.com/lakshyajain-0291/GitCury/utils"
 
 	"github.com/spf13/cobra"
 )

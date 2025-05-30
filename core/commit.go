@@ -1,10 +1,10 @@
 package core
 
 import (
-	"GitCury/git"
-	"GitCury/interfaces"
-	"GitCury/output"
-	"GitCury/utils"
+	"github.com/lakshyajain-0291/GitCury/git"
+	"github.com/lakshyajain-0291/GitCury/interfaces"
+	"github.com/lakshyajain-0291/GitCury/output"
+	"github.com/lakshyajain-0291/GitCury/utils"
 	"fmt"
 	"strings"
 	"time"
