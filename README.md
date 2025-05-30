@@ -296,17 +296,6 @@ GitCury provides a comprehensive CLI to streamline your Git workflow:
   gitcury config --delete
   ```
 
-### **Basic Clustering Configuration**
-- View clustering settings:
-  ```bash
-  gitcury config clustering
-  ```
-- Configure clustering method:
-  ```bash
-  gitcury config clustering set --method directory
-  gitcury config clustering preset --name speed
-  ```
-
 ### **Message Generation**
 - Generate commit messages for all folders:
   ```bash
@@ -382,41 +371,7 @@ GitCury provides a comprehensive CLI to streamline your Git workflow:
   gitcury alias --remove seal
   ```
 
-### **Advanced Clustering Commands**
-- Analyze and cluster files:
-  ```bash
-  gitcury cluster --analyze
-  ```
-- Test clustering algorithms:
-  ```bash
-  gitcury cluster --test --algorithm semantic
-  ```
-- Benchmark clustering performance:
-  ```bash
-  gitcury cluster --benchmark --preset balanced
-  ```
-- View clustering statistics:
-  ```bash
-  gitcury cluster --stats
-  ```
 
-### **AI & Embeddings Management**
-- Test AI connectivity:
-  ```bash
-  gitcury ai --test
-  ```
-- Generate embeddings for codebase:
-  ```bash
-  gitcury ai --generate-embeddings
-  ```
-- Clear AI cache:
-  ```bash
-  gitcury ai --clear-cache
-  ```
-- View AI performance metrics:
-  ```bash
-  gitcury ai --metrics
-  ```
 
 ### **End-to-End Workflow**
 - Complete workflow with confirmations:
@@ -490,21 +445,18 @@ gitcury deploy --all --branch main
 
 ### 🧠 **AI-Powered Smart Workflow**
 ```bash
-# Initialize and optimize
-gitcury optimize --auto-tune
-gitcury ai --generate-embeddings
+# Generate AI-powered commit messages
+gitcury getmsgs --all
 
-# Smart clustering and analysis
-gitcury cluster --analyze --algorithm semantic
-gitcury smart-commit --cluster-first
+# Review and commit changes
+gitcury output --log
+gitcury commit --all
 
-# Intelligent commit with AI insights
-gitcury getmsgs --all --use-clustering
-gitcury commit --all --grouped
+# Push to remote
 gitcury push --all --branch main
 
-# Performance monitoring
-gitcury monitor --live
+# Complete workflow with confirmations
+gitcury boom --all --stats
 ```
 
 ## 🛠️ Configuration
@@ -520,11 +472,6 @@ gitcury monitor --live
 - `output_file_path`: Path to output JSON file
 - `retries`: Number of operation retries (default: 3)
 - `timeout`: Operation timeout duration (default: 30s)
-
-### **Basic Clustering Options**
-- `method`: Clustering method (directory, similarity, cached, semantic)
-- `similarity_threshold`: Threshold for similarity grouping
-- `max_clusters`: Maximum number of clusters to create
 
 ## 🔧 Advanced Features
 
@@ -574,41 +521,39 @@ GitCury intelligently identifies relationships between test files and their corr
 
 ### 🎯 **Core Technologies**
 - **Language**: Go 1.19+ with advanced concurrency patterns
-- **AI Integration**: Google Gemini API with semantic embeddings
-- **Clustering Engine**: Multi-algorithm approach with ML-powered insights
-- **Performance**: Worker pools, caching layers, and adaptive optimization
-- **Testing**: 100+ comprehensive test cases with edge case coverage
+- **AI Integration**: Google Gemini API for intelligent commit message generation
+- **CLI Framework**: Cobra for robust command-line interface
+- **Configuration**: JSON-based configuration with environment variable support
+- **Testing**: Comprehensive test suite with integration coverage
 
 ### 📊 **Performance Metrics**
 ```
-🚀 Clustering Speed:     Up to 10x faster with smart caching
+🚀 Message Generation:  Fast AI-powered analysis
 🧠 AI Accuracy:         95%+ semantic understanding
-⚡ Concurrency:         8+ parallel workers by default
-💾 Memory Efficiency:   LRU cache with automatic cleanup
-🔄 Reliability:         Zero-downtime fallback systems
+⚡ Concurrency:         Parallel processing for multiple repositories
+💾 Memory Efficiency:   Optimized for large codebases
+🔄 Reliability:         Robust error handling and retry mechanisms
 ```
 
 ### 🎨 **Architecture Highlights**
 ```mermaid
 graph TD
     A[GitCury CLI]
-    A --> B[Clustering Engine]
-    B --> E[Semantic AI]
-    B --> F[Pattern Analysis]
-    B --> G[Directory Grouping]
-    B --> H[Smart Sampling]
-    B --> I[Cached Results]
-    
+    A --> B[Configuration Management]
     A --> C[AI Integration]
     C --> J[Gemini API]
-    C --> K[Embeddings]
+    C --> K[Message Generation]
     C --> L[Context Analysis]
     
     A --> D[Git Operations]
     D --> M[Commit Management]
-    D --> N[Progress Tracking]
-    D --> O[Error Recovery]
-
+    D --> N[Push Operations]
+    D --> O[Repository Handling]
+    
+    A --> E[Output Management]
+    E --> P[JSON Output]
+    E --> Q[Message Storage]
+    E --> R[File Organization]
 ```
 
 ## 🏗️ CI/CD & Deployment Architecture
@@ -873,14 +818,14 @@ git push origin v1.2.3
 - **📊 Web Dashboard**: Real-time analytics and monitoring  
 - **🔗 CI/CD Integration**: Native pipeline integrations for popular CI/CD platforms
 - **🎯 Multi-Language Support**: Beyond Go repositories
-- **🧠 Advanced ML Models**: Even smarter clustering algorithms
+- **🧠 Enhanced AI Features**: Improved commit message generation
 - **🌐 Plugin System**: Extensible architecture for custom integrations
 
 ### 🎯 **Long-term Vision**
 - **🤖 Full AI Automation**: Complete workflow automation
 - **🌐 Cloud Integration**: Native cloud platform support
 - **📱 Mobile Companion**: Mobile app for monitoring
-- **🔮 Predictive Analytics**: Predict optimal commit strategies
+- **🔮 Enhanced Analytics**: Better insights into development patterns
 
 ## 🤝 Contributing
 
@@ -889,16 +834,16 @@ We ❤️ contributions! Here's how you can help make GitCury even more amazing:
 ### 🚀 **Getting Started**
 1. **Fork the repository** and create your feature branch
 2. **Set up development environment** with `make setup-dev`
-3. **Explore the codebase** - check out our advanced clustering algorithms
+3. **Explore the codebase** - check out the AI integration and Git automation features
 4. **Run the comprehensive test suite** - we have 15.5% integration coverage
 5. **Add your improvements** - from performance optimizations to new AI features
 
 ### 🎯 **Contribution Areas**
-- **🧠 AI & Machine Learning**: Improve clustering algorithms and semantic analysis
-- **⚡ Performance**: Optimize caching, worker pools, and concurrency
-- **🎨 User Experience**: Enhance CLI interface and progress visualization  
-- **🧪 Testing**: Add edge cases and performance benchmarks
-- **📝 Documentation**: Help others understand our advanced features
+- **🧠 AI & Machine Learning**: Improve commit message generation and semantic analysis
+- **⚡ Performance**: Optimize processing speed and resource usage
+- **🎨 User Experience**: Enhance CLI interface and user workflows  
+- **🧪 Testing**: Add edge cases and integration tests
+- **📝 Documentation**: Help others understand GitCury's features
 - **🚀 Deployment**: Improve CI/CD pipeline and deployment automation
 - **📦 Distribution**: Add new package managers or installation methods
 
@@ -918,8 +863,8 @@ make test-coverage
 ./tests/run_coverage.sh
 
 # 4. Test specific components
-./gitcury cluster --test
-make check-release
+make test
+make test-coverage
 
 # 5. Create feature branch
 git checkout -b feature/amazing-new-feature
@@ -985,16 +930,16 @@ GitCury is proudly **open-source** and licensed under the **MIT License**. See t
 
 ### 🙏 **Special Thanks**
 
-- **🤖 Google Gemini Team**: For providing the incredible AI that powers our semantic analysis
+- **🤖 Google Gemini Team**: For providing the incredible AI that powers our commit message generation
 - **🌐 Go Community**: For creating the robust ecosystem that makes GitCury possible  
-- **🧠 Open Source ML Community**: For the machine learning insights that drive our clustering
+- **🧠 Open Source Community**: For the insights and patterns that guide our development
 - **👥 GitCury Contributors**: Every bug report, feature request, and code contribution matters
 - **⭐ Early Adopters**: Your feedback shaped GitCury into what it is today
 
 ### 🏆 **Powered By**
 - **Go 1.19+**: Lightning-fast performance and excellent concurrency
-- **Google Gemini API**: State-of-the-art AI for semantic understanding
-- **Advanced Algorithms**: Cosine similarity, Jaccard analysis, and hybrid clustering
+- **Google Gemini API**: State-of-the-art AI for intelligent commit message generation
+- **Cobra CLI**: Robust command-line interface framework
 - **Community Feedback**: Real-world testing from developers worldwide
 
 ### 💡 **Inspiration**
