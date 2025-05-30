@@ -1,4 +1,4 @@
-module GitCury
+module github.com/lakshyajain-0291/GitCury
 
 go 1.24.1
 

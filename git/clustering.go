@@ -1,9 +1,9 @@
 package git
 
 import (
-	"GitCury/config"
-	"GitCury/embeddings"
-	"GitCury/utils"
+	"github.com/lakshyajain-0291/GitCury/config"
+	"github.com/lakshyajain-0291/GitCury/embeddings"
+	"github.com/lakshyajain-0291/GitCury/utils"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"

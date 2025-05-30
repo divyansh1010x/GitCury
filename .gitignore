@@ -32,6 +32,7 @@ config.json
 .env 
 
 gitcury
+gitcury-test
 GitCury
 # Go executable files
 *.out.exe

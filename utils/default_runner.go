@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"GitCury/di"
-	"GitCury/interfaces"
+	"github.com/lakshyajain-0291/GitCury/di"
+	"github.com/lakshyajain-0291/GitCury/interfaces"
 )
 
 // DefaultGeminiRunner implements the GeminiRunner interface using the real Gemini API

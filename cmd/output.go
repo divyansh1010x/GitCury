@@ -1,9 +1,9 @@
 // package cmd
 
 // import (
-// 	"GitCury/config"
-// 	"GitCury/output"
-// 	"GitCury/utils"
+// 	"github.com/lakshyajain-0291/GitCury/config"
+// 	"github.com/lakshyajain-0291/GitCury/output"
+// 	"github.com/lakshyajain-0291/GitCury/utils"
 // 	"os"
 // 	"os/exec"
 // 	"strings"
@@ -88,9 +88,9 @@
 package cmd
 
 import (
-	"GitCury/config"
-	"GitCury/output"
-	"GitCury/utils"
+	"github.com/lakshyajain-0291/GitCury/config"
+	"github.com/lakshyajain-0291/GitCury/output"
+	"github.com/lakshyajain-0291/GitCury/utils"
 	"os"
 	"os/exec"
 	"strings"

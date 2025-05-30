@@ -1,7 +1,7 @@
 package cmd
 
 // import (
-// 	"GitCury/utils"
+// 	"github.com/lakshyajain-0291/GitCury/utils"
 // 	"os"
 
 // 	"github.com/spf13/cobra"

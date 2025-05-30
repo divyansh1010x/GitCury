@@ -1,7 +1,7 @@
 package config
 
 import (
-	"GitCury/utils"
+	"github.com/lakshyajain-0291/GitCury/utils"
 )
 
 // ResetConfig clears all configuration settings - used for testing only

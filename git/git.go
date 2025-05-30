@@ -1,11 +1,11 @@
 package git
 
 import (
-	"GitCury/config"
-	"GitCury/di"
-	"GitCury/embeddings"
-	"GitCury/output"
-	"GitCury/utils"
+	"github.com/lakshyajain-0291/GitCury/config"
+	"github.com/lakshyajain-0291/GitCury/di"
+	"github.com/lakshyajain-0291/GitCury/embeddings"
+	"github.com/lakshyajain-0291/GitCury/output"
+	"github.com/lakshyajain-0291/GitCury/utils"
 	"bytes"
 	"fmt"
 	"os"

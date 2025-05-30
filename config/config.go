@@ -1,8 +1,8 @@
 package config
 
 import (
-	"GitCury/api"
-	"GitCury/utils"
+	"github.com/lakshyajain-0291/GitCury/api"
+	"github.com/lakshyajain-0291/GitCury/utils"
 	"encoding/json"
 	"fmt"
 	"os"

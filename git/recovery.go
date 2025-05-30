@@ -1,7 +1,7 @@
 package git
 
 import (
-	"GitCury/utils"
+	"github.com/lakshyajain-0291/GitCury/utils"
 	"fmt"
 	"os"
 	"path/filepath"

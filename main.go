@@ -1,8 +1,8 @@
 package main
 
 import (
-	"GitCury/cmd"
-	"GitCury/utils"
+	"github.com/lakshyajain-0291/GitCury/cmd"
+	"github.com/lakshyajain-0291/GitCury/utils"
 	"fmt"
 	"os"
 )
