@@ -122,17 +122,48 @@ if [[ -n $(git status --porcelain) ]]; then
     fi
 fi
 
-# Check if tag already exists
+# Check if tag already exists (both locally and remotely)
+LOCAL_TAG_EXISTS=false
+REMOTE_TAG_EXISTS=false
+
 if git tag -l | grep -q "^$VERSION$"; then
+    LOCAL_TAG_EXISTS=true
+fi
+
+# Check if tag exists on remote
+if git ls-remote --tags origin | grep -q "refs/tags/$VERSION$"; then
+    REMOTE_TAG_EXISTS=true
+fi
+
+if [[ "$LOCAL_TAG_EXISTS" == true ]] || [[ "$REMOTE_TAG_EXISTS" == true ]]; then
     if [[ "$FORCE" == false ]]; then
-        print_error "Tag $VERSION already exists!"
+        if [[ "$LOCAL_TAG_EXISTS" == true ]] && [[ "$REMOTE_TAG_EXISTS" == true ]]; then
+            print_error "Tag $VERSION already exists locally and remotely!"
+        elif [[ "$LOCAL_TAG_EXISTS" == true ]]; then
+            print_error "Tag $VERSION already exists locally!"
+        else
+            print_error "Tag $VERSION already exists on remote!"
+        fi
         print_info "Use --force to overwrite existing tag"
         exit 1
     else
-        print_warning "Tag $VERSION already exists, will be overwritten"
+        if [[ "$LOCAL_TAG_EXISTS" == true ]] && [[ "$REMOTE_TAG_EXISTS" == true ]]; then
+            print_warning "Tag $VERSION exists locally and remotely, will be overwritten"
+        elif [[ "$LOCAL_TAG_EXISTS" == true ]]; then
+            print_warning "Tag $VERSION exists locally, will be overwritten"
+        else
+            print_warning "Tag $VERSION exists on remote, will be overwritten"
+        fi
+        
         if [[ "$DRY_RUN" == false ]]; then
-            git tag -d "$VERSION" || true
-            git push origin ":refs/tags/$VERSION" || true
+            # Delete local tag if it exists
+            if [[ "$LOCAL_TAG_EXISTS" == true ]]; then
+                git tag -d "$VERSION" || true
+            fi
+            # Delete remote tag if it exists
+            if [[ "$REMOTE_TAG_EXISTS" == true ]]; then
+                git push origin ":refs/tags/$VERSION" || true
+            fi
         fi
     fi
 fi
@@ -149,10 +180,13 @@ if [[ "$CURRENT_BRANCH" != "main" && "$CURRENT_BRANCH" != "master" ]]; then
     fi
 fi
 
-# Pull latest changes
-print_info "Pulling latest changes..."
+# Pull latest changes and fetch tags
+print_info "Pulling latest changes and fetching tags..."
 if [[ "$DRY_RUN" == false ]]; then
     git pull origin "$CURRENT_BRANCH"
+    git fetch --tags
+else
+    print_info "DRY RUN: Would pull latest changes and fetch tags"
 fi
 
 # Check if GoReleaser is installed
@@ -205,10 +239,19 @@ fi
 # Create and push tag
 if [[ "$DRY_RUN" == false ]]; then
     print_info "Creating tag $VERSION..."
-    git tag -a "$VERSION" -m "Release $VERSION"
+    if ! git tag -a "$VERSION" -m "Release $VERSION"; then
+        print_error "Failed to create tag $VERSION"
+        exit 1
+    fi
     
     print_info "Pushing tag to origin..."
-    git push origin "$VERSION"
+    if ! git push origin "$VERSION"; then
+        print_error "Failed to push tag $VERSION to origin"
+        print_warning "Cleaning up local tag..."
+        git tag -d "$VERSION" || true
+        print_info "If the tag exists remotely, you can use --force to overwrite it"
+        exit 1
+    fi
     
     print_success "Tag $VERSION created and pushed"
 else
