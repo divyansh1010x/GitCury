@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"GitCury/config"
-	"GitCury/core"
-	"GitCury/output"
-	"GitCury/utils"
+	"github.com/lakshyajain-0291/GitCury/config"
+	"github.com/lakshyajain-0291/GitCury/core"
+	"github.com/lakshyajain-0291/GitCury/output"
+	"github.com/lakshyajain-0291/GitCury/utils"
 	"encoding/json"
 	"fmt"
 	"net/http"

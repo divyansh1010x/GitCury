@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"GitCury/api"
+	"github.com/lakshyajain-0291/GitCury/api"
 	"context"
 	"encoding/json"
 	"fmt"

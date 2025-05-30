@@ -1,6 +1,6 @@
 package di
 
-import "GitCury/interfaces"
+import "github.com/lakshyajain-0291/GitCury/interfaces"
 
 // GeminiRunnerInstance allows dependency injection for testing
 var GeminiRunnerInstance interfaces.GeminiRunner
