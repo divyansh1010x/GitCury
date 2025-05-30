@@ -206,6 +206,11 @@ Examples:
 [NOTICE]: Ensure proper configuration of root folders to optimize message generation.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		// Start tracking this command if stats are enabled
+		if utils.IsStatsEnabled() {
+			utils.StartOperation("Command:" + cmd.Name())
+		}
+
 		// Handle custom instructions temporarily (not saved to config)
 		var originalInstructions interface{}
 		var hadInstructions bool
@@ -280,6 +285,9 @@ func init() {
 	getMsgsCmd.Flags().BoolVarP(&allFlag, "all", "a", false, "Generate messages for all changed files across all root folders")
 	getMsgsCmd.Flags().BoolVarP(&groupFlag, "group", "g", false, "Group commit messages by file type")
 	getMsgsCmd.Flags().StringVarP(&customInstructions, "instructions", "i", "", "Custom instructions for commit message generation (not saved to config)")
+
+	// Add stats tracking to the getmsgs command
+	utils.AddStatsPostRunToCommand(getMsgsCmd)
 
 	rootCmd.AddCommand(getMsgsCmd)
 }
