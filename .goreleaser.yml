@@ -32,8 +32,6 @@ archives:
       - LICENSE
       - README.md
       - config.json.example
-    # Use zlib compression for better compatibility
-    compression: zlib
     # Allow files with different permissions
     rlcp: true
   - id: windows-zip
