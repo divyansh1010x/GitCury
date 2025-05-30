@@ -46,7 +46,7 @@ check-release:
 # Build Docker image
 docker-build:
 	@echo "Building Docker image..."
-	docker build -t lakshyajain0291/gitcury:dev .
+	docker build -t lakshyajain1503/gitcury:dev .
 
 # Run the application with Docker
 docker-run:
@@ -55,7 +55,7 @@ docker-run:
 		-v "$(PWD):/app/data" -w "/app/data" \
 		-v "$(HOME)/.gitconfig:/home/gitcuryuser/.gitconfig:ro" \
 		-v "$(HOME)/.gitcury:/home/gitcuryuser/.gitcury" \
-		lakshyajain0291/gitcury:dev $(CMD)
+		lakshyajain1503/gitcury:dev $(CMD)
 
 # Run the application with Docker Compose
 docker-compose-up:

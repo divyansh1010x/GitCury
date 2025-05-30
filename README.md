@@ -16,7 +16,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 [![Release](https://img.shields.io/github/v/release/lakshyajain-0291/GitCury)](https://github.com/lakshyajain-0291/GitCury/releases/latest)
-[![Docker Pulls](https://img.shields.io/docker/pulls/lakshyajain0291/gitcury)](https://hub.docker.com/r/lakshyajain0291/gitcury)
+[![Docker Pulls](https://img.shields.io/docker/pulls/lakshyajain1503/gitcury)](https://hub.docker.com/r/lakshyajain1503/gitcury)
 [![CI/CD Pipeline](https://img.shields.io/github/actions/workflow/status/lakshyajain-0291/GitCury/release.yml?label=CI%2FCD)](https://github.com/lakshyajain-0291/GitCury/actions)
 [![Coverage](https://img.shields.io/badge/coverage-15.5%25-green)](https://github.com/lakshyajain-0291/GitCury/blob/main/COVERAGE_REPORT.md)
 
@@ -75,29 +75,19 @@ gitcury --version
 ### 🐳 Docker (All Platforms)
 
 ```bash
-# Pull the latest stable image
-docker pull lakshyajain0291/gitcury:latest
-
-# Or pull a specific version
-docker pull lakshyajain0291/gitcury:v1.0.0
-```
-
-#### Docker Usage Examples:
-
-```bash
 # Quick run in current directory
 docker run -it --rm \
   -v "$(pwd):/app/data" -w "/app/data" \
   -v "$HOME/.gitconfig:/home/gitcuryuser/.gitconfig:ro" \
   -v "$HOME/.gitcury:/home/gitcuryuser/.gitcury" \
-  lakshyajain0291/gitcury --help
+  lakshyajain1503/gitcury --help
 
 # With environment variables
 docker run -it --rm \
   -v "$(pwd):/app/data" -w "/app/data" \
   -v "$HOME/.gitcury:/home/gitcuryuser/.gitcury" \
   -e GEMINI_API_KEY="your-api-key" \
-  lakshyajain0291/gitcury getmsgs --all
+  lakshyajain1503/gitcury getmsgs --all
 
 # Using Docker Compose (see docker-compose.yml)
 docker-compose run --rm gitcury --help
@@ -737,8 +727,8 @@ After the GitHub Actions workflows complete (5-10 minutes):
 # Check GitHub Release was created
 # Visit: https://github.com/lakshyajain-0291/GitCury/releases
 
-# Verify Docker image
-docker pull lakshyajain0291/gitcury:v1.0.0
+# Verify Docker image (will be available after first release)
+# docker pull lakshyajain1503/gitcury:v1.0.0
 
 # Verify Homebrew (after ~30 minutes)
 brew tap lakshyajain-0291/gitcury && brew install gitcury
@@ -755,7 +745,7 @@ Monitor your deployment across all channels:
 | Channel | Status Check | Expected Time | Verification Command |
 |---------|-------------|---------------|---------------------|
 | **🚀 GitHub Release** | ✅ Immediate | ~2-3 min | Visit [releases page](https://github.com/lakshyajain-0291/GitCury/releases) |
-| **🐳 Docker Hub** | ✅ Fast | ~3-5 min | `docker pull lakshyajain0291/gitcury:latest` |
+| **🐳 Docker Hub** | ⏳ Planned | ~3-5 min | *Will be available after first release* |
 | **🍺 Homebrew** | ⏳ Automatic | ~15-30 min | `brew install lakshyajain-0291/gitcury/gitcury` |
 | **📦 Scoop** | ⏳ Automatic | ~10-20 min | `scoop install gitcury` |
 | **📋 Go Modules** | ✅ Immediate | ~1-2 min | `go install github.com/lakshyajain-0291/gitcury@latest` |
@@ -766,7 +756,7 @@ Monitor your deployment across all channels:
 # Visit: https://github.com/lakshyajain-0291/GitCury/actions
 
 # Monitor Docker Hub
-curl -s "https://hub.docker.com/v2/repositories/lakshyajain0291/gitcury/tags/" | jq '.results[0].name'
+curl -s "https://hub.docker.com/v2/repositories/lakshyajain1503/gitcury/tags/" | jq '.results[0].name'
 
 # Check Homebrew formula
 curl -s "https://raw.githubusercontent.com/lakshyajain-0291/homebrew-gitcury/main/Formula/gitcury.rb" | grep version
@@ -914,7 +904,7 @@ brew update && brew install lakshyajain-0291/gitcury/gitcury
 scoop update && scoop install gitcury
 
 # Verify Docker
-docker pull lakshyajain0291/gitcury:v1.2.3
+docker pull lakshyajain1503/gitcury:v1.2.3
 
 # Verify Go modules
 go install github.com/lakshyajain-0291/gitcury@v1.2.3
@@ -951,7 +941,7 @@ GitCury was born from the frustration of managing complex multi-repository workf
 
 ### 🎉 **Ready to Revolutionize Your Git Workflow?**
 
-**[⭐ Star GitCury](https://github.com/lakshyajain-0291/GitCury)** | **[🚀 Quick Start](#-quick-start)** | **[📖 Documentation](https://github.com/lakshyajain-0291/GitCury/wiki)** | **[🐳 Docker Hub](https://hub.docker.com/r/lakshyajain0291/gitcury)** | **[📦 Releases](https://github.com/lakshyajain-0291/GitCury/releases)**
+**[⭐ Star GitCury](https://github.com/lakshyajain-0291/GitCury)** | **[🚀 Quick Start](#-quick-start)** | **[📖 Documentation](https://github.com/lakshyajain-0291/GitCury/wiki)** | **[🐳 Docker Hub](https://hub.docker.com/r/lakshyajain1503/gitcury)** | **[📦 Releases](https://github.com/lakshyajain-0291/GitCury/releases)**
 
 #### 📥 **Install Now**:
 ```bash
@@ -962,7 +952,7 @@ brew tap lakshyajain-0291/gitcury && brew install gitcury
 scoop bucket add gitcury https://github.com/lakshyajain-0291/GitCury-Scoop-Bucket.git && scoop install gitcury
 
 # Docker
-docker pull lakshyajain0291/gitcury:latest
+docker pull lakshyajain1503/gitcury:latest
 
 # Go
 go install github.com/lakshyajain-0291/gitcury@latest

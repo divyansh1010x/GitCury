@@ -79,19 +79,18 @@ scoops:
     description: "AI-Powered Git Automation CLI tool"
     license: "MIT"
 
-# Docker images - disabled for now to complete testing
-# dockers:
-#   - image_templates:
-#       - "lakshyajain0291/gitcury:latest"
-#       - "lakshyajain0291/gitcury:{{ .Tag }}"
-#       - "lakshyajain0291/gitcury:v{{ .Major }}"
-#       - "lakshyajain0291/gitcury:v{{ .Major }}.{{ .Minor }}"
-#     dockerfile: Dockerfile
-#     use: buildx
-#     build_flag_templates:
-#       - "--pull"
-#       - "--label=org.opencontainers.image.created={{.Date}}"
-#       - "--label=org.opencontainers.image.name={{.ProjectName}}"
-#       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-#       - "--label=org.opencontainers.image.version={{.Version}}"
-#       - "--label=org.opencontainers.image.source={{.GitURL}}"
+dockers:
+  - image_templates:
+      - "lakshyajain1503/gitcury:latest"
+      - "lakshyajain1503/gitcury:{{ .Tag }}"
+      - "lakshyajain1503/gitcury:v{{ .Major }}"
+      - "lakshyajain1503/gitcury:v{{ .Major }}.{{ .Minor }}"
+    dockerfile: Dockerfile
+    use: buildx
+    build_flag_templates:
+      - "--pull"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.name={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source={{.GitURL}}"

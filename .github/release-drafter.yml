@@ -64,7 +64,7 @@ template: |
 
   ### Docker
   ```bash
-  docker pull lakshyajain0291/gitcury:latest
+  docker pull lakshyajain1503/gitcury:latest
   ```
 
   ### Direct Download
