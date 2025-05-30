@@ -65,7 +65,7 @@ gitcury --version
 If you have Go 1.20+ installed:
 
 ```bash
-go install github.com/lakshyajain-0291/gitcury@latest
+go install github.com/lakshyajain-0291/GitCury@latest
 
 # Ensure $GOPATH/bin is in your PATH
 export PATH=$PATH:$(go env GOPATH)/bin
