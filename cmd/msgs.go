@@ -1,9 +1,9 @@
 // package cmd
 
 // import (
-// 	"github.com/lakshyajain-0291/GitCury/core"
-// 	"github.com/lakshyajain-0291/GitCury/output"
-// 	"github.com/lakshyajain-0291/GitCury/utils"
+// 	"github.com/lakshyajain-0291/gitcury/core"
+// 	"github.com/lakshyajain-0291/gitcury/output"
+// 	"github.com/lakshyajain-0291/gitcury/utils"
 
 // 	"github.com/spf13/cobra"
 // )
@@ -74,9 +74,9 @@
 // package cmd
 
 // import (
-// 	"github.com/lakshyajain-0291/GitCury/core"
-// 	"github.com/lakshyajain-0291/GitCury/output"
-// 	"github.com/lakshyajain-0291/GitCury/utils"
+// 	"github.com/lakshyajain-0291/gitcury/core"
+// 	"github.com/lakshyajain-0291/gitcury/output"
+// 	"github.com/lakshyajain-0291/gitcury/utils"
 
 // 	"github.com/spf13/cobra"
 // )
@@ -155,10 +155,10 @@
 package cmd
 
 import (
-	"github.com/lakshyajain-0291/GitCury/config"
-	"github.com/lakshyajain-0291/GitCury/core"
-	"github.com/lakshyajain-0291/GitCury/output"
-	"github.com/lakshyajain-0291/GitCury/utils"
+	"github.com/lakshyajain-0291/gitcury/config"
+	"github.com/lakshyajain-0291/gitcury/core"
+	"github.com/lakshyajain-0291/gitcury/output"
+	"github.com/lakshyajain-0291/gitcury/utils"
 
 	"github.com/spf13/cobra"
 )
