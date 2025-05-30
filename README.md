@@ -1,967 +1,629 @@
+# GitCury
+
 <div align="center">
 
-# 🌟 GitCury: AI-Powered Git Automation 🚀
+```
+██████╗ ██╗████████╗ ██████╗██╗   ██╗██████╗ ██╗   ██╗
+██╔════╝ ██║╚══██╔══╝██╔════╝██║   ██║██╔══██╗╚██╗ ██╔╝
+██║  ███╗██║   ██║   ██║     ██║   ██║██████╔╝ ╚████╔╝ 
+██║   ██║██║   ██║   ██║     ██║   ██║██╔══██╗  ╚██╔╝  
+╚██████╔╝██║   ██║   ╚██████╗╚██████╔╝██║  ██║   ██║   
+ ╚═════╝ ╚═╝   ╚═╝    ╚═════╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   
+```
 
-*Streamline Your Git Workflow with Intelligent Commit Messages*
+**⚡ Your AI-Powered Git Assistant**
 
-[<img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/go/go-original.svg" width="60">](https://go.dev/)
-[<img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/git/git-original.svg" width="60">](https://git-scm.com/)
-[<img src="https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg" width="60">](https://gemini.google.com/)
+*Transform your Git workflow with intelligent automation and AI-generated commit messages*
 
-[![Open in Visual Studio Code](https://img.shields.io/badge/Open%20in%20VS%20Code-007ACC?logo=visual-studio-code&logoColor=white)](https://vscode.dev/)
-[![Contributors](https://img.shields.io/github/contributors/lakshyajain-0291/GitCury)](https://github.com/lakshyajain-0291/gitcury/graphs/contributors)
-[![Forks](https://img.shields.io/github/forks/lakshyajain-0291/GitCury?style=social)](https://github.com/lakshyajain-0291/gitcury/network/members)
-[![Stars](https://img.shields.io/github/stars/lakshyajain-0291/GitCury?style=social)](https://github.com/lakshyajain-0291/gitcury/stargazers)
-[![Go Report Card](https://goreportcard.com/badge/github.com/lakshyajain-0291/gitcury)](https://goreportcard.com/report/github.com/lakshyajain-0291/gitcury)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-[![Release](https://img.shields.io/github/v/release/lakshyajain-0291/GitCury)](https://github.com/lakshyajain-0291/gitcury/releases/latest)
+[![Go Version](https://img.shields.io/badge/go-%3E%3D1.24-blue.svg)](https://golang.org/dl/)
+[![Release](https://img.shields.io/github/v/release/lakshyajain-0291/GitCury)](https://github.com/lakshyajain-0291/GitCury/releases)
+[![License](https://img.shields.io/github/license/lakshyajain-0291/GitCury)](./LICENSE)
+[![Go Report Card](https://goreportcard.com/badge/github.com/lakshyajain-0291/GitCury)](https://goreportcard.com/report/github.com/lakshyajain-0291/GitCury)
 [![Docker Pulls](https://img.shields.io/docker/pulls/lakshyajain1503/gitcury)](https://hub.docker.com/r/lakshyajain1503/gitcury)
-[![CI/CD Pipeline](https://img.shields.io/github/actions/workflow/status/lakshyajain-0291/GitCury/release.yml?label=CI%2FCD)](https://github.com/lakshyajain-0291/gitcury/actions)
-[![Coverage](https://img.shields.io/badge/coverage-15.5%25-green)](https://github.com/lakshyajain-0291/gitcury/blob/main/COVERAGE_REPORT.md)
+[![Essential Checks](https://github.com/lakshyajain-0291/GitCury/actions/workflows/essential-checks.yml/badge.svg)](https://github.com/lakshyajain-0291/GitCury/actions)
+
+[✨ Features](#features) • [🚀 Quick Start](#quick-start) • [📖 Documentation](#documentation) • [🤝 Contributing](#contributing)
 
 </div>
 
 ---
 
-## 🎯 What is GitCury?
+## ✨ Features
 
-GitCury is an **AI-powered Git automation CLI tool** that streamlines your development workflow. Built with Go and powered by Google's Gemini AI, GitCury automates commit message generation, manages multi-repository operations, and provides intelligent Git workflow automation.
+GitCury revolutionizes your Git workflow by combining the power of AI with seamless automation:
 
-### 🧠 Core Intelligence
+- 🧠 **AI-Powered Commit Messages** - Generate meaningful commit messages using Google Gemini API
+- 🎯 **Multi-Repository Management** - Handle multiple repositories effortlessly from a single interface
+- ⚡ **Batch Operations** - Process commits, pushes, and messages across all your projects at once
+- 🛡️ **Smart Error Recovery** - Robust error handling with detailed diagnostics and recovery suggestions
+- 🎨 **Beautiful CLI** - Intuitive command-line interface with rich output formatting
+- 🐳 **Docker Ready** - Full containerization support for consistent environments
+- 📊 **Progress Tracking** - Real-time progress indicators for all operations
+- 🔧 **Highly Configurable** - Extensive configuration options to match your workflow
 
-GitCury leverages **Google Gemini AI** to understand your code changes and generate meaningful commit messages automatically. It supports multi-repository workflows and provides a comprehensive CLI for managing Git operations across multiple project roots.
+## 🚀 Quick Start
 
-## 📥 Installation & Deployment
+### Installation
 
-GitCury is distributed through multiple channels for maximum accessibility:
- 
-> **📊 Deployment Status**: All distribution channels are automatically updated when new releases are tagged. Check the [latest release](https://github.com/lakshyajain-0291/gitcury/releases/latest) for the most current version.
+<details>
+<summary><strong>📦 Package Managers (Recommended)</strong></summary>
 
-### 🍺 Homebrew (macOS and Linux) - **Recommended**
-
+#### Homebrew (macOS & Linux)
 ```bash
-# Add the official GitCury tap
 brew tap lakshyajain-0291/gitcury
 brew install gitcury
-
-# Verify installation
-gitcury --version
 ```
 
-### 🪣 Scoop (Windows) - **Recommended**
-
+#### Scoop (Windows)
 ```powershell
-# Add the GitCury bucket
-scoop bucket add gitcury https://github.com/lakshyajain-0291/gitcury-Scoop-Bucket.git
+scoop bucket add gitcury https://github.com/lakshyajain-0291/GitCury-Scoop-Bucket.git
 scoop install gitcury
-
-# Verify installation
-gitcury --version
 ```
 
-### 🐹 Go Install (All Platforms)
-
-If you have Go 1.20+ installed:
-
+#### Go Install
 ```bash
 go install github.com/lakshyajain-0291/gitcury@latest
-
-# Ensure $GOPATH/bin is in your PATH
-export PATH=$PATH:$(go env GOPATH)/bin
-gitcury --version
 ```
 
-### 🐳 Docker (All Platforms)
+</details>
+
+<details>
+<summary><strong>🐳 Docker</strong></summary>
 
 ```bash
-# Quick run in current directory
+# Pull the latest image
+docker pull lakshyajain1503/gitcury:latest
+
+# Run GitCury in a container
 docker run -it --rm \
-  -v "$(pwd):/app/data" -w "/app/data" \
+  -v "$(pwd):/app/data" \
   -v "$HOME/.gitconfig:/home/gitcuryuser/.gitconfig:ro" \
   -v "$HOME/.gitcury:/home/gitcuryuser/.gitcury" \
-  lakshyajain1503/gitcury --help
-
-# With environment variables
-docker run -it --rm \
-  -v "$(pwd):/app/data" -w "/app/data" \
-  -v "$HOME/.gitcury:/home/gitcuryuser/.gitcury" \
-  -e GEMINI_API_KEY="your-api-key" \
-  lakshyajain1503/gitcury getmsgs --all
-
-# Using Docker Compose (see docker-compose.yml)
-docker-compose run --rm gitcury --help
+  lakshyajain1503/gitcury:latest --help
 ```
 
-### 📦 Direct Binary Download
+</details>
 
-Download platform-specific binaries from [GitHub Releases](https://github.com/lakshyajain-0291/gitcury/releases):
+<details>
+<summary><strong>📥 Direct Download</strong></summary>
 
-#### Available Platforms:
-- **Linux**: `amd64`, `arm64`
-- **macOS**: `amd64` (Intel), `arm64` (Apple Silicon)
-- **Windows**: `amd64`, `arm64`
+Download pre-built binaries from our [releases page](https://github.com/lakshyajain-0291/GitCury/releases/latest) for:
+- Linux (x86_64, ARM64)
+- macOS (Intel, Apple Silicon)
+- Windows (x86_64, ARM64)
+
+</details>
+
+### Initial Setup
+
+1. **Get your Gemini API key** (free) from [Google AI Studio](https://aistudio.google.com/app/apikey)
+
+2. **Configure GitCury**:
+```bash
+gitcury setup
+gitcury config set --key GEMINI_API_KEY --value YOUR_API_KEY_HERE
+```
+
+3. **Add your project directories**:
+```bash
+gitcury config set --key root_folders --value "/path/to/your/projects,/path/to/other/projects"
+```
+
+4. **Verify setup**:
+```bash
+gitcury config check
+```
+
+## 🎯 Usage
+
+### Core Commands
+
+Generate AI-powered commit messages:
+```bash
+# For all repositories
+gitcury msgs --all
+
+# For specific repository
+gitcury msgs --root /path/to/repo
+
+# Generate multiple message options
+gitcury msgs --all --num 3
+```
+
+Commit with generated messages:
+```bash
+# Commit all changes across repositories
+gitcury commit --all
+
+# Commit changes in specific repository
+gitcury commit --root /path/to/repo
+```
+
+Push changes:
+```bash
+# Push all repositories
+gitcury push --all
+
+# Push specific repository
+gitcury push --root /path/to/repo
+```
+
+### Workflow Examples
+
+<details>
+<summary><strong>🔄 Complete Workflow Automation</strong></summary>
+
+**Workflow Visualization:**
+
+```mermaid
+graph TD
+    START[Start GitCury] --> SCAN[Scan Repositories]
+    SCAN --> ANALYZE[Analyze Changes]
+    ANALYZE --> GENERATE[Generate AI Messages]
+    
+    GENERATE --> REVIEW{Review Messages}
+    REVIEW -->|Approve| COMMIT[Commit Changes]
+    REVIEW -->|Regenerate| GENERATE
+    
+    COMMIT --> BATCH[Batch Process]
+    BATCH --> PUSH[Push to Remote]
+    PUSH --> COMPLETE[Workflow Complete]
+    
+    subgraph "Multi-Repository Processing"
+        REPO1[Repository 1]
+        REPO2[Repository 2]
+        REPO3[Repository N...]
+    end
+    
+    BATCH --> REPO1
+    BATCH --> REPO2
+    BATCH --> REPO3
+    
+    subgraph "AI Processing"
+        CONTEXT[Build Context]
+        GEMINI[Gemini API]
+        CLUSTER[Apply Clustering]
+    end
+    
+    GENERATE --> CONTEXT
+    CONTEXT --> GEMINI
+    GEMINI --> CLUSTER
+    CLUSTER --> REVIEW
+```
 
 ```bash
-# Example: Download and install on Linux
-wget https://github.com/lakshyajain-0291/gitcury/releases/latest/download/gitcury_linux_amd64.tar.gz
-tar -xzf gitcury_linux_amd64.tar.gz
-sudo mv gitcury /usr/local/bin/
-chmod +x /usr/local/bin/gitcury
+# 1. Generate commit messages for all projects
+gitcury msgs --all --num 2
+
+# 2. Review and commit changes
+gitcury commit --all
+
+# 3. Push all changes
+gitcury push --all
 ```
 
-### 🛠️ Build from Source (Development)
+**Process Flow:**
+1. **Analysis** - GitCury scans all configured repositories
+2. **AI Generation** - Gemini API creates contextual commit messages
+3. **Review** - User reviews generated messages
+4. **Batch Commit** - All repositories committed simultaneously
+5. **Push** - Changes pushed to remote repositories
 
-For developers and contributors:
+</details>
+
+<details>
+<summary><strong>🎯 Single Repository Workflow</strong></summary>
 
 ```bash
-# Clone the repository
-git clone https://github.com/lakshyajain-0291/gitcury.git
-cd GitCury
+# Navigate to your project
+cd /path/to/your/project
 
-# Install dependencies
-go mod tidy
+# Generate commit messages
+gitcury msgs --root .
 
-# Build optimized binary
-make build
+# Commit with AI-generated message
+gitcury commit --root .
 
-# Or build with custom flags
-go build -ldflags="-s -w -X main.version=dev" -o gitcury main.go
-
-# Run tests
-make test
+# Push changes
+gitcury push --root .
 ```
 
-## 🚀 Deployment & Release Process
+</details>
 
-GitCury uses a sophisticated multi-channel deployment pipeline:
-
-### 🔄 Automated Release Pipeline
-
-**Trigger**: Push git tag (e.g., `git tag v1.2.3 && git push origin v1.2.3`)
-
-**Process**:
-1. **🧪 Tests**: Comprehensive test suite runs across multiple Go versions
-2. **🏗️ Build**: Cross-platform binaries built with GoReleaser
-3. **🐳 Docker**: Multi-arch container images pushed to Docker Hub
-4. **📦 Package Managers**: 
-   - Homebrew formula updated automatically
-   - Scoop manifest updated automatically
-5. **📋 Release**: GitHub release created with changelog
-6. **✅ Verification**: Post-deployment tests run
-
-### 🌍 Distribution Channels
-
-| Channel | Update Method | Platforms | Automation |
-|---------|---------------|-----------|------------|
-| **GitHub Releases** | GoReleaser | All | ✅ Automatic |
-| **Docker Hub** | GitHub Actions | All | ✅ Automatic |
-| **Homebrew** | Tap Update | macOS/Linux | ✅ Automatic |
-| **Scoop** | Bucket Update | Windows | ✅ Automatic |
-| **Go Modules** | Git Tags | All | ✅ Automatic |
-
-### 🔧 Development Deployment
-
-For testing and development:
+<details>
+<summary><strong>⚡ Express Mode</strong></summary>
 
 ```bash
-# Local development build
-make build
-
-# Test release process (no publishing)
-make check-release
-
-# Build Docker image locally
-make docker-build
-
-# Run local Docker container
-make docker-run
+# One-liner for quick commits (using aliases)
+gc msgs --all && gc commit --all && gc push --all
 ```
 
-## ✨ Key Features
+</details>
 
-### 🤖 **AI-Powered Commit Messages**  
-Let the Gemini API craft meaningful commit messages for you based on file changes. No more staring at your terminal in despair!
+## 📖 Documentation
 
-### 📂 **Multi-Repository Support**  
-Configure multiple root folders to manage Git operations across different projects simultaneously. Perfect for monorepos and multi-project workflows!
+| Document | Description |
+|----------|-------------|
+| [🔧 Development Guide](./DEVELOPMENT.md) | Setup development environment and contribution guidelines |
+| [📋 Release Guide](./RELEASE_GUIDE.md) | Complete release process and versioning information |
+| [🔄 Versioning Strategy](./VERSIONING.md) | Semantic versioning and release strategy |
+| [📊 Test Coverage Report](./COVERAGE_REPORT.md) | Comprehensive testing metrics and coverage analysis |
 
-### 📊 **Organized Output**  
-Commit messages are neatly organized in `output.json` by root folder:
+### Advanced Configuration
+
+<details>
+<summary><strong>⚙️ Configuration Options</strong></summary>
+
+**Configuration Flow:**
+
+```mermaid
+flowchart TD
+    START[Application Start] --> LOAD[Load Config]
+    LOAD --> CHECK{Config Exists?}
+    CHECK -->|No| SETUP[Interactive Setup]
+    CHECK -->|Yes| VALIDATE[Validate Config]
+    
+    SETUP --> APIKEY[Request API Key]
+    APIKEY --> FOLDERS[Configure Root Folders]
+    FOLDERS --> ALIASES[Set Custom Aliases]
+    ALIASES --> SAVE[Save Configuration]
+    
+    VALIDATE --> VALID{Valid?}
+    VALID -->|No| ERROR[Show Errors]
+    VALID -->|Yes| READY[Ready to Use]
+    
+    ERROR --> REPAIR[Auto-Repair Attempt]
+    REPAIR --> MANUAL[Manual Fix Required]
+    
+    SAVE --> READY
+    MANUAL --> READY
+    
+    subgraph "Config Structure"
+        JSON[config.json]
+        ENV[Environment Variables]
+        PROFILES[Multiple Profiles]
+    end
+    
+    READY --> JSON
+    READY --> ENV
+    READY --> PROFILES
+```
+
+GitCury supports extensive configuration through `~/.gitcury/config.json`:
+
 ```json
 {
-  "folders": {
-    "root_folder1": {
-      "files": {
-        "file1.go": "feat: implement user authentication",
-        "file2.go": "fix: resolve login validation issue"
-      }
-    },
-    "root_folder2": {
-      "files": {
-        "file3.py": "docs: update API documentation",
-        "file4.py": "test: add unit tests for data processing"
-      }
-    }
+  "gemini_api_key": "your-api-key",
+  "root_folders": ["/path/to/project1", "/path/to/project2"],
+  "default_commit_count": 3,
+  "auto_push": false,
+  "clustering": {
+    "enabled": true,
+    "similarity_threshold": 0.8
+  },
+  "aliases": {
+    "commit": "seal",
+    "push": "deploy",
+    "msgs": "getmsgs"
   }
 }
 ```
 
-### ⚡ **Batch Operations**  
-Perform Git operations across all root folders or focus on just one. Complete flexibility for your workflow!
+**Key Configuration Features:**
+- 🎛️ **Clustering** - Group similar changes for better commit organization
+- 🚀 **Auto-push** - Automatically push after successful commits
+- 📝 **Custom Aliases** - Personalize command names to match your workflow
+- 🎯 **Smart Defaults** - Sensible defaults that work out of the box
 
-### 🔑 **Alias-Based Commands**  
-Use intuitive aliases like `seal` for commit, `deploy` for push, and `genesis` for generating commit messages. Fully customizable to suit your preferences.
+**Configuration Management:**
+- **Validation** - Automatic configuration validation on startup
+- **Migration** - Seamless config updates between versions
+- **Environment Variables** - Override settings via environment variables
+- **Multiple Profiles** - Support for different configuration profiles
 
-### 🛠️ **Flexible Configuration**  
-Easy configuration management through CLI commands or direct config file editing. Set API keys, root folders, file limits, and custom aliases.
+</details>
 
-### 📈 **Statistics Tracking**  
-Track operation performance, success rates, and execution times with the global `--stats` flag for all commands.
+<details>
+<summary><strong>🔌 API Integration</strong></summary>
 
-### 🌊 **End-to-End Workflow**  
-The `boom` command provides a complete workflow: generate messages → commit → push, all with interactive confirmations.
-
-## 🚀 Quick Start
-
-### 📋 Prerequisites
-- **Git** (obviously! 😄)
-- **Gemini API Key** - Get yours from [Google AI Studio](https://makersuite.google.com/app/apikey)
-
-### ⚡ 3-Step Setup
-
-1. **Install GitCury** (choose your method above)
-2. **Configure API Key**:
-   ```bash
-   gitcury config set --key GEMINI_API_KEY --value "your-api-key-here"
-   ```
-3. **Set Project Paths**:
-   ```bash
-   gitcury config set --key root_folders --value "/path/to/your/project"
-   ```
-
-### 🎯 Basic Usage
-
-```bash
-# Generate AI-powered commit messages
-gitcury getmsgs --all
-
-# Review generated messages  
-gitcury output --log
-
-# Commit changes
-gitcury commit --all
-
-# Push to remote
-gitcury push --all --branch main
-```
-
-### 🌊 One-Command Workflow
-
-```bash
-# Complete workflow: generate → commit → push (with confirmations)
-gitcury boom --all
-```
-
-## 📚 CLI Commands
-
-GitCury provides a comprehensive CLI to streamline your Git workflow:
-
-### **Configuration Management**
-- View current configuration:
-  ```bash
-  gitcury config
-  ```
-- Set configuration values:
-  ```bash
-  gitcury config set --key <key> --value <value>
-  gitcury config set --key root_folders --value "/path/to/repo1,/path/to/repo2"
-  ```
-- Remove configuration keys:
-  ```bash
-  gitcury config remove --key <key>
-  ```
-- Reset configuration:
-  ```bash
-  gitcury config --delete
-  ```
-
-### **Message Generation**
-- Generate commit messages for all folders:
-  ```bash
-  gitcury getmsgs --all
-  gitcury msgs --all  # alias
-  ```
-- Generate for specific folder:
-  ```bash
-  gitcury getmsgs --root /path/to/folder
-  ```
-- Limit number of files:
-  ```bash
-  gitcury getmsgs --all --num 10
-  ```
-- Custom instructions:
-  ```bash
-  gitcury getmsgs --all --instructions "Focus on security improvements"
-  ```
-
-> **📝 Note:** GitCury automatically skips binary files (images, executables, compiled files, etc.) during message generation and commit operations to focus on readable source code changes.
-
-### **Commit Operations**
-- Commit all changes:
-  ```bash
-  gitcury commit --all
-  ```
-- Commit specific folder:
-  ```bash
-  gitcury commit --root /path/to/folder
-  ```
-- Commit with date:
-  ```bash
-  gitcury commit with-date --all
-  ```
-
-> **📝 Note:** GitCury automatically skips binary files when processing commits, ensuring only source code and text files are analyzed for commit message generation.
-
-### **Push Operations**
-- Push all changes:
-  ```bash
-  gitcury push --all --branch main
-  ```
-- Push specific folder:
-  ```bash
-  gitcury push --root /path/to/folder --branch dev
-  ```
-
-### **Output Management**
-- View generated messages:
-  ```bash
-  gitcury output --log
-  ```
-- Edit output file:
-  ```bash
-  gitcury output --edit
-  ```
-- Clear all messages:
-  ```bash
-  gitcury output --delete
-  ```
-
-### **Alias Management**
-- List all aliases:
-  ```bash
-  gitcury alias --list
-  ```
-- Add custom alias:
-  ```bash
-  gitcury alias --add commit seal
-  ```
-- Remove alias:
-  ```bash
-  gitcury alias --remove seal
-  ```
-
-
-
-### **End-to-End Workflow**
-- Complete workflow with confirmations:
-  ```bash
-  gitcury boom --all
-  gitcury boom --root /path/to/folder
-  ```
-
-### **Statistics & Performance**
-Add `--stats` or `-s` to any command for detailed performance metrics:
-```bash
-gitcury commit --all --stats
-gitcury msgs --all -s
-gitcury boom --all --stats
-```
-
-### **Setup & Completion**
-- Initialize configuration:
-  ```bash
-  gitcury setup
-  ```
-- Generate shell completion:
-  ```bash
-  gitcury setup completion bash
-  gitcury setup completion zsh
-  ```
-
-## 🎯 Workflow Examples
-
-### 🚀 **Basic Workflow**
-```bash
-# Generate commit messages
-gitcury getmsgs --all
-
-# Review the generated messages
-gitcury output --log
-
-# Commit changes
-gitcury commit --all
-
-# Push to remote
-gitcury push --all --branch main
-```
-
-### 🌊 **End-to-End Workflow**
-```bash
-# One command for everything with confirmations
-gitcury boom --all
-
-# With performance tracking
-gitcury boom --all --stats
-```
-
-### ⚡ **Quick Setup Workflow**
-```bash
-# Initial setup
-gitcury setup
-gitcury config set --key GEMINI_API_KEY --value "your_key"
-gitcury config set --key root_folders --value "/path/to/projects"
-
-# Configure aliases
-gitcury alias --add getmsgs genesis
-gitcury alias --add commit seal
-gitcury alias --add push deploy
-
-# Use your aliases
-gitcury genesis --all
-gitcury seal --all
-gitcury deploy --all --branch main
-```
-
-### 🧠 **AI-Powered Smart Workflow**
-```bash
-# Generate AI-powered commit messages
-gitcury getmsgs --all
-
-# Review and commit changes
-gitcury output --log
-gitcury commit --all
-
-# Push to remote
-gitcury push --all --branch main
-
-# Complete workflow with confirmations
-gitcury boom --all --stats
-```
-
-## 🛠️ Configuration
-
-### **Configuration Keys**
-- `GEMINI_API_KEY`: Your Gemini API key (required)
-- `root_folders`: Comma-separated list of project root paths
-- `numFilesToCommit`: Maximum files per commit operation (default: 5)
-- `app_name`: Application name (default: "GitCury")
-- `version`: Application version
-- `log_level`: Logging level (default: "info")
-- `editor`: Text editor for commit message editing (default: "nano")
-- `output_file_path`: Path to output JSON file
-- `retries`: Number of operation retries (default: 3)
-- `timeout`: Operation timeout duration (default: 30s)
-
-## 🔧 Advanced Features
-
-### **Flexible Root Folder Management**
-Configure multiple project roots for complex workflows:
-```bash
-gitcury config set --key root_folders --value "/home/user/frontend,/home/user/backend,/home/user/mobile"
-```
-
-### **Custom Aliases**
-Create personalized command aliases:
-```bash
-gitcury alias --add commit seal
-gitcury alias --add push deploy
-gitcury alias --add getmsgs genesis
-gitcury alias --add boom cascade
-```
-
-### **Performance Monitoring**
-Track operation performance and success rates:
-```bash
-gitcury commit --all --stats
-# Outputs: operation times, success rates, memory usage, etc.
-```
-
-### **Interactive Workflow**
-The `boom` command provides guided workflow with user confirmations:
-- Generates commit messages
-- Shows preview and asks for confirmation
-- Commits changes after approval
-- Optionally pushes to remote with branch selection
-
-### **Advanced Hidden Features**
-
-#### 🔍 **Test-Implementation Relationship Detection**
-GitCury intelligently identifies relationships between test files and their corresponding implementation files, enabling:
-- **🧪 Smart Test Organization**: Automatic grouping of tests with their source code
-- **📊 Coverage Analysis**: Understanding of test-to-code relationships
-- **🔄 Synchronized Commits**: Coordinated commits of tests and implementation
-
-#### 🏗️ **Architectural Intelligence**
-- **📦 Package Dependency Analysis**: Understands Go module relationships
-- **🎯 Import Path Recognition**: Smart handling of internal and external dependencies
-- **🏗️ Project Structure Detection**: Automatic identification of project patterns and conventions
-
-## 🏗️ Technical Architecture
-
-### 🎯 **Core Technologies**
-- **Language**: Go 1.19+ with advanced concurrency patterns
-- **AI Integration**: Google Gemini API for intelligent commit message generation
-- **CLI Framework**: Cobra for robust command-line interface
-- **Configuration**: JSON-based configuration with environment variable support
-- **Testing**: Comprehensive test suite with integration coverage
-
-### 📊 **Performance Metrics**
-```
-🚀 Message Generation:  Fast AI-powered analysis
-🧠 AI Accuracy:         95%+ semantic understanding
-⚡ Concurrency:         Parallel processing for multiple repositories
-💾 Memory Efficiency:   Optimized for large codebases
-🔄 Reliability:         Robust error handling and retry mechanisms
-```
-
-### 🎨 **Architecture Highlights**
-```mermaid
-graph TD
-    A[GitCury CLI]
-    A --> B[Configuration Management]
-    A --> C[AI Integration]
-    C --> J[Gemini API]
-    C --> K[Message Generation]
-    C --> L[Context Analysis]
-    
-    A --> D[Git Operations]
-    D --> M[Commit Management]
-    D --> N[Push Operations]
-    D --> O[Repository Handling]
-    
-    A --> E[Output Management]
-    E --> P[JSON Output]
-    E --> Q[Message Storage]
-    E --> R[File Organization]
-```
-
-## 🏗️ CI/CD & Deployment Architecture
-
-### 🚀 **Continuous Integration Pipeline**
-
-GitCury uses GitHub Actions for automated testing and deployment:
+**AI Integration Flow:**
 
 ```mermaid
-graph TD
-    A[Push/PR] --> B[Multi-OS Testing]
-    B --> C[Go 1.20-1.22 Matrix]
-    C --> D[Integration Tests]
-    D --> E[Code Quality Checks]
-    E --> F{Tests Pass?}
-    F -->|No| G[❌ Block Merge]
-    F -->|Yes| H[✅ Ready for Release]
-```
-
-#### **🧪 Test Matrix**
-- **Operating Systems**: Ubuntu, macOS, Windows
-- **Go Versions**: 1.20, 1.21, 1.22
-- **Test Types**: Unit, Integration, End-to-End
-- **Coverage**: 15.5% integration coverage across core workflows
-
-#### **🔍 Quality Gates**
-- **Linting**: `golangci-lint` with strict rules
-- **Performance**: Benchmark regression testing
-- **Dependency**: `govulncheck` for known vulnerabilities
-
-### 🚀 **Release Automation**
-
-**Trigger Process**:
-```bash
-# Create and push release tag
-git tag v1.2.3
-git push origin v1.2.3
-```
-
-**Automated Steps**:
-
-1. **🧪 Pre-Release Validation**
-   - Full test suite execution
-   - Cross-platform compatibility checks
-   - Performance benchmark validation
-
-2. **🏗️ Multi-Platform Builds**
-   - Linux: `amd64`, `arm64`
-   - macOS: `amd64` (Intel), `arm64` (Apple Silicon)
-   - Windows: `amd64`, `arm64`
-   - All binaries optimized with `-ldflags="-s -w"`
-
-3. **🐳 Container Deployment**
-   - Multi-arch Docker images (`linux/amd64`, `linux/arm64`)
-   - Pushed to Docker Hub with semantic versioning
-   - Minimal Alpine-based images for security
-
-4. **📦 Package Manager Updates**
-   - **Homebrew**: Formula auto-updated in tap repository
-   - **Scoop**: Manifest auto-updated in bucket repository
-   - **Go Modules**: Automatically available via Git tags
-
-5. **📋 Release Notes**
-   - Automated changelog generation
-   - Binary downloads with checksums
-   - Container image tags and signatures
-
-### 🌐 **Infrastructure Overview**
-
-```yaml
-Deployment Channels:
-  GitHub Releases:
-    - Automated via GoReleaser
-    - Cross-platform binaries
-    - Checksum verification
+sequenceDiagram
+    participant User
+    participant CLI
+    participant Core
+    participant Gemini as Gemini API
+    participant Git
     
-  Docker Hub:
-    - Multi-architecture images
-    - Semantic versioning
-    - Security scanning
+    User->>CLI: gitcury msgs --all
+    CLI->>Core: ProcessMsgGeneration()
+    Core->>Git: AnalyzeChanges()
+    Git-->>Core: ChangesContext
     
-  Package Managers:
-    Homebrew:
-      - macOS and Linux support
-      - Automatic formula updates
-      - Version verification
+    loop For each repository
+        Core->>Gemini: GenerateCommitMessage(context)
+        Gemini-->>Core: AI-Generated Messages
+        Core->>Core: ApplyClustering()
+        Core->>Core: ValidateMessages()
+    end
     
-    Scoop:
-      - Windows package management
-      - JSON manifest updates
-      - Hash verification
-      
-  Go Module Registry:
-    - Automatic via Git tags
-    - Proxy cache integration
-    - Version resolution
+    Core-->>CLI: FormattedResults
+    CLI-->>User: Display Messages
+    
+    Note over Gemini: Rate limiting & caching applied
+    Note over Core: Batch processing optimization
 ```
 
-### 🔧 **Development Workflow**
+GitCury integrates with Google Gemini API for intelligent commit message generation:
 
-**For Contributors**:
-```bash
-# 1. Setup development environment
-git clone https://github.com/lakshyajain-0291/gitcury.git
-cd GitCury
-make setup-dev
+- **Contextual Analysis** - Analyzes code changes to understand intent
+- **Multiple Options** - Generates several commit message variations
+- **Best Practices** - Follows conventional commit standards
+- **Smart Categorization** - Automatically detects feature, fix, docs, etc.
 
-# 2. Create feature branch
-git checkout -b feature/amazing-feature
+**Integration Features:**
+- **Rate Limiting**: Intelligent API call management
+- **Error Handling**: Graceful fallbacks and retry mechanisms  
+- **Caching**: Optimized performance with response caching
+- **Batch Processing**: Efficient handling of multiple repositories
 
-# 3. Local testing
-make test
-make test-coverage
-make lint
+</details>
 
-# 4. Local release simulation
-make check-release
+## 🏗️ Architecture
 
-# 5. Submit PR
-git push origin feature/amazing-feature
+<details>
+<summary><strong>📋 Project Structure</strong></summary>
+
+```
+GitCury/
+├── cmd/                    # CLI commands and interface
+├── core/                   # Core business logic
+├── config/                 # Configuration management
+├── git/                    # Git operations and integration
+├── utils/                  # Utility functions and helpers
+├── interfaces/             # Interface definitions
+├── tests/                  # Comprehensive test suite
+├── assets/                 # Project assets and documentation
+└── docs/                   # Additional documentation
 ```
 
-**For Maintainers**:
-```bash
-# 1. Merge approved PRs
-git checkout main && git pull
+**System Architecture Diagram:**
 
-# 2. Create release tag
-git tag v1.2.3 -m "Release v1.2.3"
-
-# 3. Trigger automated deployment
-git push origin v1.2.3
-
-# 4. Monitor deployment status
-# GitHub Actions will handle the rest!
+```mermaid
+graph TB
+    subgraph "CLI Layer"
+        CMD[cmd/]
+        ROOT[root.go]
+        MSGS[msgs.go]
+        COMMIT[commit.go]
+        PUSH[push.go]
+    end
+    
+    subgraph "Core Layer"
+        CORE[core/]
+        CORE_MSGS[msgs.go]
+        CORE_COMMIT[commit.go]
+        CORE_PUSH[push.go]
+    end
+    
+    subgraph "Service Layer"
+        GIT[git/]
+        UTILS[utils/]
+        CONFIG[config/]
+        DI[di/]
+    end
+    
+    subgraph "Integration Layer"
+        INTERFACES[interfaces/]
+        GEMINI[gemini.go]
+        API[api/]
+    end
+    
+    subgraph "External Services"
+        GEMINI_API[Google Gemini API]
+        GIT_REPOS[Git Repositories]
+    end
+    
+    CMD --> CORE
+    CORE --> GIT
+    CORE --> UTILS
+    CORE --> CONFIG
+    INTERFACES --> GEMINI_API
+    GIT --> GIT_REPOS
+    UTILS --> INTERFACES
+    DI --> INTERFACES
 ```
 
-## 🚀 **First-Time Deployment Guide**
+The architecture follows a modular design with clear separation of concerns:
+- **CLI Layer** (`cmd/`) - User interface and command handling
+- **Core Layer** (`core/`) - Business logic and workflows
+- **Service Layer** (`git/`, `utils/`) - Git operations and utilities
+- **Integration Layer** (`interfaces/`) - External API integrations
+- **Configuration Layer** (`config/`) - Settings and user preferences
 
-Since you've already run `setup-distribution.sh` and pushed everything to GitHub, here's your step-by-step deployment process:
+</details>
 
-### **Step 1: ⚙️ GitHub Secrets Setup (CRITICAL)**
+<details>
+<summary><strong>🔧 Technical Specifications</strong></summary>
 
-**Required GitHub Repository Secrets:**
-```bash
-# Go to: https://github.com/lakshyajain-0291/gitcury/settings/secrets/actions
-# Add these secrets:
+**System Component Overview:**
 
-HOMEBREW_TAP_PAT=<your-github-personal-access-token>
-SCOOP_BUCKET_PAT=<your-github-personal-access-token>  
-DOCKERHUB_USERNAME=<your-dockerhub-username>
-DOCKERHUB_TOKEN=<your-dockerhub-access-token>
+```mermaid
+graph LR
+    subgraph "Application Core"
+        CLI[CLI Interface<br/>Cobra Framework]
+        CORE[Business Logic<br/>Core Package]
+        CONFIG[Configuration<br/>JSON/YAML]
+    end
+    
+    subgraph "AI Integration"
+        GEMINI[Gemini API<br/>Client]
+        AI_PROC[Message Generation<br/>Processing]
+        CONTEXT[Code Analysis<br/>Context Builder]
+    end
+    
+    subgraph "Git Operations"
+        GIT_CLIENT[Git Client<br/>Operations]
+        MULTI_REPO[Multi-Repository<br/>Manager]
+        BATCH[Batch Processing<br/>Worker Pool]
+    end
+    
+    subgraph "Infrastructure"
+        ERROR[Error Recovery<br/>System]
+        PROGRESS[Progress Tracking<br/>Real-time]
+        LOGGING[Logging<br/>Structured]
+    end
+    
+    CLI --> CORE
+    CORE --> GEMINI
+    CORE --> GIT_CLIENT
+    GEMINI --> AI_PROC
+    AI_PROC --> CONTEXT
+    GIT_CLIENT --> MULTI_REPO
+    MULTI_REPO --> BATCH
+    CORE --> ERROR
+    CORE --> PROGRESS
+    ERROR --> LOGGING
 ```
 
-**Create Personal Access Token:**
-- GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
-- Generate token with scopes: `repo`, `write:packages`
-- Use same token for both `HOMEBREW_TAP_PAT` and `SCOOP_BUCKET_PAT`
+**Technical Stack:**
+- **Language**: Go 1.24+
+- **CLI Framework**: Cobra
+- **AI Integration**: Google Gemini API
+- **Architecture**: Modular, dependency-injected design
+- **Testing**: 15.5% integration coverage with end-to-end validation
+- **Platforms**: Cross-platform (Linux, macOS, Windows)
+- **Deployment**: Multi-channel distribution (Homebrew, Scoop, Docker, Direct)
 
-### **Step 2: 🚀 Create Your First Release**
+**Key Components:**
+- **Dependency Injection**: Clean architecture with interface-based design
+- **Worker Pool**: Concurrent processing for multi-repository operations
+- **Error Recovery**: Advanced error handling with context and suggestions
+- **Progress Tracking**: Real-time feedback for long-running operations
+- **Configuration Management**: Flexible JSON-based configuration system
 
-```bash
-# 1. Ensure you're on main branch with latest changes
-git checkout main && git pull
-
-# 2. Create your first release tag
-git tag v1.0.0 -m "Initial release v1.0.0"
-
-# 3. Push the tag to trigger automated deployment
-git push origin v1.0.0
-
-# 4. Monitor the deployment
-# Check: https://github.com/lakshyajain-0291/gitcury/actions
-```
-
-### **Step 3: ✅ Verify Deployment Success**
-
-After the GitHub Actions workflows complete (5-10 minutes):
-
-```bash
-# Check GitHub Release was created
-# Visit: https://github.com/lakshyajain-0291/gitcury/releases
-
-# Verify Docker image (will be available after first release)
-# docker pull lakshyajain1503/gitcury:v1.0.0
-
-# Verify Homebrew (after ~30 minutes)
-brew tap lakshyajain-0291/gitcury && brew install gitcury
-
-# Verify Scoop (Windows)
-scoop bucket add gitcury https://github.com/lakshyajain-0291/gitcury-Scoop-Bucket.git
-scoop install gitcury
-```
-
-### **Step 4: 📊 Deployment Status Dashboard**
-
-Monitor your deployment across all channels:
-
-| Channel | Status Check | Expected Time | Verification Command |
-|---------|-------------|---------------|---------------------|
-| **🚀 GitHub Release** | ✅ Immediate | ~2-3 min | Visit [releases page](https://github.com/lakshyajain-0291/gitcury/releases) |
-| **🐳 Docker Hub** | ⏳ Planned | ~3-5 min | *Will be available after first release* |
-| **🍺 Homebrew** | ⏳ Automatic | ~15-30 min | `brew install lakshyajain-0291/gitcury/gitcury` |
-| **📦 Scoop** | ⏳ Automatic | ~10-20 min | `scoop install gitcury` |
-| **📋 Go Modules** | ✅ Immediate | ~1-2 min | `go install github.com/lakshyajain-0291/gitcury@latest` |
-
-**Monitoring Commands:**
-```bash
-# Check GitHub Actions status
-# Visit: https://github.com/lakshyajain-0291/gitcury/actions
-
-# Monitor Docker Hub
-curl -s "https://hub.docker.com/v2/repositories/lakshyajain1503/gitcury/tags/" | jq '.results[0].name'
-
-# Check Homebrew formula
-curl -s "https://raw.githubusercontent.com/lakshyajain-0291/homebrew-gitcury/main/Formula/gitcury.rb" | grep version
-
-# Verify Go module availability  
-go list -m -versions github.com/lakshyajain-0291/gitcury
-```
-
-## 🔄 **Subsequent Deployment Strategy**
-
-For all future releases, GitCury uses **automated semantic versioning**:
-
-### **🤖 Automatic Releases (Recommended)**
-
-Simply merge PRs to main with conventional commit messages:
-
-```bash
-# These commit types trigger version bumps:
-feat: new feature          → Minor version bump (v1.1.0)
-fix: bug fix               → Patch version bump (v1.0.1)  
-feat!: breaking change    → Major version bump (v2.0.0)
-docs: documentation       → No version bump
-```
-
-**Workflow:**
-1. Create feature branch: `git checkout -b feature/my-feature`
-2. Make changes and commit: `git commit -m "feat: add amazing feature"`
-3. Push and create PR: `git push origin feature/my-feature`
-4. Merge PR → Automatic tag creation → Automatic release
-
-### **🎯 Manual Release (When Needed)**
-
-For immediate releases or specific versioning:
-
-```bash
-# 1. Ensure main is ready
-git checkout main && git pull
-
-# 2. Create specific version tag  
-git tag v1.2.3 -m "Release v1.2.3: Brief description"
-
-# 3. Trigger deployment
-git push origin v1.2.3
-
-
-## 🌟 Future Roadmap
-
-### 🚧 **Coming Soon**
-- **📊 Web Dashboard**: Real-time analytics and monitoring  
-- **🔗 CI/CD Integration**: Native pipeline integrations for popular CI/CD platforms
-- **🎯 Multi-Language Support**: Beyond Go repositories
-- **🧠 Enhanced AI Features**: Improved commit message generation
-- **🌐 Plugin System**: Extensible architecture for custom integrations
-
-### 🎯 **Long-term Vision**
-- **🤖 Full AI Automation**: Complete workflow automation
-- **🌐 Cloud Integration**: Native cloud platform support
-- **📱 Mobile Companion**: Mobile app for monitoring
-- **🔮 Enhanced Analytics**: Better insights into development patterns
+</details>
 
 ## 🤝 Contributing
 
-We ❤️ contributions! Here's how you can help make GitCury even more amazing:
+We welcome contributions! Here's how to get started:
 
-### 🚀 **Getting Started**
-1. **Fork the repository** and create your feature branch
-2. **Set up development environment** with `make setup-dev`
-3. **Explore the codebase** - check out the AI integration and Git automation features
-4. **Run the comprehensive test suite** - we have 15.5% integration coverage
-5. **Add your improvements** - from performance optimizations to new AI features
+<details>
+<summary><strong>🚀 Quick Contribution Setup</strong></summary>
 
-### 🎯 **Contribution Areas**
-- **🧠 AI & Machine Learning**: Improve commit message generation and semantic analysis
-- **⚡ Performance**: Optimize processing speed and resource usage
-- **🎨 User Experience**: Enhance CLI interface and user workflows  
-- **🧪 Testing**: Add edge cases and integration tests
-- **📝 Documentation**: Help others understand GitCury's features
-- **🚀 Deployment**: Improve CI/CD pipeline and deployment automation
-- **📦 Distribution**: Add new package managers or installation methods
+**Development Setup Flow:**
 
-### 🔧 **Development Workflow**
+```mermaid
+graph TD
+    FORK[Fork Repository] --> CLONE[Clone Locally]
+    CLONE --> DEPS[Install Dependencies]
+    DEPS --> ENV[Setup Dev Environment]
+    ENV --> TEST[Run Tests]
+    TEST --> BUILD[Build & Test]
+    BUILD --> READY[Ready to Contribute]
+    
+    subgraph "Development Cycle"
+        BRANCH[Create Feature Branch]
+        CODE[Write Code]
+        TEST_LOCAL[Test Locally]
+        COMMIT_LOCAL[Commit Changes]
+        PUSH_BRANCH[Push Branch]
+        PR[Create Pull Request]
+    end
+    
+    READY --> BRANCH
+    BRANCH --> CODE
+    CODE --> TEST_LOCAL
+    TEST_LOCAL --> COMMIT_LOCAL
+    COMMIT_LOCAL --> PUSH_BRANCH
+    PUSH_BRANCH --> PR
+    
+    subgraph "CI/CD Pipeline"
+        CI_BUILD[CI Build]
+        CI_TEST[CI Tests]
+        CODE_REVIEW[Code Review]
+        MERGE[Merge to Main]
+    end
+    
+    PR --> CI_BUILD
+    CI_BUILD --> CI_TEST
+    CI_TEST --> CODE_REVIEW
+    CODE_REVIEW --> MERGE
+```
+
 ```bash
-# 1. Fork and clone
+# 1. Fork and clone the repository
 git clone https://github.com/your-username/GitCury.git
 cd GitCury
 
-# 2. Setup development environment
-make setup-dev
-go mod tidy
+# 2. Install dependencies
+go mod download
 
-# 3. Run comprehensive tests
+# 3. Set up development environment
+make install
+
+# 4. Run tests
 make test
-make test-coverage
-./tests/run_coverage.sh
 
-# 4. Test specific components
-make test
-make test-coverage
-
-# 5. Create feature branch
-git checkout -b feature/amazing-new-feature
-
-# 6. Make your changes and validate
-make lint
-make test
-make docker-build
-
-# 7. Submit your PR
-git commit -m "feat: add amazing new feature"
-git push origin feature/amazing-new-feature
+# 5. Build and test locally
+make build
+./gitcury --help
 ```
 
-### 📋 **Pull Request Guidelines**
-- **🧪 Tests**: Include tests for new features
-- **📝 Documentation**: Update README and docs as needed
-- **🔍 Code Quality**: Follow Go best practices and pass linting
-- **🚀 Performance**: Consider impact on build and runtime performance
-- **🏗️ Deployment**: Test that changes don't break build pipeline
+</details>
 
-### 🎯 **Release Process for Maintainers**
+### Development Workflow
 
-**Creating a Release**:
-```bash
-# 1. Ensure main branch is ready
-git checkout main && git pull
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes (`git commit -m 'feat: add amazing feature'`)
+4. **Push** to the branch (`git push origin feature/amazing-feature`)
+5. **Open** a Pull Request
 
-# 2. Update version and changelog
-# Edit version in relevant files
+### Code Standards
 
-# 3. Create and push tag
-git tag v1.2.3 -m "Release v1.2.3: Brief description"
-git push origin v1.2.3
+- ✅ Follow Go best practices and idioms
+- ✅ Add tests for new functionality
+- ✅ Use conventional commit messages
+- ✅ Ensure all CI checks pass
+- ✅ Update documentation as needed
 
-# 4. Monitor automated deployment
-# Check GitHub Actions for build status
-# Verify packages are updated across all channels
-```
+## 📊 Project Status
 
-**Post-Release Verification**:
-```bash
-# Verify Homebrew
-brew update && brew install lakshyajain-0291/gitcury/gitcury
+| Metric | Status |
+|--------|--------|
+| **Build Status** | [![Essential Checks](https://github.com/lakshyajain-0291/GitCury/actions/workflows/essential-checks.yml/badge.svg)](https://github.com/lakshyajain-0291/GitCury/actions) |
+| **Latest Release** | ![Release](https://img.shields.io/github/v/release/lakshyajain-0291/GitCury) |
+| **Test Coverage** | 15.5% (Integration-focused) |
+| **Go Version** | 1.24+ |
+| **Platforms** | Linux, macOS, Windows |
 
-# Verify Scoop (Windows PowerShell)
-scoop update && scoop install gitcury
+## 🔗 Links
 
-# Verify Docker
-docker pull lakshyajain1503/gitcury:v1.2.3
+- 📊 [GitHub Repository](https://github.com/lakshyajain-0291/GitCury)
+- 📦 [Docker Hub](https://hub.docker.com/r/lakshyajain1503/gitcury)
+- 🍺 [Homebrew Tap](https://github.com/lakshyajain-0291/homebrew-gitcury)
+- 🪣 [Scoop Bucket](https://github.com/lakshyajain-0291/GitCury-Scoop-Bucket)
+- 🔑 [Get Gemini API Key](https://aistudio.google.com/app/apikey)
 
-# Verify Go modules
-go install github.com/lakshyajain-0291/gitcury@v1.2.3
-```
+## 📄 License
 
-## 📜 License
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
 
-GitCury is proudly **open-source** and licensed under the **MIT License**. See the [LICENSE](LICENSE) file for complete details.
+## 🙏 Acknowledgments
 
-**Why MIT?** We believe in fostering innovation and collaboration. Use GitCury in your personal projects, commercial applications, or contribute back to the community - the choice is yours!
-
-## 🌟 Acknowledgments & Credits
-
-### 🙏 **Special Thanks**
-
-- **🤖 Google Gemini Team**: For providing the incredible AI that powers our commit message generation
-- **🌐 Go Community**: For creating the robust ecosystem that makes GitCury possible  
-- **🧠 Open Source Community**: For the insights and patterns that guide our development
-- **👥 GitCury Contributors**: Every bug report, feature request, and code contribution matters
-- **⭐ Early Adopters**: Your feedback shaped GitCury into what it is today
-
-### 🏆 **Powered By**
-- **Go 1.19+**: Lightning-fast performance and excellent concurrency
-- **Google Gemini API**: State-of-the-art AI for intelligent commit message generation
-- **Cobra CLI**: Robust command-line interface framework
-- **Community Feedback**: Real-world testing from developers worldwide
-
-### 💡 **Inspiration**
-GitCury was born from the frustration of managing complex multi-repository workflows and the vision of bringing AI-powered intelligence to everyday Git operations. What started as a simple commit message generator evolved into a comprehensive Git automation platform.
+- **Google Gemini API** - Powering our AI-driven commit message generation
+- **Cobra CLI** - Excellent command-line interface framework
+- **Go Community** - For the robust ecosystem and best practices
+- **Contributors** - Everyone who has helped make GitCury better
 
 ---
 
 <div align="center">
 
-### 🎉 **Ready to Revolutionize Your Git Workflow?**
+**⭐ Star us on GitHub** — it motivates us to keep improving GitCury!
 
-**[⭐ Star GitCury](https://github.com/lakshyajain-0291/gitcury)** | **[🚀 Quick Start](#-quick-start)** | **[📖 Documentation](https://github.com/lakshyajain-0291/gitcury/wiki)** | **[🐳 Docker Hub](https://hub.docker.com/r/lakshyajain1503/gitcury)** | **[📦 Releases](https://github.com/lakshyajain-0291/gitcury/releases)**
-
-#### 📥 **Install Now**:
-```bash
-# Homebrew (macOS/Linux)
-brew tap lakshyajain-0291/gitcury && brew install gitcury
-
-# Scoop (Windows PowerShell)  
-scoop bucket add gitcury https://github.com/lakshyajain-0291/gitcury-Scoop-Bucket.git && scoop install gitcury
-
-# Docker
-docker pull lakshyajain1503/gitcury:latest
-
-# Go
-go install github.com/lakshyajain-0291/gitcury@latest
-```
-
----
-
-**Made with ❤️ and ☕ by developers, for developers**
-
-*Happy coding with GitCury! 🎉✨*
+*Made with ❤️ for developers who love efficient Git workflows*
 
 </div>
