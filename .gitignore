@@ -29,6 +29,8 @@ tmp/
 output.json
 config.json
 
+.env 
+
 gitcury
 GitCury
 # Go executable files
