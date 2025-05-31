@@ -102,7 +102,7 @@ Download pre-built binaries from our [releases page](https://github.com/lakshyaj
 
 2. **Configure GitCury**:
 ```bash
-gitcury setup
+gitcury config
 gitcury config set --key GEMINI_API_KEY --value YOUR_API_KEY_HERE
 ```
 
@@ -113,7 +113,7 @@ gitcury config set --key root_folders --value "/path/to/your/projects,/path/to/o
 
 4. **Verify setup**:
 ```bash
-gitcury config check
+gitcury config
 ```
 
 ## 🎯 Usage
@@ -237,7 +237,7 @@ gitcury push --root .
 
 ```bash
 # One-liner for quick commits (using aliases)
-gc msgs --all && gc commit --all && gc push --all
+gitcury msgs --all && gitcury commit --all && gitcury push --all
 ```
 
 </details>
