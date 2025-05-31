@@ -63,6 +63,8 @@ scoop install gitcury
 #### Go Install
 ```bash
 go install github.com/lakshyajain-0291/gitcury@latest
+export PATH=$PATH:$(go env GOPATH)/bin
+gitcury -h
 ```
 
 </details>
