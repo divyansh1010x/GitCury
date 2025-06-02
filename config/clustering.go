@@ -209,8 +209,8 @@ func SetClusteringConfigByKey(key, value string) error {
 		if floatVal, err := parseFloat(value); err == nil {
 			configCopy.SimilarityThresholds["directory"] = floatVal
 			configCopy.SimilarityThresholds["pattern"] = floatVal
-			configCopy.SimilarityThresholds["cached"] = floatVal
-			configCopy.SimilarityThresholds["semantic"] = floatVal
+			// configCopy.SimilarityThresholds["cached"] = floatVal
+			// configCopy.SimilarityThresholds["semantic"] = floatVal
 		} else {
 			return fmt.Errorf("invalid float value for similarity_threshold: %s", value)
 		}

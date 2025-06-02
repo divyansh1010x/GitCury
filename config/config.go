@@ -1,10 +1,10 @@
 package config
 
 import (
-	"github.com/lakshyajain-0291/gitcury/api"
-	"github.com/lakshyajain-0291/gitcury/utils"
 	"encoding/json"
 	"fmt"
+	"github.com/lakshyajain-0291/gitcury/api"
+	"github.com/lakshyajain-0291/gitcury/utils"
 	"os"
 	"path/filepath"
 	"strings"
@@ -375,6 +375,7 @@ func LoadConfigForConfigCommands() error {
 			"config_dir":       os.Getenv("HOME") + "/.gitcury",
 			"output_file_path": os.Getenv("HOME") + "/.gitcury/output.json",
 			"editor":           "nano",
+			// "RATE_LIMIT":   15, // Set a default rate limit
 			"aliases": map[string]interface{}{
 				"getmsgs": DefaultAliases.GetMsgs,
 				"commit":  DefaultAliases.Commit,
@@ -458,6 +459,7 @@ func LoadConfigForConfigCommands() error {
 			"logLevel":     "info",
 			"retries":      3,
 			"timeout":      30,
+			// "RATE_LIMIT":   15, // Set a default rate limit
 		}
 		Aliases = DefaultAliases
 		return nil
@@ -576,6 +578,12 @@ func checkCriticalConfig() []string {
 		settings["numFilesToCommit"] = 5
 		configChanged = true
 	}
+
+	// if _, exists := settings["RATE_LIMIT"]; !exists {
+    //     utils.Debug("[Config]: Setting default RATE_LIMIT to 15")
+    //     settings["RATE_LIMIT"] = 15
+    //     configChanged = true
+    // }
 
 	if _, exists := settings["editor"]; !exists {
 		utils.Debug("[Config]: Setting default editor to nano")
@@ -723,6 +731,12 @@ func validateConfig() error {
 	if _, exists := settings["output_file_path"]; !exists {
 		settings["output_file_path"] = os.Getenv("HOME") + "/.gitcury/output.json"
 	}
+
+	// // Ensure RATE_LIMIT is set
+	// if _, exists := settings["RATE_LIMIT"]; !exists {
+    //     utils.Debug("[Config]: Setting default RATE_LIMIT to 15")
+    //     settings["RATE_LIMIT"] = 15
+    // }
 
 	// Ensure config_dir is set
 	if _, exists := settings["config_dir"]; !exists {
