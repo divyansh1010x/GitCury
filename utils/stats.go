@@ -352,7 +352,7 @@ func CaptureClusteringConfig() {
 	// Default clustering info - this will be enhanced when we integrate with config
 	clusteringInfo = &ClusteringMethodInfo{
 		Method:         "auto",
-		EnabledMethods: []string{"directory", "pattern", "cached", "semantic"},
+		EnabledMethods: []string{"directory", "pattern", "semantic"},
 		ConfidenceThresholds: map[string]float64{
 			"directory": 0.8,
 			"pattern":   0.7,
