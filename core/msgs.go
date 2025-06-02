@@ -183,7 +183,7 @@ func GetMsgsForRootFolder(folder string, numFiles ...int) error {
 	utils.UpdateCreativeLoaderPhase("generating")
 	utils.UpdateCreativeLoaderMessage(fmt.Sprintf("Generating messages for %d files", len(changedFiles)))
 
-	err = GitRunnerInstance.BatchProcessGetMessages(changedFiles, folder)
+	err = git.BatchProcessGetMessages(changedFiles, folder)
 	if err != nil {
 		utils.StopCreativeLoader()
 		utils.ShowCompletionMessage("Batch processing failed", false)
