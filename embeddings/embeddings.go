@@ -48,117 +48,133 @@ func GenerateEmbedding(text string) ([]float32, error) {
 		)
 	}
 
-	// Get the API key from config or environment
-	apiKeyInterface := config.Get("GEMINI_API_KEY")
-	apiKey, ok := apiKeyInterface.(string)
-	if !ok || apiKey == "" {
-		apiKey = os.Getenv("GEMINI_API_KEY")
-		if apiKey == "" {
-			return nil, utils.NewConfigError(
-				"Google API key not found",
-				nil,
-				map[string]interface{}{
-					"configKey": "GEMINI_API_KEY",
-					"envVar":    "GEMINI_API_KEY",
-				},
-			)
-		}
-	}
-
-	// Create a context with timeout for the entire operation
-	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
-	defer cancel()
-
-	var embedding *genai.ContentEmbedding
-
-	// Initialize the client outside the retry loop for better performance
-	client, err := genai.NewClient(ctx, &genai.ClientConfig{
-		APIKey:  apiKey,
-		Backend: genai.BackendGeminiAPI,
-	})
-	if err != nil {
-		return nil, utils.NewAPIError(
-			"Error creating Gemini client",
-			err,
+	// Get the API keys from config or environment (comma-separated)
+	var rawKeys string
+	if k, ok := config.Get("GEMINI_API_KEY").(string); ok && k != "" {
+		rawKeys = k
+	} else if env := os.Getenv("GEMINI_API_KEY"); env != "" {
+		rawKeys = env
+	} else {
+		return nil, utils.NewConfigError(
+			"Google API key(s) not found",
+			nil,
 			map[string]interface{}{
-				"apiProvider": "Google Gemini",
+				"configKey": "GEMINI_API_KEY",
+				"envVar":    "GEMINI_API_KEY",
 			},
 		)
 	}
 
-	// Prepare the content once for all retries
-	contents := []*genai.Content{
-		genai.NewContentFromText(text, genai.RoleUser),
-	}
+	keys := strings.Split(rawKeys, ",")
+	for i, key := range keys {
+		key = strings.TrimSpace(key)
 
-	// Define the operation to retry
-	embedOperation := func() error {
-		result, err := client.Models.EmbedContent(ctx,
-			"text-embedding-004",
-			contents,
-			nil,
-		)
+		// Create a context with timeout for the entire operation
+		ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
+		defer cancel()
+
+		var embedding *genai.ContentEmbedding
+
+		// Initialize the client with this key
+		client, err := genai.NewClient(ctx, &genai.ClientConfig{
+			APIKey:  key,
+			Backend: genai.BackendGeminiAPI,
+		})
 		if err != nil {
-			// Check for rate limit errors and update circuit breaker
-			if strings.Contains(err.Error(), "429") || strings.Contains(err.Error(), "quota") {
-				consecutiveFailures++
-				lastFailureTime = time.Now()
-				utils.Warning("[EMBEDDINGS]: Rate limit detected, updating circuit breaker")
+			if i == len(keys)-1 {
+				return nil, utils.NewAPIError(
+					"Error creating Gemini client with all API keys",
+					err,
+					map[string]interface{}{
+						"attemptedKeys": len(keys),
+					},
+				)
 			}
-			return utils.NewAPIError(
-				"Error getting embeddings from Gemini API",
-				err,
-				map[string]interface{}{
-					"modelName":  "text-embedding-004",
-					"textLength": len(text),
-				},
-			)
+			continue
 		}
 
-		// Reset circuit breaker on success
-		consecutiveFailures = 0
+		// Prepare the content once
+		contents := []*genai.Content{
+			genai.NewContentFromText(text, genai.RoleUser),
+		}
 
-		if len(result.Embeddings) == 0 || result.Embeddings[0] == nil {
-			return utils.NewAPIError(
-				"Received empty embedding response from API",
+		// Define the operation to retry
+		embedOperation := func() error {
+			result, err := client.Models.EmbedContent(ctx,
+				"text-embedding-004",
+				contents,
+				nil,
+			)
+			if err != nil {
+				// Check for rate limit errors and update circuit breaker
+				if strings.Contains(err.Error(), "429") || strings.Contains(err.Error(), "quota") {
+					consecutiveFailures++
+					lastFailureTime = time.Now()
+					utils.Warning(`[EMBEDDINGS]: Rate limit detected for key , updating circuit breaker`)
+					return err // trigger retry or fallback to next key
+				}
+				return utils.NewAPIError(
+					"Error getting embeddings from Gemini API",
+					err,
+					map[string]interface{}{
+						"modelName":  "text-embedding-004",
+						"textLength": len(text),
+					},
+				)
+			}
+
+			// Reset circuit breaker on success
+			consecutiveFailures = 0
+
+			if len(result.Embeddings) == 0 || result.Embeddings[0] == nil {
+				return utils.NewAPIError(
+					"Received empty embedding response from API",
+					nil,
+					map[string]interface{}{
+						"modelName": "text-embedding-004",
+					},
+				)
+			}
+
+			embedding = result.Embeddings[0]
+			return nil
+		}
+
+		// Retry config
+		retryConfig := utils.RetryConfig{
+			MaxRetries:   3,
+			InitialDelay: 5 * time.Second,
+			MaxDelay:     30 * time.Second,
+			Factor:       2.0,
+		}
+
+		err = utils.WithRetry(ctx, "GetEmbeddings", retryConfig, embedOperation)
+		if err != nil {
+			// If last key also failed, return the error
+			if i == len(keys)-1 {
+				return nil, err
+			}
+			continue // try next key
+		}
+
+		flatEmbeddings := embedding.Values
+		if len(flatEmbeddings) == 0 {
+			return nil, utils.NewAPIError(
+				"Received empty embedding vector from API",
 				nil,
 				map[string]interface{}{
-					"modelName": "text-embedding-004",
+					"modelName":      "text-embedding-004",
+					"responseStatus": "empty vector",
 				},
 			)
 		}
 
-		embedding = result.Embeddings[0]
-		return nil
+		// Success
+		return flatEmbeddings, nil
 	}
 
-	// Use the retry mechanism with a more conservative configuration for rate limit issues
-	retryConfig := utils.RetryConfig{
-		MaxRetries:   3,                // Reduced from 10
-		InitialDelay: 5 * time.Second,  // Reduced from 30
-		MaxDelay:     30 * time.Second, // Reduced from 120
-		Factor:       2.0,
-	}
-
-	err = utils.WithRetry(ctx, "GetEmbeddings", retryConfig, embedOperation)
-	if err != nil {
-		return nil, err // Already wrapped with context by WithRetry
-	}
-
-	flatEmbeddings := embedding.Values
-
-	if len(flatEmbeddings) == 0 {
-		return nil, utils.NewAPIError(
-			"Received empty embedding vector from API",
-			nil,
-			map[string]interface{}{
-				"modelName":      "text-embedding-004",
-				"responseStatus": "empty vector",
-			},
-		)
-	}
-
-	return flatEmbeddings, nil
+	// Should not reach here
+	return nil, utils.NewAPIError("All API keys exhausted and failed", nil, nil)
 }
 
 func KMeans(data [][]float32, k int, maxIter int) ([]int, error) {
@@ -228,6 +244,85 @@ func KMeans(data [][]float32, k int, maxIter int) ([]int, error) {
 		}
 
 		centroids = newCentroids
+	}
+
+	return labels, nil
+}
+
+func AutoCluster(data [][]float32, k int, maxIter int) ([]int, error) {
+	if len(data) == 0 {
+		return nil, utils.NewValidationError(
+			"Data points are required for clustering",
+			nil,
+			map[string]interface{}{
+				"dataPoints": len(data),
+			},
+		)
+	}
+
+	if k > 0 {
+		return KMeans(data, k, maxIter)
+	}
+
+	// DBSCAN Parameters
+	eps := float32(0.5)     // radius threshold for neighborhood
+	minPts := 4             // minimum neighbors to form a cluster
+	n := len(data)
+	labels := make([]int, n)
+	visited := make([]bool, n)
+	clusterID := 0
+
+	distance := func(a, b []float32) float32 {
+		var sum float32
+		for i := range a {
+			diff := a[i] - b[i]
+			sum += diff * diff
+		}
+		return float32(math.Sqrt(float64(sum)))
+	}
+
+	var regionQuery = func(pointIdx int) []int {
+		var neighbors []int
+		for i := 0; i < n; i++ {
+			if i != pointIdx && distance(data[pointIdx], data[i]) <= eps {
+				neighbors = append(neighbors, i)
+			}
+		}
+		return neighbors
+	}
+
+	var expandCluster func(int, []int)
+	expandCluster = func(pointIdx int, neighbors []int) {
+		labels[pointIdx] = clusterID
+		queue := append([]int(nil), neighbors...)
+		for len(queue) > 0 {
+			curr := queue[0]
+			queue = queue[1:]
+			if !visited[curr] {
+				visited[curr] = true
+				newNeighbors := regionQuery(curr)
+				if len(newNeighbors) >= minPts {
+					queue = append(queue, newNeighbors...)
+				}
+			}
+			if labels[curr] == -1 {
+				labels[curr] = clusterID
+			}
+		}
+	}
+
+	for i := range data {
+		if visited[i] {
+			continue
+		}
+		visited[i] = true
+		neighbors := regionQuery(i)
+		if len(neighbors) < minPts {
+			labels[i] = -1 // mark as noise
+		} else {
+			expandCluster(i, neighbors)
+			clusterID++
+		}
 	}
 
 	return labels, nil

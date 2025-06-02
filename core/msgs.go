@@ -4,6 +4,7 @@ import (
 	"github.com/lakshyajain-0291/gitcury/config"
 	"github.com/lakshyajain-0291/gitcury/output"
 	"github.com/lakshyajain-0291/gitcury/utils"
+	"github.com/lakshyajain-0291/gitcury/git"
 	"fmt"
 	"strconv"
 	"sync"
@@ -214,7 +215,7 @@ func GroupAndGetAllMsgs(numFiles ...int) error {
 		return fmt.Errorf("invalid or missing root_folders configuration")
 	}
 
-	clusters := 10 // Default value
+	clusters := 0 // Default value
 	if len(numFiles) > 0 && numFiles[0] > 0 {
 		utils.Debug("Using provided number of files to commit: " + strconv.Itoa(numFiles[0]))
 		clusters = numFiles[0]
@@ -237,6 +238,9 @@ func GroupAndGetAllMsgs(numFiles ...int) error {
 	var rootFolderWg sync.WaitGroup
 	var mu sync.Mutex
 	var errors []string
+	promptChan := make(chan utils.PromptRequest)
+	go utils.StartPromptCoordinator(promptChan)
+
 
 	for _, rootFolder := range rootFolders {
 		rootFolderStr, ok := rootFolder.(string)
@@ -252,7 +256,7 @@ func GroupAndGetAllMsgs(numFiles ...int) error {
 			utils.Debug("Grouped (embedding-based) processing for folder: " + folder)
 			utils.UpdateCreativeLoaderMessage(fmt.Sprintf("Clustering files in folder: %s", folder))
 
-			changedFiles, err := GitRunnerInstance.GetAllChangedFiles(folder)
+			changedFiles, err := git.GetAllChangedFiles(folder)
 			if err != nil {
 				utils.Error("Failed to retrieve changed files for folder '" + folder + "' - " + err.Error())
 				mu.Lock()
@@ -269,8 +273,8 @@ func GroupAndGetAllMsgs(numFiles ...int) error {
 			utils.Debug("Total files to process with embeddings in folder '" + folder + "': " + strconv.Itoa(len(changedFiles)))
 			utils.UpdateCreativeLoaderPhase("generating")
 			utils.UpdateCreativeLoaderMessage(fmt.Sprintf("Generating grouped messages for %d files", len(changedFiles)))
-
-			err = GitRunnerInstance.BatchProcessWithEmbeddings(changedFiles, folder, clusters)
+			
+			err = git.BatchProcessWithEmbeddings(changedFiles, folder, clusters, promptChan)
 			if err != nil {
 				utils.Error("Embedding-based batch processing failed for folder '" + folder + "' - " + err.Error())
 				mu.Lock()
@@ -284,6 +288,7 @@ func GroupAndGetAllMsgs(numFiles ...int) error {
 	utils.UpdateCreativeLoaderMessage("Completing grouped processing")
 
 	rootFolderWg.Wait()
+	close(promptChan)
 
 	if len(errors) > 0 {
 		utils.StopCreativeLoader()
@@ -311,7 +316,7 @@ func GroupAndGetMsgsForRootFolder(folder string, numFiles ...int) error {
 	utils.StartCreativeLoader(fmt.Sprintf("Clustering files in folder: %s", folder), utils.BrailleAnimation)
 	utils.UpdateCreativeLoaderPhase("clustering")
 
-	clusters := 10 // Default value
+	clusters := 0 // Default value (When 0, uses DBSCAN to create automatic clusters)
 	if len(numFiles) > 0 && numFiles[0] > 0 {
 		utils.Debug("Using provided number of files to commit: " + strconv.Itoa(numFiles[0]))
 		clusters = numFiles[0]
@@ -336,7 +341,7 @@ func GroupAndGetMsgsForRootFolder(folder string, numFiles ...int) error {
 	utils.UpdateCreativeLoaderPhase("processing")
 	utils.UpdateCreativeLoaderMessage("Scanning for changed files")
 
-	changedFiles, err := GitRunnerInstance.GetAllChangedFiles(folder)
+	changedFiles, err := git.GetAllChangedFiles(folder)
 	if err != nil {
 		utils.StopCreativeLoader()
 		utils.Error("Failed to retrieve changed files for folder '" + folder + "' - " + err.Error())
@@ -354,7 +359,7 @@ func GroupAndGetMsgsForRootFolder(folder string, numFiles ...int) error {
 	utils.UpdateCreativeLoaderPhase("generating")
 	utils.UpdateCreativeLoaderMessage(fmt.Sprintf("Generating grouped messages for %d files", len(changedFiles)))
 
-	err = GitRunnerInstance.BatchProcessWithEmbeddings(changedFiles, folder, clusters)
+	err = git.BatchProcessWithEmbeddings(changedFiles, folder, clusters, nil)
 	if err != nil {
 		utils.StopCreativeLoader()
 		utils.ShowCompletionMessage("Grouped batch processing failed", false)
