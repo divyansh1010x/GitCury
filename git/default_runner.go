@@ -95,7 +95,7 @@ func (d *DefaultGitRunner) BatchProcessGetMessages(allChangedFiles []string, roo
 
 // BatchProcessWithEmbeddings processes files using embeddings and clustering
 func (d *DefaultGitRunner) BatchProcessWithEmbeddings(allChangedFiles []string, rootFolder string, numClusters int) error {
-	return BatchProcessWithEmbeddings(allChangedFiles, rootFolder, numClusters)
+	return BatchProcessWithEmbeddings(allChangedFiles, rootFolder, numClusters, nil)
 }
 
 // Conversion functions between output and interface types

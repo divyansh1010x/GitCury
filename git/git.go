@@ -2,7 +2,6 @@ package git
 
 import (
 	"github.com/lakshyajain-0291/gitcury/config"
-	"github.com/lakshyajain-0291/gitcury/di"
 	"github.com/lakshyajain-0291/gitcury/embeddings"
 	"github.com/lakshyajain-0291/gitcury/output"
 	"github.com/lakshyajain-0291/gitcury/utils"
@@ -14,12 +13,96 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode/utf8"
 )
 
 type FileEmbedding struct {
 	Path      string
 	Diff      string
 	Embedding []float32
+}
+
+type CommitRequest struct {
+	Files    []string
+	Dir      string
+	RespChan chan CommitResponse
+}
+
+type CommitResponse struct {
+	Message string
+	Error   error
+}
+
+type GeminiWorker struct {
+	ID       int
+	APIKey   string
+	TaskChan chan CommitRequest
+	Failed   bool
+}
+
+func (gw *GeminiWorker) Start() {
+	go func() {
+		for task := range gw.TaskChan {
+			msg, err := GenCommitMessageWithKey(task.Files, task.Dir, gw.APIKey)
+			if isRateLimit(err) {
+				// utils.Warn(fmt.Sprintf("[GEMINI.WORKER.%d]: Rate limited, disabling worker temporarily", gw.ID))
+				gw.Failed = true
+			}
+			task.RespChan <- CommitResponse{Message: msg, Error: err}
+		}
+	}()
+}
+
+type GeminiPool struct {
+	Workers []*GeminiWorker
+	Index   int
+	Mutex   sync.Mutex
+}
+
+func NewGeminiPool(apiKeys []string) *GeminiPool {
+	pool := &GeminiPool{}
+	for i, key := range apiKeys {
+		worker := &GeminiWorker{
+			ID:       i,
+			APIKey:   strings.TrimSpace(key),
+			TaskChan: make(chan CommitRequest),
+		}
+		worker.Start()
+		pool.Workers = append(pool.Workers, worker)
+	}
+	return pool
+}
+
+func (gp *GeminiPool) Dispatch(files []string, dir string) (string, error) {
+	gp.Mutex.Lock()
+	defer gp.Mutex.Unlock()
+
+	n := len(gp.Workers)
+	for i := 0; i < n; i++ {
+		worker := gp.Workers[gp.Index%n]
+		gp.Index++
+		if worker.Failed {
+			continue
+		}
+
+		respChan := make(chan CommitResponse)
+		worker.TaskChan <- CommitRequest{
+			Files:    files,
+			Dir:      dir,
+			RespChan: respChan,
+		}
+
+		resp := <-respChan
+		return resp.Message, resp.Error
+	}
+	return "", fmt.Errorf("all Gemini workers are unavailable")
+}
+
+func isRateLimit(err error) bool {
+	if err == nil {
+		return false
+	}
+	return strings.Contains(err.Error(), "rate") || strings.Contains(err.Error(), "429")
 }
 
 func RunGitCmd(dir string, envVars map[string]string, args ...string) (string, error) {
@@ -188,6 +271,19 @@ func GenCommitMessage(files []string, dir string) (string, error) {
 			fileType = "updated"
 		}
 
+		// 🔐 Ensure UTF-8 validity here
+		diffOutput = sanitizeUTF8(diffOutput)
+
+		if !utf8.ValidString(diffOutput) {
+			utils.Error(fmt.Sprintf("[GIT.COMMIT.MSG]: Skipping file with invalid UTF-8 after sanitization: '%s'", file))
+			continue
+		}
+
+		if strings.TrimSpace(diffOutput) == "" {
+			utils.Error(fmt.Sprintf("[GIT.COMMIT.MSG]: Empty diff after sanitization, skipping: '%s'", file))
+			continue
+		}
+
 		contextData[file] = map[string]string{
 			"type": fileType,
 			"diff": diffOutput,
@@ -196,7 +292,85 @@ func GenCommitMessage(files []string, dir string) (string, error) {
 		utils.Debug("[GIT.COMMIT.MSG]: Processed file '" + file + "' as " + fileType)
 	}
 
-	message, err := di.GetGeminiRunner().SendToGemini(contextData, apiKey.(string))
+	if len(contextData) == 0 {
+		return "", fmt.Errorf("no valid diffs found to send to Gemini")
+	}
+
+	// 🚀 Call Gemini with sanitized data
+	message, err := utils.SendToGemini(contextData, apiKey.(string))
+	if err != nil {
+		utils.Error("[GEMINI.FAIL]: Error generating group commit message: " + err.Error())
+		return "", err
+	}
+
+	return message, nil
+}
+
+func GenCommitMessageWithKey(files []string, dir string, apiKey string) (string, error) {
+	contextData := make(map[string]map[string]string)
+
+	for _, file := range files {
+		var fileType, diffOutput string
+
+		cacheMu.RLock()
+		status, cached := changedFilesCache[file]
+		cacheMu.RUnlock()
+
+		if cached && strings.HasPrefix(status, "D") {
+			fileType = "deleted"
+			contextData[file] = map[string]string{
+				"type": fileType,
+				"diff": "file deleted",
+			}
+			utils.Debug("[GIT.COMMIT.MSG]: File marked as deleted: '" + file + "'")
+			continue
+		}
+
+		diffOutput, err := RunGitCmd(dir, nil, "diff", "--", file)
+		if err != nil {
+			utils.Error(fmt.Sprintf("[GIT.DIFF.FAIL]: Error running git diff for '%s': %s", file, err.Error()))
+			return "", err
+		}
+
+		if strings.TrimSpace(diffOutput) == "" {
+			diffOutput, err = RunGitCmd(dir, nil, "diff", "--cached", "--", file)
+			if err != nil {
+				utils.Error(fmt.Sprintf("[GIT.DIFF.FAIL]: Error running git diff --cached for '%s': %s", file, err.Error()))
+				return "", err
+			}
+		}
+
+		if strings.TrimSpace(diffOutput) == "" {
+			contentBytes, err := os.ReadFile(file)
+			if err != nil {
+				utils.Error(fmt.Sprintf("[GIT.FILE.READ.FAIL]: Error reading new file '%s': %s", file, err.Error()))
+				return "", err
+			}
+			diffOutput = string(contentBytes)
+			fileType = "new"
+		} else {
+			fileType = "updated"
+		}
+
+		diffOutput = sanitizeUTF8(diffOutput)
+
+		if !utf8.ValidString(diffOutput) || strings.TrimSpace(diffOutput) == "" {
+			utils.Error(fmt.Sprintf("[GIT.COMMIT.MSG]: Skipping file '%s' due to empty or invalid diff", file))
+			continue
+		}
+
+		contextData[file] = map[string]string{
+			"type": fileType,
+			"diff": diffOutput,
+		}
+		utils.Debug("[GIT.COMMIT.MSG]: Processed file '" + file + "' as " + fileType)
+	}
+
+	if len(contextData) == 0 {
+		return "", fmt.Errorf("no valid diffs found to send to Gemini")
+	}
+
+	message, err := utils.SendToGemini(contextData, apiKey)
 	if err != nil {
 		utils.Error("[GEMINI.FAIL]: Error generating group commit message: " + err.Error())
 		return "", err
@@ -400,13 +574,17 @@ func GetFileDiff(filePath string, rootFolder string) (string, error) {
 	return out.String(), nil
 }
 
-func BatchProcessWithEmbeddings(allChangedFiles []string, rootFolder string, numClusters int) error {
+func sanitizeUTF8(input string) string {
+	return string([]rune(input)) // Drops invalid byte sequences
+}
+
+func BatchProcessWithEmbeddings(allChangedFiles []string, rootFolder string, numClusters int, promptChan chan utils.PromptRequest) error {
 	utils.Debug("[GIT.BATCH]: Starting batch processing with embeddings and clustering")
 
 	// Separate binary and text files
 	var binaryFiles []string
 	var textFiles []string
-	
+
 	for _, file := range allChangedFiles {
 		if utils.IsBinaryFile(file) {
 			binaryFiles = append(binaryFiles, file)
@@ -414,44 +592,55 @@ func BatchProcessWithEmbeddings(allChangedFiles []string, rootFolder string, num
 			textFiles = append(textFiles, file)
 		}
 	}
-	
-	// Handle binary files first
+
+	rawKeys := config.Get("GEMINI_API_KEY")
+	if rawKeys == nil {
+		return fmt.Errorf("missing GEMINI_API_KEYS in config")
+	}
+	apiKeys := strings.Split(rawKeys.(string), ",")
+	pool := NewGeminiPool(apiKeys)
+
+	// Handle binary files
 	if len(binaryFiles) > 0 {
-		// Stop the creative loader to allow user interaction
 		utils.StopCreativeLoader()
-		
 		utils.Info(fmt.Sprintf("🔍 Detected %d binary file(s) for grouped processing:", len(binaryFiles)))
 		for _, file := range binaryFiles {
 			fileType := utils.GetBinaryFileType(file)
 			utils.Info(fmt.Sprintf("  • %s (%s)", filepath.Base(file), fileType))
 		}
 		fmt.Println()
-		
-		generateBinaryMessages := utils.ConfirmAction(
-			"Would you like to generate automated commit messages for the binary files?", 
-			true,
-		)
-		
-		// Restart the creative loader after user input
+
+		var generateBinaryMessages bool
+		if promptChan != nil {
+			respChan := make(chan bool)
+			promptChan <- utils.PromptRequest{
+				Question: "Would you like to generate automated commit messages for the binary files?",
+				Default:  true,
+				RespChan: respChan,
+			}
+			generateBinaryMessages = <-respChan
+		} else {
+			generateBinaryMessages = utils.ConfirmAction(
+				"Would you like to generate automated commit messages for the binary files?",
+				true,
+			)
+		}
+
 		utils.StartCreativeLoader("Processing files with clustering", utils.BrailleAnimation)
 		utils.UpdateCreativeLoaderPhase("clustering")
-		
+
 		if generateBinaryMessages {
 			utils.Info("📝 Generating automated commit messages for binary files...")
 			for _, file := range binaryFiles {
-				// Get git status for this file
 				cacheMu.RLock()
 				status, cached := changedFilesCache[file]
 				cacheMu.RUnlock()
-				
 				if !cached {
-					// If not in cache, assume it's modified
 					status = "M"
 				}
-				
 				message := utils.GenerateBinaryCommitMessage(file, status)
-				utils.Debug("[GIT.BATCH.BINARY]: Generated message for binary file: " + file + " - " + message)
 				output.Set(file, rootFolder, message)
+				utils.Debug("[GIT.BATCH.BINARY]: Generated message for binary file: " + file + " - " + message)
 			}
 			utils.Success(fmt.Sprintf("✅ Generated commit messages for %d binary file(s)", len(binaryFiles)))
 		} else {
@@ -459,14 +648,45 @@ func BatchProcessWithEmbeddings(allChangedFiles []string, rootFolder string, num
 		}
 		fmt.Println()
 	}
-	
-	// Process text files with embeddings and clustering (only if there are any)
+
 	if len(textFiles) == 0 {
 		utils.Info("ℹ️ No text files to process with AI clustering.")
 		return nil
 	}
+
+	methodName := config.Get("defaultMethod")
+
+	utils.Info(fmt.Sprintf("🤖 Attempting Smart Clustering on %d text file(s)...", len(textFiles)))
 	
-	utils.Info(fmt.Sprintf("🤖 Processing %d text file(s) with AI clustering...", len(textFiles)))
+	var methodStr string
+	if str, ok := methodName.(string); ok {
+		methodStr = str
+	} else {
+		methodStr = "none"
+	}
+	
+	clustersData, err := executeSpecificMethod(textFiles, rootFolder, numClusters, methodStr, false)
+	if err == nil && len(clustersData) > 0 {
+		for idx, group := range clustersData {
+			utils.Debug(fmt.Sprintf("[GIT.SMART]: Generating commit message for group %d with %d files", idx, len(group)))
+			
+			// message, err := GenCommitMessage(group, rootFolder)
+			message, err := pool.Dispatch(group, rootFolder)
+			if err != nil {
+				utils.Error(fmt.Sprintf("[GIT.SMART]: Commit message generation failed for group %d - %s", idx, err.Error()))
+				continue
+			}
+			
+			for _, file := range group {
+				output.Set(file, rootFolder, message)
+				utils.Debug("[GIT.SMART.SUCCESS]: Generated commit message for file: " + file + " - " + message)
+			}
+		}
+		utils.Success("✅ Smart clustering completed with commit messages.")
+		return nil
+	}	
+
+	utils.Info("⚙️ Using semantic clustering...")
 
 	var fileData []FileEmbedding
 	var fileErrors []error
@@ -478,7 +698,11 @@ func BatchProcessWithEmbeddings(allChangedFiles []string, rootFolder string, num
 			utils.Error("[GIT.BATCH]: Could not get diff for file: " + file)
 			continue
 		}
-
+		if !utf8.ValidString(diff) {
+			utils.Error("[GIT.BATCH]: Invalid UTF-8 characters in diff for file: " + file)
+			continue
+		}
+		diff = sanitizeUTF8(diff)
 		embed, err := embeddings.GenerateEmbedding(diff)
 		if err != nil {
 			utils.Error("[GIT.BATCH]: Could not generate embedding for file: " + file)
@@ -487,7 +711,6 @@ func BatchProcessWithEmbeddings(allChangedFiles []string, rootFolder string, num
 			fileMu.Unlock()
 			continue
 		}
-
 		fileData = append(fileData, FileEmbedding{
 			Path:      file,
 			Diff:      diff,
@@ -500,13 +723,12 @@ func BatchProcessWithEmbeddings(allChangedFiles []string, rootFolder string, num
 	}
 
 	utils.Debug(fmt.Sprintf("[GIT.BATCH]: Clustering %d files by embeddings", len(fileData)))
-
 	vectors := make([][]float32, len(fileData))
 	for i, f := range fileData {
 		vectors[i] = f.Embedding
 	}
 
-	labels, err := embeddings.KMeans(vectors, numClusters, 10)
+	labels, err := embeddings.AutoCluster(vectors, numClusters, 10)
 	if err != nil {
 		return fmt.Errorf("clustering failed: %v", err)
 	}
@@ -529,45 +751,33 @@ func BatchProcessWithEmbeddings(allChangedFiles []string, rootFolder string, num
 		fileWg.Add(1)
 		go func(label int, group []FileEmbedding) {
 			defer fileWg.Done()
-
-			utils.Debug(fmt.Sprintf("[GIT.BATCH]: Generating commit message for group %d with %d files", label, len(group)))
-
 			var filePaths []string
 			for _, f := range group {
 				filePaths = append(filePaths, f.Path)
 			}
-
-			message, err := GenCommitMessage(filePaths, rootFolder)
+			// message, err := GenCommitMessage(filePaths, rootFolder)
+			message, err := pool.Dispatch(filePaths, rootFolder)
 			if err != nil {
-				utils.Error(fmt.Sprintf("[GIT.BATCH]: Commit message generation failed for group %d - %s", label, err.Error()))
 				fileMu.Lock()
 				fileErrors = append(fileErrors, err)
 				fileMu.Unlock()
 				return
 			}
-
 			commitMu.Lock()
-			commitGroups = append(commitGroups, CommitGroup{
-				Message: message,
-				Files:   filePaths,
-			})
+			commitGroups = append(commitGroups, CommitGroup{Message: message, Files: filePaths})
 			commitMu.Unlock()
-
 			for _, f := range group {
-				utils.Debug("[GIT.BATCH.SUCCESS]: Generated commit message for file: " + f.Path + " - " + message)
 				output.Set(f.Path, rootFolder, message)
 			}
 		}(label, group)
 	}
 
 	fileWg.Wait()
-
 	if len(fileErrors) > 0 {
-		utils.Error("[GIT.BATCH.FAIL]: Batch processing completed with errors")
 		return fmt.Errorf("one or more errors occurred while preparing commit messages")
 	}
 
-	utils.Success(fmt.Sprintf("✅ Generated AI commit messages for %d text file(s) using clustering", len(textFiles)))
+	utils.Success(fmt.Sprintf("✅ Generated AI commit messages for %d text file(s) using embeddings", len(textFiles)))
 	return nil
 }
 

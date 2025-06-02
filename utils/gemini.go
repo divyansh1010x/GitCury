@@ -287,32 +287,56 @@ func SendToGemini(contextData map[string]map[string]string, apiKey string, custo
 
 	Debug("[GEMINI]: ✨ Response received: " + respMessage)
 
-	// First try to parse as JSON with "message" key
-	var result map[string]string
-	err = json.Unmarshal([]byte(respMessage), &result)
-	if err == nil {
-		// Successfully parsed as JSON object
-		if message, ok := result["message"]; ok {
-			return message, nil
+	// Step 1: Try parsing as a simple JSON object with "message"
+	// First try to parse as JSON object with a "message" key
+	var single map[string]string
+	if err := json.Unmarshal([]byte(respMessage), &single); err == nil {
+		if msg, ok := single["message"]; ok {
+			return msg, nil
 		}
-		// JSON object but no "message" key, fall through to treat as plain text
-		Debug("[GEMINI]: JSON response missing 'message' key, treating as plain text")
+		Debug("[GEMINI]: JSON object does not contain 'message' key, checking for array")
 	} else {
-		// Failed to parse as JSON object, check if it's an array or other format
-		Debug("[GEMINI]: Failed to parse as JSON object, treating as plain text: " + err.Error())
+		Debug("[GEMINI]: Failed to parse as single message object: " + err.Error())
 	}
 
-	// If JSON parsing failed or no "message" key found, treat the entire response as the message
-	// This handles cases where Gemini returns plain text or unexpected JSON format
-	trimmedResponse := strings.TrimSpace(respMessage)
-	if trimmedResponse == "" {
+	// Try to parse as an array of message objects
+	var multiple []map[string]string
+	if err := json.Unmarshal([]byte(respMessage), &multiple); err == nil {
+		var combined []string
+		for _, m := range multiple {
+			if msg, ok := m["message"]; ok {
+				combined = append(combined, msg)
+			}
+		}
+		if len(combined) > 0 {
+			// Join all commit messages into one string (adjust separator as needed)
+			return strings.Join(combined, "\n"), nil
+		}
+		Debug("[GEMINI]: Parsed array but found no 'message' keys")
+	} else {
+		Debug("[GEMINI]: Failed to parse as array of message objects: " + err.Error())
+	}
+
+	// Step 2: Handle raw string or misformatted response
+	trimmed := strings.TrimSpace(respMessage)
+	if strings.HasPrefix(trimmed, "[") {
+		// Try parsing as raw JSON array of objects
+		var arr []map[string]string
+		if err := json.Unmarshal([]byte(trimmed), &arr); err == nil && len(arr) > 0 {
+			if msg, ok := arr[0]["message"]; ok {
+				return msg, nil
+			}
+		}
+	}
+
+	if trimmed == "" {
 		Error("[GEMINI]: ❌ Empty response after trimming.")
 		return "", NewAPIError("Empty response after trimming", nil, map[string]interface{}{
 			"raw_response": respMessage,
 		})
 	}
 
-	return trimmedResponse, nil
+	return trimmed, nil
 }
 
 // Keep track of the last system instruction for testing
