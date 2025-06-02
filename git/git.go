@@ -450,13 +450,21 @@ func BatchProcessGetMessages(allChangedFiles []string, rootFolder string) error 
 	var fileErrors []error
 	fileMu := sync.Mutex{}
 
+	rawKeys := config.Get("GEMINI_API_KEY")
+	if rawKeys == nil {
+		return fmt.Errorf("missing GEMINI_API_KEYS in config")
+	}
+	apiKeys := strings.Split(rawKeys.(string), ",")
+	pool := NewGeminiPool(apiKeys)
+
 	for _, file := range textFiles {
 		fileWg.Add(1)
 		go func(file string) {
 			defer fileWg.Done()
 
 			utils.Debug("[GIT.BATCH]: Processing text file: " + file)
-			message, err := GenCommitMessage([]string{file}, rootFolder) // <-- wrapped in slice
+			// message, err := GenCommitMessage([]string{file}, rootFolder) // <-- wrapped in slice
+			message, err := pool.Dispatch([]string{file}, rootFolder)
 			if err != nil {
 				utils.Error("[GIT.BATCH.FAIL]: Failed to generate commit message for file: " + file + " - " + err.Error())
 				fileMu.Lock()
