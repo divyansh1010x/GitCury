@@ -103,6 +103,24 @@ Download pre-built binaries from our [releases page](https://github.com/lakshyaj
 - macOS (Intel, Apple Silicon)
 - Windows (x86_64, ARM64)
 
+🔧 Then Make GitCury Globally Accessible
+
+#### 📍 Windows
+
+1. Move `GitCury.exe` to `C:\Program Files\GitCury\`
+2. Add that folder to your `PATH` environment variable
+3. Run `GitCury` from any terminal
+
+> Or move to `%USERPROFILE%\AppData\Local\Microsoft\WindowsApps` if you're using Windows 10+
+
+#### 🐧 Linux / 🍏 macOS
+
+```bash
+chmod +x GitCury
+sudo mv GitCury /usr/local/bin/gitcury
+```
+Now, run gitcury from anywhere 🎉
+
 </details>
 
 ### Initial Setup
