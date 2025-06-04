@@ -65,6 +65,8 @@ scoop install gitcury
 #### Go Install
 ```bash
 go install github.com/lakshyajain-0291/gitcury@latest
+export PATH=$PATH:$(go env GOPATH)/bin
+gitcury -h
 ```
 
 </details>
@@ -255,7 +257,7 @@ gitcury push --root .
 
 ```bash
 # One-liner for quick commits (using aliases)
-gc msgs --all && gc commit --all && gc push --all
+gitcury msgs --all && gitcury commit --all && gitcury push --all
 ```
 
 </details>
