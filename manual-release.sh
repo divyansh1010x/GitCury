@@ -189,34 +189,8 @@ else
     print_info "DRY RUN: Would pull latest changes and fetch tags"
 fi
 
-# Check if GoReleaser is installed
-if ! command -v goreleaser &> /dev/null; then
-    print_error "GoReleaser is not installed!"
-    print_info "Install it with: go install github.com/goreleaser/goreleaser@latest"
-    exit 1
-fi
-
-# Validate GoReleaser configuration
-print_info "Validating GoReleaser configuration..."
-if ! goreleaser check; then
-    print_error "GoReleaser configuration is invalid!"
-    exit 1
-fi
-
-print_success "GoReleaser configuration is valid"
-
-# Check required environment variables for release
-if [[ "$DRY_RUN" == false ]]; then
-    if [[ -z "$GITHUB_TOKEN" ]]; then
-        print_warning "GITHUB_TOKEN not set. Release will fail without it."
-        read -p "Continue anyway? (y/N): " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            print_info "Set GITHUB_TOKEN environment variable and try again"
-            exit 1
-        fi
-    fi
-fi
+# Note: GoReleaser will be handled by CI/CD pipeline after tag is pushed
+print_info "Tag will trigger CI/CD pipeline for automated release"
 
 # Show what will be released
 print_info "Release summary:"
@@ -227,11 +201,11 @@ print_info "  Dry run: $DRY_RUN"
 
 if [[ "$DRY_RUN" == false ]]; then
     echo
-    print_warning "This will create a tag and release $VERSION"
+    print_warning "This will create and push tag $VERSION (CI/CD will handle the release)"
     read -p "Are you sure you want to proceed? (y/N): " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        print_info "Release cancelled"
+        print_info "Tag creation cancelled"
         exit 0
     fi
 fi
@@ -253,47 +227,22 @@ if [[ "$DRY_RUN" == false ]]; then
         exit 1
     fi
     
-    print_success "Tag $VERSION created and pushed"
+    print_success "Tag $VERSION created and pushed successfully! 🎉"
+    print_info "CI/CD pipeline will now handle the release process"
 else
     print_info "DRY RUN: Would create and push tag $VERSION"
 fi
 
-# Run GoReleaser
-print_info "Running GoReleaser..."
-
-if [[ "$DRY_RUN" == true ]]; then
-    # Use GoReleaser's snapshot mode for dry run
-    print_info "Running GoReleaser in snapshot mode (dry run)..."
-    if goreleaser release --snapshot --skip=publish --clean; then
-        print_success "GoReleaser dry run completed successfully!"
-        print_info "Check the 'dist' directory for generated artifacts"
-    else
-        print_error "GoReleaser dry run failed!"
-        exit 1
-    fi
-else
-    # Actual release
-    print_info "Running GoReleaser for real release..."
-    if goreleaser release --clean; then
-        print_success "Release $VERSION completed successfully! 🎉"
-        print_info "Check GitHub releases: https://github.com/lakshyajain-0291/gitcury/releases"
-    else
-        print_error "GoReleaser release failed!"
-        print_warning "You may need to manually delete the tag if it was created:"
-        print_warning "  git tag -d $VERSION"
-        print_warning "  git push origin :refs/tags/$VERSION"
-        exit 1
-    fi
-fi
-
-print_success "Release process completed!"
+print_success "Tag creation process completed!"
 
 if [[ "$DRY_RUN" == false ]]; then
     echo
-    print_info "Post-release checklist:"
+    print_info "Next steps:"
     print_info "  ✓ Tag $VERSION created and pushed"
-    print_info "  ✓ GitHub release created"
-    print_info "  ✓ Binaries uploaded"
-    print_info "  → Check release page: https://github.com/lakshyajain-0291/gitcury/releases/tag/$VERSION"
-    print_info "  → Verify binary installation: go install github.com/lakshyajain-0291/gitcury@$VERSION"
+    print_info "  → CI/CD pipeline will automatically:"
+    print_info "    • Run GoReleaser"
+    print_info "    • Create GitHub release"
+    print_info "    • Upload binaries"
+    print_info "  → Monitor pipeline: https://github.com/lakshyajain-0291/gitcury/actions"
+    print_info "  → Check release when ready: https://github.com/lakshyajain-0291/gitcury/releases/tag/$VERSION"
 fi
