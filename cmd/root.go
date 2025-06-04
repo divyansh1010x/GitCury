@@ -62,11 +62,48 @@ func SetVersionInfo(version, commit, date string) {
 	versionInfo.Version = version
 	versionInfo.Commit = commit
 	versionInfo.Date = date
+	
+	// Update the Long description with dynamic version
+	updateLongDescription()
+}
+
+// updateLongDescription updates the root command's Long description with current version
+func updateLongDescription() {
+	version := versionInfo.Version
+	if version == "" {
+		version = "dev"
+	}
+	
+	rootCmd.Long = fmt.Sprintf(`
+██████╗ ██╗████████╗ ██████╗██╗   ██╗██████╗ ██╗   ██╗
+██╔════╝ ██║╚══██╔══╝██╔════╝██║   ██║██╔══██╗╚██╗ ██╔╝
+██║  ███╗██║   ██║   ██║     ██║   ██║██████╔╝ ╚████╔╝ 
+██║   ██║██║   ██║   ██║     ██║   ██║██╔══██╗  ╚██╔╝  
+╚██████╔╝██║   ██║   ╚██████╗╚██████╔╝██║  ██║   ██║   
+ ╚═════╝ ╚═╝   ╚═╝    ╚═════╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   
+
+🤖 AI-POWERED GIT ASSISTANT v%s
+
+Transform your Git workflow with intelligent automation:
+  ⚡ AI-generated commit messages using Google Gemini
+  🚀 Multi-repository management and batch operations  
+  🎯 Smart file clustering and semantic grouping
+  🔧 Advanced configuration and workflow customization
+  📊 Performance tracking and statistics
+
+🚀 QUICK START:
+  1. gitcury config set --key GEMINI_API_KEY --value YOUR_KEY
+  2. gitcury config set --key root_folders --value /path/to/repo
+  3. gitcury getmsgs --all
+  4. gitcury commit --all
+
+💡 TIP: Use 'gitcury [command] --help' for detailed command information
+📖 Documentation: https://github.com/lakshyajain-0291/gitcury`, version)
 }
 
 var rootCmd = &cobra.Command{
 	Use:   "gitcury",
-	Short: "⚡ GitCury - Your AI-powered Git assistant",
+	Short: "⚡ AI-powered Git assistant for automated commit messages",
 	Long: `
 ██████╗ ██╗████████╗ ██████╗██╗   ██╗██████╗ ██╗   ██╗
 ██╔════╝ ██║╚══██╔══╝██╔════╝██║   ██║██╔══██╗╚██╗ ██╔╝
@@ -74,17 +111,24 @@ var rootCmd = &cobra.Command{
 ██║   ██║██║   ██║   ██║     ██║   ██║██╔══██╗  ╚██╔╝  
 ╚██████╔╝██║   ██║   ╚██████╗╚██████╔╝██║  ██║   ██║   
  ╚═════╝ ╚═╝   ╚═╝    ╚═════╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   
-													   
->> NEURAL GIT INTERFACE v1.0.0 <<
 
-Simplify your Git workflow with AI:
-• Smart commit message generation
-• Manage multiple repositories effortlessly
-• Advanced configuration options
-• Streamline Git operations with ease
+🤖 AI-POWERED GIT ASSISTANT
 
-[SYSTEM]: Ready to assist. All systems operational.
-`,
+Transform your Git workflow with intelligent automation:
+  ⚡ AI-generated commit messages using Google Gemini
+  🚀 Multi-repository management and batch operations  
+  🎯 Smart file clustering and semantic grouping
+  🔧 Advanced configuration and workflow customization
+  📊 Performance tracking and statistics
+
+🚀 QUICK START:
+  1. gitcury config set --key GEMINI_API_KEY --value YOUR_KEY
+  2. gitcury config set --key root_folders --value /path/to/repo
+  3. gitcury getmsgs --all
+  4. gitcury commit --all
+
+💡 TIP: Use 'gitcury [command] --help' for detailed command information
+📖 Documentation: https://github.com/lakshyajain-0291/gitcury`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// If no subcommand is specified, show help
 		if err := cmd.Help(); err != nil {
@@ -105,8 +149,8 @@ func Execute() {
 		// Continue with defaults
 	}
 
-	// Add a version flag to the root command
-	rootCmd.PersistentFlags().BoolP("version", "V", false, "Print the version number of GitCury")
+	// Add version flags (both -v and -V for convenience)
+	rootCmd.PersistentFlags().BoolP("version", "v", false, "Print the version number of GitCury")
 
 	// Add common flags
 	rootCmd.PersistentFlags().BoolP("quiet", "q", false, "Minimize output, only show errors")
@@ -118,7 +162,22 @@ func Execute() {
 		// Check if version flag is set
 		versionFlag, _ := rootCmd.PersistentFlags().GetBool("version")
 		if versionFlag {
-			fmt.Println("GitCury version 1.0.0")
+			// Display dynamic version information
+			version := versionInfo.Version
+			commit := versionInfo.Commit
+			date := versionInfo.Date
+			
+			if version == "" {
+				version = "dev"
+			}
+			if commit == "" {
+				commit = "unknown"
+			}
+			if date == "" {
+				date = "unknown"
+			}
+			
+			fmt.Printf("GitCury %s (commit %s, built on %s)\n", version, commit, date)
 			os.Exit(0)
 		}
 
@@ -155,26 +214,19 @@ func Execute() {
 	rootCmd.SetHelpTemplate(`{{with (or .Long .Short)}}{{. | trimTrailingWhitespaces}}{{end}}
 
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║                             AVAILABLE COMMANDS                               ║
+║                           📋 AVAILABLE COMMANDS                              ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
-
-{{if .HasAvailableSubCommands}}{{range .Commands}}{{if (or .IsAvailableCommand (eq .Name "help"))}}  {{rpad .Name 15}} {{rpad (aliasList .) 20}} {{.Short}}
-{{end}}{{end}}{{end}}
+{{if .HasAvailableSubCommands}}{{range .Commands}}{{if (or .IsAvailableCommand (eq .Name "help"))}}
+  {{rpad .Name 12}} {{rpad (aliasList .) 15}} {{.Short}}{{end}}{{end}}{{end}}
 
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║                              COMMAND FLAGS                                   ║
+║                            🚩 GLOBAL FLAGS                                   ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
-
+{{if .HasAvailableInheritedFlags}}{{.InheritedFlags.FlagUsages | trimTrailingWhitespaces}}{{end}}
 {{if .HasAvailableLocalFlags}}{{.LocalFlags.FlagUsages | trimTrailingWhitespaces}}{{end}}
 
-{{if .HasAvailableInheritedFlags}}╔══════════════════════════════════════════════════════════════════════════════╗
-║                              GLOBAL FLAGS                                    ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-
-{{.InheritedFlags.FlagUsages | trimTrailingWhitespaces}}{{end}}
-
-Use "{{.CommandPath}} [command] --help" for more information about a command.
-For complete documentation, visit: https://github.com/lakshyajain-0291/gitcury
+💡 Use "{{.CommandPath}} [command] --help" for detailed information about any command
+📚 Documentation: https://github.com/lakshyajain-0291/gitcury
 `)
 
 	// Use custom error handling with user-friendly messages
