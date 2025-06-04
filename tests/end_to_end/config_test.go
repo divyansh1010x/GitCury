@@ -141,6 +141,7 @@ func TestConfigValidation(t *testing.T) {
 
 	// Test with minimal config - should work
 	config.Set("app_name", "GitCury")
+	// config.Set("RATE_LIMIT", 15) // Set a default rate limit
 	config.Set("version", "1.0.0")
 	config.Set("root_folders", []string{"."})
 	config.Set("GEMINI_API_KEY", "test-api-key") // Set API key for test

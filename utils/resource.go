@@ -7,6 +7,12 @@ import (
 	"time"
 )
 
+type PromptRequest struct {
+	Question string
+	Default  bool
+	RespChan chan bool
+}
+
 // ResourceManager monitors and manages system resources for the application
 type ResourceManager struct {
 	maxMemoryPercent float64
@@ -24,6 +30,21 @@ type ResourceManager struct {
 	lastCPUUsage     float64 //nolint:unused // Will be used in future CPU monitoring
 	lastChecked      time.Time
 	resourceWarnings int
+}
+
+func StartPromptCoordinator(promptChan <-chan PromptRequest) {
+	for req := range promptChan {
+		StopCreativeLoader() // Optional: Stop loader/spinner if active
+		fmt.Println()
+
+		Info("🔔 Question from a folder:")
+		Info("👉 " + req.Question)
+
+		resp := ConfirmAction(req.Question, req.Default)
+		req.RespChan <- resp
+
+		StartCreativeLoader("Resuming processing...", BrailleAnimation)
+	}
 }
 
 // NewResourceManager creates a resource manager with default settings

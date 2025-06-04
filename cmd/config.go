@@ -363,6 +363,9 @@ Examples:
 • Set API key:
 	gitcury config set --key GEMINI_API_KEY --value YOUR_API_KEY_HERE
 
+	If you set multiple Gemini keys, comma separate them (without spaces) for parallel processing:
+	gitcury config set --key GEMINI_API_KEY --value YOUR_API_KEY_1,YOUR_API_ONE_2,...
+
 • Update root folders:
 	gitcury config set --key root_folders --value /path/to/folder1,/path/to/folder2
 `,
@@ -458,6 +461,9 @@ Set or update configuration values.
 Examples:
 • Set API key:
 	gitcury config set --key GEMINI_API_KEY --value YOUR_API_KEY_HERE
+
+	If you set multiple Gemini keys, comma separate them (without spaces) for parallel processing:
+	gitcury config set --key GEMINI_API_KEY --value YOUR_API_KEY_1,YOUR_API_KEY_2,...
 
 • Update root folders:
 	gitcury config set --key root_folders --value /path/to/folder1,/path/to/folder2
@@ -559,8 +565,7 @@ Manage clustering configuration for grouping files in commits.
 Clustering Methods:
 • directory: Group files by directory structure (fastest)
 • pattern: Group files by file patterns and extensions  
-• cached: Use cached embeddings for similarity clustering
-• semantic: Full semantic analysis clustering (slowest)
+• semantic: Group files using embeddings for semantic similarity (slowest and most accurate)																															
 
 Presets:
 • speed: Directory-only clustering for maximum speed
@@ -637,18 +642,6 @@ Method-specific Keys:
 • pattern_weight: Weight for pattern method (0.0-1.0)
 • pattern_confidence_threshold: Confidence threshold for pattern method
 • pattern_similarity_threshold: Similarity threshold for pattern method
-
-• cached_enabled: Enable cached clustering (true/false)
-• cached_weight: Weight for cached method (0.0-1.0)
-• cached_confidence_threshold: Confidence threshold for cached method
-• cached_similarity_threshold: Similarity threshold for cached method
-• cached_delay_ms: Delay between cached operations in milliseconds
-
-• semantic_enabled: Enable semantic clustering (true/false)
-• semantic_weight: Weight for semantic method (0.0-1.0)
-• semantic_confidence_threshold: Confidence threshold for semantic method
-• semantic_similarity_threshold: Similarity threshold for semantic method
-• semantic_rate_limit_delay: Rate limit delay for semantic operations
 
 Examples:
 • Set global similarity threshold:

@@ -42,52 +42,62 @@ jobs:
             echo "needs_release=false" >> $GITHUB_OUTPUT
             exit 0
           fi
+
+          # Attempt to get the latest tag
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
           
-          # Get the last tag
-          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-          echo "Last tag: $LAST_TAG"
-          
-          # Get the commit count since the last tag
-          COMMIT_COUNT=$(git rev-list $LAST_TAG..HEAD --count)
+          if [ -z "$LAST_TAG" ]; then
+            echo "No tags found. This appears to be the first release."
+            COMMIT_COUNT=$(git rev-list --count HEAD)
+            VERSION_WITHOUT_V="0.0.0"
+            MAJOR=0
+            MINOR=0
+            PATCH=0
+          else
+            echo "Last tag: $LAST_TAG"
+            COMMIT_COUNT=$(git rev-list "$LAST_TAG"..HEAD --count)
+            VERSION_WITHOUT_V=${LAST_TAG#v}
+            IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION_WITHOUT_V"
+            MAJOR=${MAJOR:-0}
+            MINOR=${MINOR:-0}
+            PATCH=${PATCH:-0}
+          fi
+
           echo "Commits since last tag: $COMMIT_COUNT"
-          
-          if [ $COMMIT_COUNT -eq 0 ]; then
+
+          if [ "$COMMIT_COUNT" -eq 0 ]; then
             echo "No new commits since last tag."
             echo "needs_release=false" >> $GITHUB_OUTPUT
             exit 0
           fi
 
-          # Determine version components
-          VERSION_WITHOUT_V=${LAST_TAG#v}
-          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION_WITHOUT_V"
-          MAJOR=${MAJOR:-0}
-          MINOR=${MINOR:-0}
-          PATCH=${PATCH:-0}
-
           # Determine type of version bump based on commit messages
-          BREAKING_CHANGE=$(git log $LAST_TAG..HEAD --pretty=format:"%s" | grep -ci "BREAKING CHANGE\|breaking:" || echo "0")
-          FEAT=$(git log $LAST_TAG..HEAD --pretty=format:"%s" | grep -ci "^feat:" || echo "0")
+          if [ -n "$LAST_TAG" ]; then
+            LOG_RANGE="$LAST_TAG..HEAD"
+          else
+            LOG_RANGE="HEAD"
+          fi
+
+          BREAKING_CHANGE=$(git log $LOG_RANGE --pretty=format:"%s" | grep -ci "BREAKING CHANGE\|breaking:" || echo "0")
+          FEAT=$(git log $LOG_RANGE --pretty=format:"%s" | grep -ci "^feat:" || echo "0")
 
           if [ "$BREAKING_CHANGE" -gt 0 ]; then
-            # Increment major version for breaking changes
             MAJOR=$((MAJOR + 1))
             MINOR=0
             PATCH=0
             echo "Detected breaking changes, bumping major version"
           elif [ "$FEAT" -gt 0 ]; then
-            # Increment minor version for features
             MINOR=$((MINOR + 1))
             PATCH=0
             echo "Detected new features, bumping minor version"
           else
-            # Increment patch version for other changes
             PATCH=$((PATCH + 1))
             echo "Detected fixes/improvements, bumping patch version"
           fi
 
           NEW_TAG="v$MAJOR.$MINOR.$PATCH"
           echo "New tag will be: $NEW_TAG"
-          
+
           # Check if this tag already exists
           if git rev-parse "$NEW_TAG" >/dev/null 2>&1; then
             echo "Tag $NEW_TAG already exists, skipping release"
@@ -95,10 +105,9 @@ jobs:
             exit 0
           fi
 
-          # Output for the next step
           echo "new_tag=$NEW_TAG" >> $GITHUB_OUTPUT
           echo "needs_release=true" >> $GITHUB_OUTPUT
-      
+
       - name: Create and push tag
         if: steps.check-version.outputs.needs_release == 'true'
         env:
