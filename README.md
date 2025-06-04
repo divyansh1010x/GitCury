@@ -77,13 +77,20 @@ gitcury -h
 ```bash
 # Pull the latest image
 docker pull lakshyajain1503/gitcury:latest
-
+```
+To use gitcury like a native command:
+```bash
 # Run GitCury in a container
+sudo tee /usr/local/bin/gitcury > /dev/null << 'EOF'
+#!/bin/bash
 docker run -it --rm \
-  -v "$(pwd):/app/data" \
-  -v "$HOME/.gitconfig:/home/gitcuryuser/.gitconfig:ro" \
-  -v "$HOME/.gitcury:/home/gitcuryuser/.gitcury" \
-  lakshyajain1503/gitcury:latest --help
+  -v "\$(pwd):/app/data" \
+  -v "\$HOME/.gitconfig:/home/gitcuryuser/.gitconfig:ro" \
+  -v "\$HOME/.gitcury:/home/gitcuryuser/.gitcury" \
+  lakshyajain1503/gitcury:latest "\$@"
+EOF
+
+sudo chmod +x /usr/local/bin/gitcury
 ```
 
 </details>
