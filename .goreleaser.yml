@@ -31,9 +31,9 @@ archives:
       - LICENSE
       - README.md
       - config.json.example
-
+      
 snapshot:
-  version_template: "{{ .Tag }}-next"
+  name_template: "{{ .Tag }}-next"
 
 changelog:
   sort: asc
