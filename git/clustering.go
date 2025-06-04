@@ -181,15 +181,15 @@ func SmartClusterFiles(changedFiles []string, rootFolder string, targetClusters 
 		}
 	}
 
-	// Layer 4: Smart sampling for large file sets
-	if config.IsMethodEnabled(config.SemanticMethod) && len(changedFiles) > clusteringConfig.MaxFilesForSemanticClustering {
-		return smartSamplingClustering(changedFiles, rootFolder, targetClusters, useThresholdClustering)
-	}
+	// // Layer 4: Smart sampling for large file sets
+	// if config.IsMethodEnabled(config.SemanticMethod) && len(changedFiles) > clusteringConfig.MaxFilesForSemanticClustering {
+	// 	return smartSamplingClustering(changedFiles, rootFolder, targetClusters, useThresholdClustering)
+	// }
 
 	// Layer 5: Full semantic clustering (fallback)
-	if config.IsMethodEnabled(config.SemanticMethod) {
-		return fullSemanticClustering(changedFiles, rootFolder, targetClusters, useThresholdClustering)
-	}
+	// if config.IsMethodEnabled(config.SemanticMethod) {
+	// 	return fullSemanticClustering(changedFiles, rootFolder, targetClusters, useThresholdClustering)
+	// }
 
 	// If all methods are disabled, fall back to single file clusters
 	utils.Warning("[GIT.CLUSTER]: All clustering methods disabled, using single file clusters")
@@ -628,18 +628,18 @@ func executeSpecificMethod(files []string, rootFolder string, targetClusters int
 		clusters, _ := patternBasedClustering(files, targetClusters)
 		return clusters, nil
 
-	case "cached":
-		if !config.IsMethodEnabled(config.CachedMethod) {
-			return nil, fmt.Errorf("cached clustering method is disabled")
-		}
-		clusters, _, _ := cachedEmbeddingClustering(files, rootFolder, targetClusters)
-		return clusters, nil
+	// case "cached":
+	// 	if !config.IsMethodEnabled(config.CachedMethod) {
+	// 		return nil, fmt.Errorf("cached clustering method is disabled")
+	// 	}
+	// 	clusters, _, _ := cachedEmbeddingClustering(files, rootFolder, targetClusters)
+	// 	return clusters, nil
 
-	case "semantic":
-		if !config.IsMethodEnabled(config.SemanticMethod) {
-			return nil, fmt.Errorf("semantic clustering method is disabled")
-		}
-		return fullSemanticClustering(files, rootFolder, targetClusters, useThresholdClustering)
+	// case "semantic":
+	// 	if !config.IsMethodEnabled(config.SemanticMethod) {
+	// 		return nil, fmt.Errorf("semantic clustering method is disabled")
+	// 	}
+	// 	return fullSemanticClustering(files, rootFolder, targetClusters, useThresholdClustering)
 
 	default:
 		return nil, fmt.Errorf("unknown clustering method: %s", methodName)

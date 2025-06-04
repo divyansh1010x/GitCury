@@ -40,6 +40,8 @@ GitCury revolutionizes your Git workflow by combining the power of AI with seaml
 - 🐳 **Docker Ready** - Full containerization support for consistent environments
 - 📊 **Progress Tracking** - Real-time progress indicators for all operations
 - 🔧 **Highly Configurable** - Extensive configuration options to match your workflow
+- 🔄 **Grouping and Clustering** - Automatically group related changes for better commit organization
+- ⚙️ **Parallelism** - Leverage multi-threaded processing for faster operations across repositories
 
 ## 🚀 Quick Start
 
@@ -121,13 +123,31 @@ gitcury config check
 Generate AI-powered commit messages:
 ```bash
 # For all repositories
-gitcury msgs --all
+gitcury getmsgs --all
 
 # For specific repository
-gitcury msgs --root /path/to/repo
+gitcury getmsgs --root /path/to/repo
 
 # Generate multiple message options
-gitcury msgs --all --num 3
+gitcury getmsgs --all --num 3
+
+#Generate messages while grouping files into clusters
+gitcury getmsgs --all -g
+
+#Generate messages while grouping files into specific number of clusters
+gitcury getmsgs --all -g --num 3
+```
+
+Change the Clustering Default Method
+```bash
+# For Directory based Clustering
+gitcury config set --key defaultMethod --value directory
+
+# For pattern based Clustering
+gitcury config set --key defaultMethod --value pattern
+
+# For semantic (embedding based) Clustering
+gitcury config set --key defaultMethod --value semantic
 ```
 
 Commit with generated messages:
@@ -248,6 +268,7 @@ gc msgs --all && gc commit --all && gc push --all
 | [📋 Release Guide](./RELEASE_GUIDE.md) | Complete release process and versioning information |
 | [🔄 Versioning Strategy](./VERSIONING.md) | Semantic versioning and release strategy |
 | [📊 Test Coverage Report](./COVERAGE_REPORT.md) | Comprehensive testing metrics and coverage analysis |
+| [📊 Performance Report](./PERFORMANCE_REPORT.md) | Comprehensive performance metrices of all grouping methods|
 
 ### Advanced Configuration
 
